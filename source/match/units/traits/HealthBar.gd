@@ -39,8 +39,8 @@ func _recalulate_bar_value():
 	if _unit.hp == null or _unit.hp_max == null:
 		return
 	var old_value = _actual_bar.texture.gradient.get_offset(1)
-	var new_value = float(_unit.hp) / _unit.hp_max
-	new_value = new_value if not is_equal_approx(new_value, 1.0) else 1.1  # fixing 1px gap
+	var raw_ratio = float(_unit.hp) / _unit.hp_max
+	var new_value = floor(raw_ratio * 10.0) / 10.0 if not is_equal_approx(raw_ratio, 1.0) else 1.1
 	_actual_bar.texture.gradient.set_offset(1, new_value)
 	if _bar_value_initialized and old_value != new_value:
 		_show_for_a_while()
@@ -51,12 +51,14 @@ func _show_for_a_while():
 	if visible:
 		return
 	show()
+	_name_label.hide()
 	_visibility_timer.start(BAR_AUTO_VISIBILITY_DURATION)
 
 
 func _on_unit_selected():
 	_visibility_timer.stop()
 	show()
+	_name_label.show()
 
 
 func _on_unit_deselected():
