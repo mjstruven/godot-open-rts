@@ -8,6 +8,14 @@ const Human = preload("res://source/match/players/human/Human.gd")
 const CommandCenter = preload("res://source/match/units/CommandCenter.tscn")
 const Drone = preload("res://source/match/units/Drone.tscn")
 const Worker = preload("res://source/match/units/Worker.tscn")
+const Engineer = preload("res://source/match/units/engineer.tscn")
+const Infantry = preload("res://source/match/units/infantry.tscn")
+const Archer = preload("res://source/match/units/archer.tscn")
+const Cavalry = preload("res://source/match/units/cavalry.tscn")
+const GrainMill = preload("res://source/match/units/grain_mill.tscn")
+const LumberMill = preload("res://source/match/units/lumber_mill.tscn")
+const StoneMill = preload("res://source/match/units/stone_mill.tscn")
+const Capital = preload("res://source/match/units/capital.tscn")
 
 @export var settings: Resource = null
 
@@ -108,6 +116,10 @@ func _create_players_from_settings():
 		var player_scene = Constants.Match.Player.CONTROLLER_SCENES[player_settings.controller]
 		var player = player_scene.instantiate()
 		player.color = player_settings.color
+		player.food = 1000
+		player.wood = 1000
+		player.stone = 1000
+		player.gold = 1000
 		if player_settings.spawn_index_offset > 0:
 			for _i in range(player_settings.spawn_index_offset):
 				_players.add_child(Node.new())
@@ -115,29 +127,46 @@ func _create_players_from_settings():
 
 
 func _setup_player_units():
+	var spawn_points = map.find_child("SpawnPoints").get_children()
+	var num_players = _players.get_children().filter(func(c): return c is Player).size()
+	var spawn_stride = max(1, spawn_points.size() / max(num_players, 1))
+	var player_num = 0
 	for player in _players.get_children():
 		if not player is Player:
 			continue
-		var player_index = player.get_index()
 		var predefined_units = player.get_children().filter(func(child): return child is Unit)
 		if not predefined_units.is_empty():
 			predefined_units.map(func(unit): _setup_unit_groups(unit, unit.player))
 		else:
-			_spawn_player_units(
-				player, map.find_child("SpawnPoints").get_child(player_index).global_transform
-			)
+			_spawn_player_units(player, spawn_points[player_num * spawn_stride].global_transform)
+		player_num += 1
 
 
 func _spawn_player_units(player, spawn_transform):
-	_setup_and_spawn_unit(CommandCenter.instantiate(), spawn_transform, player, false)
+	_setup_and_spawn_unit(Engineer.instantiate(), spawn_transform, player)
 	_setup_and_spawn_unit(
-		Drone.instantiate(), spawn_transform.translated(Vector3(-2, 0, -2)), player
+		Infantry.instantiate(), spawn_transform.translated(Vector3(2, 0, 0)), player
 	)
 	_setup_and_spawn_unit(
-		Worker.instantiate(), spawn_transform.translated(Vector3(-3, 0, 3)), player
+		Infantry.instantiate(), spawn_transform.translated(Vector3(-2, 0, 0)), player
 	)
 	_setup_and_spawn_unit(
-		Worker.instantiate(), spawn_transform.translated(Vector3(3, 0, 3)), player
+		Archer.instantiate(), spawn_transform.translated(Vector3(0, 0, -2)), player
+	)
+	_setup_and_spawn_unit(
+		Cavalry.instantiate(), spawn_transform.translated(Vector3(0, 0, 2)), player
+	)
+	_setup_and_spawn_unit(
+		Capital.instantiate(), spawn_transform.translated(Vector3(-4, 0, 2)), player, false
+	)
+	_setup_and_spawn_unit(
+		GrainMill.instantiate(), spawn_transform.translated(Vector3(3, 0, 4)), player, false
+	)
+	_setup_and_spawn_unit(
+		LumberMill.instantiate(), spawn_transform.translated(Vector3(3, 0, 0)), player, false
+	)
+	_setup_and_spawn_unit(
+		StoneMill.instantiate(), spawn_transform.translated(Vector3(3, 0, -4)), player, false
 	)
 
 
