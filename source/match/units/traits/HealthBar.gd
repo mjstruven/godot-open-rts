@@ -13,6 +13,7 @@ var _bar_value_initialized = false
 
 @onready var _unit = get_parent()
 @onready var _actual_bar = find_child("ActualBar")
+@onready var _name_label = find_child("NameLabel")
 @onready var _visibility_timer = find_child("Timer")
 
 
@@ -20,6 +21,7 @@ func _ready():
 	if Engine.is_editor_hint():
 		return
 	hide()
+	_name_label.text = _format_unit_name(_unit.type)
 	_recalulate_bar_value()
 	_unit.selected.connect(_on_unit_selected)
 	_unit.deselected.connect(_on_unit_deselected)
@@ -61,3 +63,7 @@ func _on_hp_changed():
 
 func _on_visibility_timer_timeout():
 	hide()
+
+
+func _format_unit_name(type: String) -> String:
+	return " ".join(type.split("_").map(func(w): return w.capitalize()))
