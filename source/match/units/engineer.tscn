@@ -1,0 +1,63 @@
+[gd_scene load_steps=10 format=3 uid="uid://bengnrengr05"]
+
+[ext_resource type="Script" path="res://source/match/units/engineer.gd" id="1_enggd"]
+[ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="2_enghi"]
+[ext_resource type="PackedScene" uid="uid://3c1h14nqdumt" path="res://source/match/units/traits/Selection.tscn" id="3_engse"]
+[ext_resource type="PackedScene" uid="uid://ivlo0e66qocl" path="res://source/match/units/traits/Movement.tscn" id="4_engmv"]
+[ext_resource type="PackedScene" uid="uid://c3ssj2p6voauk" path="res://source/match/units/traits/HealthBar.tscn" id="5_enghb"]
+[ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="6_engta"]
+[ext_resource type="PackedScene" uid="uid://cbbjmres24kgm" path="res://source/match/units/traits/Sparkling.tscn" id="7_engspark"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_engmt"]
+albedo_color = Color(0.99, 0.81, 0.48, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_engmsh"]
+material = SubResource("StandardMaterial3D_engmt")
+size = Vector3(0.45, 0.45, 0.45)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_engcol"]
+size = Vector3(0.45, 0.45, 0.45)
+
+[node name="Engineer" type="Area3D"]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_enggd")
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="Body" type="MeshInstance3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+mesh = SubResource("BoxMesh_engmsh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("BoxShape3D_engcol")
+
+[node name="Highlight" parent="." instance=ExtResource("2_enghi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.35
+
+[node name="Selection" parent="." instance=ExtResource("3_engse")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.35
+
+[node name="Movement" parent="." instance=ExtResource("4_engmv")]
+path_desired_distance = 0.2
+target_desired_distance = 0.2
+path_height_offset = 0.4
+path_max_distance = 0.21
+radius = 0.35
+neighbor_distance = 8.0
+max_neighbors = 40
+time_horizon_agents = 3.0
+speed = 1.5
+
+[node name="HealthBar" parent="." instance=ExtResource("5_enghb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+size = Vector2(80, 10)
+
+[node name="Targetability" parent="." instance=ExtResource("6_engta")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.35
+
+[node name="Sparkling" parent="." instance=ExtResource("7_engspark")]

@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://capgeoart0001"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_capbase"]
+albedo_color = Color(0.99, 0.81, 0.48, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_captower"]
+albedo_color = Color(0.45, 0.30, 0.15, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_capkeep"]
+albedo_color = Color(0.60, 0.42, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_capbase"]
+material = SubResource("StandardMaterial3D_capbase")
+size = Vector3(3.5, 1.5, 3.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_captower"]
+material = SubResource("StandardMaterial3D_captower")
+size = Vector3(0.8, 2.5, 0.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_capkeep"]
+material = SubResource("StandardMaterial3D_capkeep")
+size = Vector3(1.5, 2.5, 1.5)
+
+[node name="Geometry" type="Node3D"]
+
+[node name="Base" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+mesh = SubResource("BoxMesh_capbase")
+
+[node name="TowerNW" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35, 1.25, -1.35)
+mesh = SubResource("BoxMesh_captower")
+
+[node name="TowerNE" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, 1.25, -1.35)
+mesh = SubResource("BoxMesh_captower")
+
+[node name="TowerSW" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35, 1.25, 1.35)
+mesh = SubResource("BoxMesh_captower")
+
+[node name="TowerSE" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, 1.25, 1.35)
+mesh = SubResource("BoxMesh_captower")
+
+[node name="Keep" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+mesh = SubResource("BoxMesh_capkeep")

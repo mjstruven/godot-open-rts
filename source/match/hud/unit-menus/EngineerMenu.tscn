@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://engrmenuartww"]
+
+[ext_resource type="Script" path="res://source/match/hud/unit-menus/EngineerMenu.gd" id="1_engmu"]
+
+[node name="EngineerMenu" type="GridContainer"]
+mouse_filter = 2
+columns = 4
+script = ExtResource("1_engmu")
+
+[node name="Padding" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Padding2" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Padding3" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Padding4" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Padding5" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Padding6" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Padding7" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Padding8" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Padding9" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PlaceGrainMillButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "GM"
+tooltip_text = "Grain Mill - Wood:50, Stone:20"
+
+[node name="PlaceLumberMillButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "LM"
+tooltip_text = "Lumber Mill - Wood:50, Stone:20"
+
+[node name="PlaceStoneMillButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "SM"
+tooltip_text = "Stone Mill - Wood:20, Stone:50"
+
+[node name="PlaceTownCenterButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "TC"
+tooltip_text = "Town Center - Wood:300, Stone:200"
+
+[node name="PlaceCapitalButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "CAP"
+tooltip_text = "Capital - Wood:600, Stone:400"
+
+[connection signal="pressed" from="PlaceGrainMillButton" to="." method="_on_place_grain_mill_button_pressed"]
+[connection signal="pressed" from="PlaceLumberMillButton" to="." method="_on_place_lumber_mill_button_pressed"]
+[connection signal="pressed" from="PlaceStoneMillButton" to="." method="_on_place_stone_mill_button_pressed"]
+[connection signal="pressed" from="PlaceTownCenterButton" to="." method="_on_place_town_center_button_pressed"]
+[connection signal="pressed" from="PlaceCapitalButton" to="." method="_on_place_capital_button_pressed"]

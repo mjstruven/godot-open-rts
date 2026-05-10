@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://tcgeomart0001"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tcbase"]
+albedo_color = Color(0.99, 0.81, 0.48, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tctower"]
+albedo_color = Color(0.55, 0.38, 0.20, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tcroof"]
+albedo_color = Color(0.35, 0.20, 0.10, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tcbase"]
+material = SubResource("StandardMaterial3D_tcbase")
+size = Vector3(2.5, 1.5, 2.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tctower"]
+material = SubResource("StandardMaterial3D_tctower")
+size = Vector3(1.2, 1.0, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tcroof"]
+material = SubResource("StandardMaterial3D_tcroof")
+size = Vector3(0.6, 0.5, 0.6)
+
+[node name="Geometry" type="Node3D"]
+
+[node name="Base" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+mesh = SubResource("BoxMesh_tcbase")
+
+[node name="Tower" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
+mesh = SubResource("BoxMesh_tctower")
+
+[node name="Spire" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+mesh = SubResource("BoxMesh_tcroof")

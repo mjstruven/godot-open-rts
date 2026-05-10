@@ -4,12 +4,16 @@ const VehicleFactory = preload("res://source/match/units/VehicleFactory.gd")
 const AircraftFactory = preload("res://source/match/units/AircraftFactory.gd")
 const CommandCenter = preload("res://source/match/units/CommandCenter.gd")
 const Worker = preload("res://source/match/units/Worker.gd")
+const Engineer = preload("res://source/match/units/engineer.gd")
+const TownCenter = preload("res://source/match/units/town_center.gd")
 
 @onready var _generic_menu = find_child("GenericMenu")
 @onready var _command_center_menu = find_child("CommandCenterMenu")
 @onready var _vehicle_factory_menu = find_child("VehicleFactoryMenu")
 @onready var _aircraft_factory_menu = find_child("AircraftFactoryMenu")
 @onready var _worker_menu = find_child("WorkerMenu")
+@onready var _engineer_menu = find_child("EngineerMenu")
+@onready var _town_center_menu = find_child("TownCenterMenu")
 
 
 func _ready():
@@ -33,6 +37,8 @@ func _hide_all_menus():
 	_vehicle_factory_menu.hide()
 	_aircraft_factory_menu.hide()
 	_worker_menu.hide()
+	_engineer_menu.hide()
+	_town_center_menu.hide()
 
 
 func _try_showing_any_menu():
@@ -63,6 +69,16 @@ func _try_showing_any_menu():
 		_aircraft_factory_menu.unit = selected_controlled_units[0]
 		_aircraft_factory_menu.show()
 		return true
+	if (
+		selected_controlled_units.size() == 1
+		and selected_controlled_units[0] is TownCenter
+		and selected_controlled_units[0].is_constructed()
+	):
+		_town_center_menu.unit = selected_controlled_units[0]
+		_town_center_menu.show()
+		return true
+	if selected_controlled_units.size() == 1 and selected_controlled_units[0] is Engineer:
+		_engineer_menu.show()
 	if selected_controlled_units.size() == 1 and selected_controlled_units[0] is Worker:
 		_worker_menu.show()
 	if selected_controlled_units.size() > 0:
