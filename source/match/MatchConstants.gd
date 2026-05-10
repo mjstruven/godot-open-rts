@@ -343,8 +343,8 @@ class Units:
 		"res://source/match/units/cavalry.tscn": {"food": 2},
 	}
 	const MILL_OUTPUT = {
-		"res://source/match/units/grain_mill.tscn": {"food": 20},
-		"res://source/match/units/lumber_mill.tscn": {"wood": 15},
+		"res://source/match/units/grain_mill.tscn": {"food": 10},
+		"res://source/match/units/lumber_mill.tscn": {"wood": 10},
 		"res://source/match/units/stone_mill.tscn": {"stone": 10},
 	}
 	const PROJECTILES = {
