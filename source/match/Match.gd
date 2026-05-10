@@ -128,8 +128,10 @@ func _create_players_from_settings():
 
 func _setup_player_units():
 	var spawn_points = map.find_child("SpawnPoints").get_children()
-	var num_players = _players.get_children().filter(func(c): return c is Player).size()
-	var spawn_stride = max(1, spawn_points.size() / max(num_players, 1))
+	spawn_points.sort_custom(
+		func(a, b): return (a.global_position.x + a.global_position.z) < (b.global_position.x + b.global_position.z)
+	)
+	var zigzag = _build_zigzag_indices(spawn_points.size())
 	var player_num = 0
 	for player in _players.get_children():
 		if not player is Player:
@@ -138,8 +140,21 @@ func _setup_player_units():
 		if not predefined_units.is_empty():
 			predefined_units.map(func(unit): _setup_unit_groups(unit, unit.player))
 		else:
-			_spawn_player_units(player, spawn_points[player_num * spawn_stride].global_transform)
+			_spawn_player_units(player, spawn_points[zigzag[player_num]].global_transform)
 		player_num += 1
+
+
+func _build_zigzag_indices(count: int) -> Array:
+	var result = []
+	var lo = 0
+	var hi = count - 1
+	while lo <= hi:
+		result.append(lo)
+		lo += 1
+		if lo <= hi:
+			result.append(hi)
+			hi -= 1
+	return result
 
 
 func _spawn_player_units(player, spawn_transform):

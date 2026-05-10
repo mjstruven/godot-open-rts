@@ -23,10 +23,16 @@ func _ready():
 	hide()
 	_name_label.text = _format_unit_name(_unit.type)
 	_recalulate_bar_value()
+	_set_bar_color()
 	_unit.selected.connect(_on_unit_selected)
 	_unit.deselected.connect(_on_unit_deselected)
 	_unit.hp_changed.connect(_on_hp_changed)
 	_visibility_timer.timeout.connect(_on_visibility_timer_timeout)
+
+
+func _set_bar_color():
+	var color = Color.GREEN if _unit.is_in_group("controlled_units") else Color.RED
+	_actual_bar.texture.gradient.set_color(0, color)
 
 
 func _recalulate_bar_value():
