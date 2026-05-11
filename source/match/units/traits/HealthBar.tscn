@@ -4,7 +4,7 @@
 
 [sub_resource type="Gradient" id="Gradient_gked8"]
 resource_local_to_scene = true
-interpolation_mode = 1
+interpolation_mode = 2
 offsets = PackedFloat32Array(0, 0.75)
 colors = PackedColorArray(0, 1, 0, 1, 0.292969, 0.292969, 0.292969, 1)
 
@@ -31,9 +31,9 @@ billboard = 1
 no_depth_test = true
 render_priority = 1
 pixel_size = 0.01
-font_size = 10
+font_size = 28
 modulate = Color(1, 1, 1, 1)
-outline_size = 0
+outline_size = 3
 
 [node name="Timer" type="Timer" parent="."]
 one_shot = true
