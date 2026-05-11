@@ -74,4 +74,4 @@ func _on_visibility_timer_timeout():
 
 
 func _format_unit_name(type: String) -> String:
-	return " ".join(type.split("_").map(func(w): return w.capitalize()))
+	return " ".join(Array(type.split("_")).map(func(w): return w.capitalize()))
