@@ -1,0 +1,67 @@
+[gd_scene load_steps=12 format=3 uid="uid://blmblmblmlm02"]
+
+[ext_resource type="Script" path="res://source/match/units/lumber_mill.gd" id="1_lmll"]
+[ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="2_lmhi"]
+[ext_resource type="PackedScene" uid="uid://3c1h14nqdumt" path="res://source/match/units/traits/Selection.tscn" id="3_lmse"]
+[ext_resource type="PackedScene" uid="uid://d4cwip5hpxlmo" path="res://source/match/units/traits/MovementObstacle.tscn" id="4_lmmo"]
+[ext_resource type="PackedScene" uid="uid://c3ssj2p6voauk" path="res://source/match/units/traits/HealthBar.tscn" id="5_lmhb"]
+[ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="6_lmta"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lmbase"]
+albedo_color = Color(0.99, 0.81, 0.48, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lmtop"]
+albedo_color = Color(0.3, 0.15, 0.05, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lmbase"]
+material = SubResource("StandardMaterial3D_lmbase")
+size = Vector3(1.5, 1.2, 1.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lmtop"]
+material = SubResource("StandardMaterial3D_lmtop")
+size = Vector3(0.8, 0.5, 0.8)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_lmcol"]
+height = 1.5
+radius = 1.2
+
+[node name="LumberMill" type="Area3D"]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_lmll")
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="Base" type="MeshInstance3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+mesh = SubResource("BoxMesh_lmbase")
+
+[node name="Tower" type="MeshInstance3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
+mesh = SubResource("BoxMesh_lmtop")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+shape = SubResource("CylinderShape3D_lmcol")
+
+[node name="Highlight" parent="." instance=ExtResource("2_lmhi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 1.2
+
+[node name="Selection" parent="." instance=ExtResource("3_lmse")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 1.2
+
+[node name="MovementObstacle" parent="." instance=ExtResource("4_lmmo")]
+radius = 1.2
+vertices = PackedVector3Array(0, 0, -0.85, 0.6, 0, -0.6, 0.85, 0, 0, 0.6, 0, 0.6, 0, 0, 0.85, -0.6, 0, 0.6, -0.85, 0, 0, -0.6, 0, -0.6)
+affect_navigation_mesh = true
+path_height_offset = 0.6
+
+[node name="HealthBar" parent="." instance=ExtResource("5_lmhb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+size = Vector2(160, 10)
+
+[node name="Targetability" parent="." instance=ExtResource("6_lmta")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 1.2

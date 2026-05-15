@@ -1,5 +1,7 @@
 extends Node3D
 
+signal _initial_bake_done
+
 const DOMAIN = Constants.Match.Navigation.Domain.TERRAIN
 
 var _earliest_frame_to_perform_next_rebake = null
@@ -49,10 +51,15 @@ func bake(map):
 	)
 	for node in get_tree().get_nodes_in_group("terrain_navigation_input"):
 		node.remove_from_group("terrain_navigation_input")
-	NavigationServer3D.bake_from_source_geometry_data(
-		_navigation_region.navigation_mesh, _map_geometry
+	NavigationServer3D.bake_from_source_geometry_data_async(
+		_navigation_region.navigation_mesh, _map_geometry, _on_initial_bake_done
 	)
+	await _initial_bake_done
+
+
+func _on_initial_bake_done():
 	_sync_navmesh_changes()
+	_initial_bake_done.emit()
 
 
 func _rebake():

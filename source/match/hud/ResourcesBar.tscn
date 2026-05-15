@@ -8,63 +8,88 @@ script = ExtResource("1_saxre")
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
 theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
+theme_override_constants/margin_top = 3
 theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
+theme_override_constants/margin_bottom = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 0
+theme_override_constants/separation = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer"]
+[node name="HBoxFood" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-tooltip_text = "RESOURCE_A"
-theme_override_constants/separation = 14
+theme_override_constants/separation = 6
 
-[node name="Control" type="Control" parent="MarginContainer/HBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(26, 0)
+[node name="FoodColorRect" type="ColorRect" parent="MarginContainer/VBoxContainer/HBoxFood"]
+custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
-mouse_filter = 2
+color = Color(0.2, 0.8, 0.2, 1)
 
-[node name="ResourceAColorRect" type="ColorRect" parent="MarginContainer/HBoxContainer/HBoxContainer/Control"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-rotation = 0.785398
-pivot_offset = Vector2(13, 13)
-mouse_filter = 2
+[node name="FoodIcon" type="Label" parent="MarginContainer/VBoxContainer/HBoxFood"]
+layout_mode = 2
+text = "Food:"
 
-[node name="ResourceALabel" type="Label" parent="MarginContainer/HBoxContainer/HBoxContainer"]
+[node name="FoodLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxFood"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "0"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer"]
+[node name="HBoxWood" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-tooltip_text = "RESOURCE_B"
-theme_override_constants/separation = 14
+theme_override_constants/separation = 6
 
-[node name="Control2" type="Control" parent="MarginContainer/HBoxContainer/HBoxContainer2"]
-custom_minimum_size = Vector2(26, 0)
+[node name="WoodColorRect" type="ColorRect" parent="MarginContainer/VBoxContainer/HBoxWood"]
+custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
-mouse_filter = 2
+color = Color(0.5, 0.3, 0.1, 1)
 
-[node name="ResourceBColorRect" type="ColorRect" parent="MarginContainer/HBoxContainer/HBoxContainer2/Control2"]
-custom_minimum_size = Vector2(26, 0)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-rotation = 0.785398
-pivot_offset = Vector2(13, 13)
-mouse_filter = 2
+[node name="WoodIcon" type="Label" parent="MarginContainer/VBoxContainer/HBoxWood"]
+layout_mode = 2
+text = "Wood:"
 
-[node name="ResourceBLabel" type="Label" parent="MarginContainer/HBoxContainer/HBoxContainer2"]
+[node name="WoodLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxWood"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "0"
+
+[node name="HBoxStone" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="StoneColorRect" type="ColorRect" parent="MarginContainer/VBoxContainer/HBoxStone"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+color = Color(0.6, 0.6, 0.6, 1)
+
+[node name="StoneIcon" type="Label" parent="MarginContainer/VBoxContainer/HBoxStone"]
+layout_mode = 2
+text = "Stone:"
+
+[node name="StoneLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxStone"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "0"
+
+[node name="HBoxGold" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="GoldColorRect" type="ColorRect" parent="MarginContainer/VBoxContainer/HBoxGold"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+color = Color(1, 0.85, 0, 1)
+
+[node name="GoldIcon" type="Label" parent="MarginContainer/VBoxContainer/HBoxGold"]
+layout_mode = 2
+text = "Gold:"
+
+[node name="GoldLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxGold"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "0"
+
+[node name="DeficitLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+visible = false
+text = "! FOOD DEFICIT"
+modulate = Color(1, 0.2, 0.2, 1)

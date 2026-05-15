@@ -8,7 +8,7 @@ const Human = preload("res://source/match/players/human/Human.gd")
 
 
 func _ready():
-	await find_parent("Match").ready
+	await MatchSignals.match_started
 	_hide_all_bars()
 	_setup_all_bars()
 	var human_players = get_tree().get_nodes_in_group("players").filter(

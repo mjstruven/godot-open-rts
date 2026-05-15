@@ -2,16 +2,25 @@ extends Node3D
 
 signal changed
 
-@export var resource_a = 0:
+@export var food = 0:
 	set(value):
-		resource_a = value
+		food = value
 		emit_changed()
-@export var resource_b = 0:
+@export var wood = 0:
 	set(value):
-		resource_b = value
+		wood = value
+		emit_changed()
+@export var stone = 0:
+	set(value):
+		stone = value
+		emit_changed()
+@export var gold = 0:
+	set(value):
+		gold = value
 		emit_changed()
 @export var color = Color.WHITE
 
+var has_deficit = false
 var _color_material = null
 
 

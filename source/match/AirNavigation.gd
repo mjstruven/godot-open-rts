@@ -29,7 +29,8 @@ func bake(map):
 	_reference_static_collider_shape.shape = shape
 	_reference_static_collider_shape.global_transform.origin.x = map.size.x / 2.0
 	_reference_static_collider_shape.global_transform.origin.z = map.size.y / 2.0
-	_navigation_region.bake_navigation_mesh(false)
+	_navigation_region.bake_navigation_mesh(true)
+	await _navigation_region.bake_finished
 
 
 func _safety_checks():

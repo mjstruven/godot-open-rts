@@ -71,16 +71,13 @@ func _hit_target():
 	_unit.set_meta(
 		"next_attack_availability_time", Time.get_ticks_msec() + int(_unit.attack_interval * 1000.0)
 	)
-	var projectile = (
-		load(
-			Constants.Match.Units.PROJECTILES[_unit.get_script().resource_path.replace(
-				".gd", ".tscn"
-			)]
-		)
-		. instantiate()
-	)
-	projectile.target_unit = _target_unit
-	_unit.add_child(projectile)
+	var unit_scene_path = _unit.get_script().resource_path.replace(".gd", ".tscn")
+	if unit_scene_path in Constants.Match.Units.PROJECTILES:
+		var projectile = load(Constants.Match.Units.PROJECTILES[unit_scene_path]).instantiate()
+		projectile.target_unit = _target_unit
+		_unit.add_child(projectile)
+	else:
+		_target_unit.hp -= _unit.attack_damage
 	_schedule_hit()
 
 

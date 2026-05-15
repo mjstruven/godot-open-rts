@@ -5,9 +5,6 @@ const Structure = preload("res://source/match/units/Structure.gd")
 const Player = preload("res://source/match/players/Player.gd")
 const Human = preload("res://source/match/players/human/Human.gd")
 
-const CommandCenter = preload("res://source/match/units/CommandCenter.tscn")
-const Drone = preload("res://source/match/units/Drone.tscn")
-const Worker = preload("res://source/match/units/Worker.tscn")
 const Engineer = preload("res://source/match/units/engineer.tscn")
 const Infantry = preload("res://source/match/units/infantry.tscn")
 const Archer = preload("res://source/match/units/archer.tscn")
@@ -43,7 +40,7 @@ func _enter_tree():
 
 func _ready():
 	MatchSignals.setup_and_spawn_unit.connect(_setup_and_spawn_unit)
-	_setup_subsystems_dependent_on_map()
+	await _setup_subsystems_dependent_on_map()
 	_setup_players()
 	_setup_player_units()
 	visible_player = get_tree().get_nodes_in_group("players")[settings.visible_player]
@@ -91,7 +88,7 @@ func _setup_subsystems_dependent_on_map():
 	_terrain.update_shape(map.find_child("Terrain").mesh)
 	fog_of_war.resize(map.size)
 	_recalculate_camera_bounding_planes(map.size)
-	navigation.setup(map)
+	await navigation.setup(map)
 
 
 func _recalculate_camera_bounding_planes(map_size: Vector2):

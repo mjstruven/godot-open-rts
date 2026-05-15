@@ -24,6 +24,7 @@ collision_mask = 0
 script = ExtResource("1_enggd")
 
 [node name="Geometry" type="Node3D" parent="."]
+scale = Vector3(0.25, 0.25, 0.25)
 
 [node name="Body" type="MeshInstance3D" parent="Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
@@ -53,7 +54,7 @@ time_horizon_agents = 3.0
 speed = 1.5
 
 [node name="HealthBar" parent="." instance=ExtResource("5_enghb")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 size = Vector2(80, 10)
 
 [node name="Targetability" parent="." instance=ExtResource("6_engta")]

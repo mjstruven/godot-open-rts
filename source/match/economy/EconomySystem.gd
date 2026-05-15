@@ -25,12 +25,6 @@ func _process_player(player):
 		func(u): return u.player == player
 	)
 
-	for unit in all_units:
-		if unit.is_in_group("mills") and unit.is_supply_chain_active():
-			var scene_path = unit.get_script().resource_path.replace(".gd", ".tscn")
-			if scene_path in Constants.Match.Units.MILL_OUTPUT:
-				player.add_resources(Constants.Match.Units.MILL_OUTPUT[scene_path])
-
 	var upkeep = {"food": 0}
 	for unit in all_units:
 		var scene_path = unit.get_script().resource_path.replace(".gd", ".tscn")
