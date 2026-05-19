@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://c44uv86osgfps"]
+[gd_scene load_steps=2 format=3 uid="uid://c44uv86osgfps"]
 
 [ext_resource type="Script" path="res://source/match/terrain/TerrainVisualSystem.gd" id="1_tvs"]
 
@@ -6,3 +6,4 @@
 script = ExtResource("1_tvs")
 
 [node name="GroundMesh" type="MeshInstance3D" parent="."]
+cast_shadow = 0
