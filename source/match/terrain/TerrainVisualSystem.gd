@@ -57,5 +57,3 @@ func _terrain_to_color(terrain_type: int) -> Color:
 		TerrainRegion.Type.ELEVATED:
 			return Color(0.50, 0.80, 0.28)
 	return Color(0.55, 0.75, 0.35)
-
-
