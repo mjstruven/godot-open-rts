@@ -69,40 +69,43 @@ func _ready():
 
 
 func _add_terrain_visual() -> void:
-	var color = TERRAIN_COLORS_3D.get(terrain_type)
-	if color == null:
-		return
-	# Measure world-space extents from the parent transform's basis column lengths.
-	# This lets the flat overlay match the region's scale without inheriting its rotation.
-	var sx: float = global_transform.basis.x.length()
-	var sz: float = global_transform.basis.z.length()
-	var mesh_inst := MeshInstance3D.new()
-	var plane := PlaneMesh.new()
-	plane.size = Vector2(10.0 * sx, 10.0 * sz)
-	mesh_inst.mesh = plane
-	var mat := StandardMaterial3D.new()
-	if terrain_type == Type.ROCKY:
-		const TEX_PATH = "res://assets/textures/terrain/rocky-rugged-terrain_1_albedo.png"
-		var tex = load(TEX_PATH)
-		if tex == null:
-			GameLogger.debug(GameLogger.Category.STARTUP, "Rocky texture failed to load", {"path": TEX_PATH})
-		else:
-			GameLogger.debug(GameLogger.Category.STARTUP, "Rocky texture loaded OK", {"size": str(tex.get_size())})
-		mat.albedo_texture = tex
-		const TILE_SIZE := 5.0
-		mat.uv1_scale = Vector3(plane.size.x / TILE_SIZE, plane.size.y / TILE_SIZE, 1.0)
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		mat.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
-	else:
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		mat.albedo_color = color
-	mesh_inst.material_override = mat
-	mesh_inst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(mesh_inst)
-	# top_level removes parent transform inheritance so the plane is always world-horizontal.
-	mesh_inst.top_level = true
-	mesh_inst.global_transform = Transform3D(Basis.IDENTITY, global_position + Vector3(0, 0.003, 0))
+	# REPLACED BY TerrainVisualSystem
+	# Original code preserved below
+	pass
+	#var color = TERRAIN_COLORS_3D.get(terrain_type)
+	#if color == null:
+	#	return
+	## Measure world-space extents from the parent transform's basis column lengths.
+	## This lets the flat overlay match the region's scale without inheriting its rotation.
+	#var sx: float = global_transform.basis.x.length()
+	#var sz: float = global_transform.basis.z.length()
+	#var mesh_inst := MeshInstance3D.new()
+	#var plane := PlaneMesh.new()
+	#plane.size = Vector2(10.0 * sx, 10.0 * sz)
+	#mesh_inst.mesh = plane
+	#var mat := StandardMaterial3D.new()
+	#if terrain_type == Type.ROCKY:
+	#	const TEX_PATH = "res://assets/textures/terrain/rocky-rugged-terrain_1_albedo.png"
+	#	var tex = load(TEX_PATH)
+	#	if tex == null:
+	#		GameLogger.debug(GameLogger.Category.STARTUP, "Rocky texture failed to load", {"path": TEX_PATH})
+	#	else:
+	#		GameLogger.debug(GameLogger.Category.STARTUP, "Rocky texture loaded OK", {"size": str(tex.get_size())})
+	#	mat.albedo_texture = tex
+	#	const TILE_SIZE := 5.0
+	#	mat.uv1_scale = Vector3(plane.size.x / TILE_SIZE, plane.size.y / TILE_SIZE, 1.0)
+	#	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	#	mat.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
+	#else:
+	#	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	#	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	#	mat.albedo_color = color
+	#mesh_inst.material_override = mat
+	#mesh_inst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	#add_child(mesh_inst)
+	## top_level removes parent transform inheritance so the plane is always world-horizontal.
+	#mesh_inst.top_level = true
+	#mesh_inst.global_transform = Transform3D(Basis.IDENTITY, global_position + Vector3(0, 0.003, 0))
 
 
 static func _get_shadow_mat() -> StandardMaterial3D:

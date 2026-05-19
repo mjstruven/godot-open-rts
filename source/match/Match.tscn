@@ -1,4 +1,4 @@
-[gd_scene load_steps=52 format=3 uid="uid://camns8fqod8d4"]
+[gd_scene load_steps=53 format=3 uid="uid://camns8fqod8d4"]
 
 [ext_resource type="Script" path="res://source/match/Match.gd" id="1_1555u"]
 [ext_resource type="Script" path="res://source/match/IsometricCamera3D.gd" id="1_qb2ry"]
@@ -35,6 +35,7 @@
 [ext_resource type="PackedScene" uid="uid://leftpanelart0001" path="res://source/match/hud/LeftPanel.tscn" id="36_leftpanel"]
 [ext_resource type="PackedScene" uid="uid://unitinfobox00001" path="res://source/match/hud/UnitInfoBox.tscn" id="37_unitinfo"]
 [ext_resource type="PackedScene" uid="uid://chatbox00001" path="res://source/match/hud/ChatBox.tscn" id="38_chatbox"]
+[ext_resource type="PackedScene" uid="uid://c44uv86osgfps" path="res://source/match/terrain/TerrainVisualSystem.tscn" id="39_tvs"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ysb0j"]
 sun_angle_max = 200.0
@@ -163,7 +164,10 @@ environment = SubResource("Environment_qxcnu")
 
 [node name="RectangularSelection3D" parent="." instance=ExtResource("5_yi0pu")]
 
+[node name="TerrainVisualSystem" parent="." instance=ExtResource("39_tvs")]
+
 [node name="GroundBase" type="MeshInstance3D" parent="."]
+visible = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, 0)
 cast_shadow = 0
 mesh = SubResource("PlaneMesh_groundbase")
