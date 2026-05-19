@@ -36,8 +36,6 @@ func _build_mesh() -> void:
 	_mesh_instance.material_override = mat
 	_material = mat
 
-	get_tree().create_timer(10.0).timeout.connect(_delayed_mesh_check)
-
 	GameLogger.info(GameLogger.Category.STARTUP, "TerrainVisualSystem generated", {
 		"texture_size": "256x256",
 		"mesh_size": "260x260",
@@ -61,9 +59,3 @@ func _terrain_to_color(terrain_type: int) -> Color:
 	return Color(0.55, 0.75, 0.35)
 
 
-func _delayed_mesh_check() -> void:
-	print("10s check - mesh visible: ", _mesh_instance.visible)
-	print("10s check - mesh in tree: ", _mesh_instance.is_inside_tree())
-	print("10s check - material: ", _mesh_instance.material_override)
-	print("10s check - mesh set: ", _mesh_instance.mesh != null)
-	print("10s check - render layers: ", _mesh_instance.layers)
