@@ -31,7 +31,8 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\matti\\\\godot-open-rts\" -Recurse -Filter \"project.godot\")",
       "Bash(Select-Object -First 1 -ExpandProperty FullName)",
       "Bash(Test-Path *)",
-      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\matti\\\\godot-open-rts\\\\assets\\\\textures\\\\terrain\" -ErrorAction SilentlyContinue)"
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\matti\\\\godot-open-rts\\\\assets\\\\textures\\\\terrain\" -ErrorAction SilentlyContinue)",
+      "Bash(Get-ChildItem *)"
     ]
   }
 }

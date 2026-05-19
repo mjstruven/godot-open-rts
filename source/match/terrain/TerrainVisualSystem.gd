@@ -134,15 +134,15 @@ func _terrain_to_height(terrain_type: int) -> float:
 		TerrainRegion.Type.GRASSLAND:
 			return 0.0
 		TerrainRegion.Type.FOREST:
-			return 0.3
+			return 0.0
 		TerrainRegion.Type.ROCKY:
-			return 0.8
+			return 0.0
 		TerrainRegion.Type.FERTILE_LAND:
 			return 0.0
 		TerrainRegion.Type.FORD:
-			return -0.5
+			return 0.0
 		TerrainRegion.Type.ELEVATED:
-			return 2.0
+			return 0.0
 	return 0.0
 
 

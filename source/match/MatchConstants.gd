@@ -33,6 +33,12 @@ const MAPS = {
 		"players": 2,
 		"size": Vector2i(256, 256),
 	},
+	"res://source/match/maps/TestTerrainMap.tscn":
+	{
+		"name": "Terrain Test Map",
+		"players": 2,
+		"size": Vector2i(128, 128),
+	},
 }
 
 
