@@ -1,0 +1,56 @@
+[gd_scene load_steps=8 format=3 uid="uid://labrlabr0001"]
+
+[ext_resource type="Script" path="res://source/match/units/laborer.gd" id="1_labrg"]
+[ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="2_labrhi"]
+[ext_resource type="PackedScene" uid="uid://3c1h14nqdumt" path="res://source/match/units/traits/Selection.tscn" id="3_labrse"]
+[ext_resource type="PackedScene" uid="uid://ivlo0e66qocl" path="res://source/match/units/traits/Movement.tscn" id="4_labrmv"]
+[ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="5_labrta"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_labrmt"]
+albedo_color = Color(0.55, 0.38, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_labrmsh"]
+material = SubResource("StandardMaterial3D_labrmt")
+size = Vector3(0.45, 0.45, 0.45)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_labrcol"]
+size = Vector3(0.45, 0.45, 0.45)
+
+[node name="Laborer" type="Area3D"]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_labrg")
+
+[node name="Geometry" type="Node3D" parent="."]
+scale = Vector3(0.25, 0.25, 0.25)
+
+[node name="Body" type="MeshInstance3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+mesh = SubResource("BoxMesh_labrmsh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("BoxShape3D_labrcol")
+
+[node name="Highlight" parent="." instance=ExtResource("2_labrhi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.35
+
+[node name="Selection" parent="." instance=ExtResource("3_labrse")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.35
+
+[node name="Movement" parent="." instance=ExtResource("4_labrmv")]
+path_desired_distance = 0.2
+target_desired_distance = 0.2
+path_height_offset = 0.4
+path_max_distance = 0.21
+radius = 0.01
+neighbor_distance = 8.0
+max_neighbors = 40
+time_horizon_agents = 3.0
+speed = 0.375
+
+[node name="Targetability" parent="." instance=ExtResource("5_labrta")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.35

@@ -1,0 +1,269 @@
+[gd_scene load_steps=5 format=3 uid="uid://roughmap0001"]
+
+[ext_resource type="PackedScene" uid="uid://b7c1crf36x1li" path="res://source/match/Map.tscn" id="1_map"]
+[ext_resource type="PackedScene" uid="uid://terrainreg0001" path="res://source/match/terrain/TerrainRegion.tscn" id="2_trgn"]
+[ext_resource type="Material" uid="uid://co8vfcoqqs5i8" path="res://source/match/resources/materials/terrain.material.tres" id="3_mat"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_rm1"]
+resource_local_to_scene = true
+material = ExtResource("3_mat")
+size = Vector2(260, 260)
+center_offset = Vector3(128, 0, 128)
+
+[node name="Map" instance=ExtResource("1_map")]
+size = Vector2(256, 256)
+
+[node name="Terrain" parent="Geometry" index="1"]
+mesh = SubResource("PlaneMesh_rm1")
+
+[node name="Marker3D" type="Marker3D" parent="SpawnPoints" index="0"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 16, 0, 16)
+
+[node name="Marker3D2" type="Marker3D" parent="SpawnPoints" index="1"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 240, 0, 240)
+
+[node name="TerrainRegions" type="Node3D" parent="."]
+
+[node name="ForestNwTop" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(4.0595, 0, -1.4774, 0, 1, 0, 0.3694, 0, 1.0148, 12, 0, 3)
+terrain_type = 1
+
+[node name="ForestNwLeft" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(0.8694, 0, 0.2329, 0, 1, 0, -0.8384, 0, 3.1295, 2.5, 0, 15)
+terrain_type = 1
+
+[node name="ForestNe" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.9363, 0, -1.3693, 0, 1, 0, 1.5214, 0, 3.2627, 241, 0, 14)
+terrain_type = 1
+
+[node name="ForestNeB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.7063, 0, 0.9850, 0, 1, 0, -1.1081, 0, 3.0447, 248, 0, 10)
+terrain_type = 1
+
+[node name="ForestNeC" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(1.9303, 0, -1.6198, 0, 1, 0, 1.8513, 0, 2.2061, 243, 0, 21)
+terrain_type = 1
+
+[node name="ForestSw" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(3.2627, 0, 1.5214, 0, 1, 0, -1.5214, 0, 3.2627, 16, 0, 240)
+terrain_type = 1
+
+[node name="ForestSwB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.8058, 0, -1.6200, 0, 1, 0, 1.6200, 0, 2.8058, 10, 0, 245)
+terrain_type = 1
+
+[node name="ForestSwC" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.2061, 0, 1.8513, 0, 1, 0, -1.8513, 0, 2.2061, 19, 0, 247)
+terrain_type = 1
+
+[node name="ForestSeLeft" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(1.0431, 0, -0.2795, 0, 1, 0, 1.4908, 0, 5.5636, 217, 0, 240)
+terrain_type = 1
+
+[node name="ForestSeBottom" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(4.3978, 0, 1.6006, 0, 1, 0, -0.3694, 0, 1.0148, 233, 0, 253)
+terrain_type = 1
+
+[node name="ForestInteriorTop" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.6102, 0, -1.2172, 0, 1, 0, 1.2172, 0, 2.6102, 52, 0, 23)
+terrain_type = 1
+
+[node name="ForestInteriorTopB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.1823, 0, 1.2600, 0, 1, 0, -1.3500, 0, 2.3382, 61, 0, 30)
+terrain_type = 1
+
+[node name="ForestNearCenter" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.4941, 0, -1.4400, 0, 1, 0, 1.4400, 0, 2.4941, 116, 0, 86)
+terrain_type = 1
+
+[node name="ForestNearCenterB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(1.9303, 0, 1.6198, 0, 1, 0, -1.6198, 0, 1.9303, 125, 0, 95)
+terrain_type = 1
+
+[node name="ForestCenterLeft" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.8756, 0, -1.0465, 0, 1, 0, 1.1628, 0, 3.1950, 56, 0, 118)
+terrain_type = 1
+
+[node name="ForestCenterLeftB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.3593, 0, 1.6520, 0, 1, 0, -1.8585, 0, 2.6543, 67, 0, 127)
+terrain_type = 1
+
+[node name="ForestCenterLeftC" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(1.8725, 0, -1.6861, 0, 1, 0, 1.9271, 0, 2.1402, 58, 0, 132)
+terrain_type = 1
+
+[node name="ForestCenterRight" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.9363, 0, 1.3693, 0, 1, 0, -1.5214, 0, 3.2627, 175, 0, 126)
+terrain_type = 1
+
+[node name="ForestCenterRightB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.3593, 0, -1.6520, 0, 1, 0, 1.8585, 0, 2.6543, 167, 0, 135)
+terrain_type = 1
+
+[node name="ForestCenterRightC" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(1.8725, 0, 1.6861, 0, 1, 0, -1.9271, 0, 2.1402, 176, 0, 137)
+terrain_type = 1
+
+[node name="FertileP1" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.7190, 0, -1.2678, 0, 1, 0, 1.2678, 0, 2.7190, 43, 0, 57)
+terrain_type = 0
+
+[node name="FertileP1B" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.2938, 0, 1.6060, 0, 1, 0, -1.6060, 0, 2.2938, 51, 0, 64)
+terrain_type = 0
+
+[node name="FertileP1Secondary" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(1.9734, 0, 0.7182, 0, 1, 0, -0.7661, 0, 2.1049, 23, 0, 96)
+terrain_type = 0
+
+[node name="FertileP1SecondaryB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.4248, 0, -1.4000, 0, 1, 0, 1.5000, 0, 2.5980, 30, 0, 105)
+terrain_type = 0
+
+[node name="FertileCenterLeft" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(3.7588, 0, -1.3680, 0, 1, 0, 1.0944, 0, 3.0070, 79, 0, 151)
+terrain_type = 0
+
+[node name="FertileCenterLeftB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.9492, 0, 2.0650, 0, 1, 0, -1.7208, 0, 2.4576, 89, 0, 159)
+terrain_type = 0
+
+[node name="FertileCenter" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(4.2500, 0, -1.1388, 0, 1, 0, 1.0352, 0, 3.8636, 120, 0, 139)
+terrain_type = 0
+
+[node name="FertileCenterB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(3.4640, 0, 2.0000, 0, 1, 0, -1.8000, 0, 3.1176, 131, 0, 147)
+terrain_type = 0
+
+[node name="FertileCenterC" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.7576, 0, -2.3140, 0, 1, 0, 2.0570, 0, 2.4512, 122, 0, 152)
+terrain_type = 0
+
+[node name="FertileCenterRight" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.4432, 0, 0.8892, 0, 1, 0, -0.8003, 0, 2.1990, 161, 0, 102)
+terrain_type = 0
+
+[node name="FertileCenterRightB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.9492, 0, -2.0650, 0, 1, 0, 2.0650, 0, 2.9492, 152, 0, 111)
+terrain_type = 0
+
+[node name="FertileP2" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(3.6252, 0, -1.6904, 0, 1, 0, 1.3524, 0, 2.9002, 199, 0, 183)
+terrain_type = 0
+
+[node name="FertileP2B" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.9492, 0, 2.0650, 0, 1, 0, -1.7208, 0, 2.4576, 208, 0, 191)
+terrain_type = 0
+
+[node name="FertileP2Secondary" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(3.2626, 0, 1.5214, 0, 1, 0, -0.9298, 0, 1.9938, 209, 0, 215)
+terrain_type = 0
+
+[node name="FertileP2SecondaryB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.7712, 0, -1.6000, 0, 1, 0, 1.0000, 0, 1.7320, 217, 0, 221)
+terrain_type = 0
+
+[node name="RockyCenterLeft" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.9909, 0, -1.3946, 0, 1, 0, 1.3946, 0, 2.9909, 60, 0, 80)
+terrain_type = 2
+
+[node name="RockyCenterLeftB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.4576, 0, 1.7208, 0, 1, 0, -1.7208, 0, 2.4576, 71, 0, 89)
+terrain_type = 2
+
+[node name="RockyCenterLeftC" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(1.6971, 0, -1.6971, 0, 1, 0, 1.9092, 0, 1.9092, 61, 0, 94)
+terrain_type = 2
+
+[node name="RockyCenter" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(3.3830, 0, 1.2312, 0, 1, 0, -1.1286, 0, 3.1010, 103, 0, 115)
+terrain_type = 2
+
+[node name="RockyCenterB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.7033, 0, -1.8929, 0, 1, 0, 1.7208, 0, 2.4576, 113, 0, 125)
+terrain_type = 2
+
+[node name="RockyCenterC" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(1.9092, 0, 1.9092, 0, 1, 0, -1.9092, 0, 1.9092, 102, 0, 128)
+terrain_type = 2
+
+[node name="RockyCenterRight" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.5980, 0, -1.5000, 0, 1, 0, 1.5000, 0, 2.5980, 106, 0, 166)
+terrain_type = 2
+
+[node name="RockyCenterRightB" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.0682, 0, 1.7355, 0, 1, 0, -1.9284, 0, 2.2980, 115, 0, 175)
+terrain_type = 2
+
+[node name="FordWest" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.6, 36, 0, 68)
+terrain_type = 4
+
+[node name="FordWestCrossing" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(1.6, 0, 0, 0, 1, 0, 0, 0, 0.8, 40, 0, 76)
+terrain_type = 4
+
+[node name="FordMidWest" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.4, 36, 0, 103)
+terrain_type = 4
+
+[node name="FordMidCrossing" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(1.6, 0, 0, 0, 1, 0, 0, 0, 0.8, 40, 0, 114)
+terrain_type = 4
+
+[node name="FordEast" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.6, 152, 0, 58)
+terrain_type = 4
+
+[node name="FordEastCrossing" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 0.8, 158, 0, 74)
+terrain_type = 4
+
+[node name="FordEastMid" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 4.2, 152, 0, 99)
+terrain_type = 4
+
+[node name="FordEastCrossing2" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.8, 0, 0, 0, 1, 0, 0, 0, 0.8, 162, 0, 120)
+terrain_type = 4
+
+[node name="FordEastSouth" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 2.6, 152, 0, 137)
+terrain_type = 4
+
+[node name="FordCentral" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1.6, 120, 0, 104)
+terrain_type = 4
+
+[node name="FordSouthCentral" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.4, 0, 0, 0, 1, 0, 0, 0, 1.6, 136, 0, 164)
+terrain_type = 4
+
+[node name="ElevationMesa" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.6, 0, 0, 0, 1, 0, 0, 0, 2.6, 126, 0, 120)
+terrain_type = 5
+
+[node name="ElevationNorthHill" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.6, 0, 0, 0, 1, 0, 0, 0, 2.6, 114, 0, 26)
+terrain_type = 5
+
+[node name="ElevationSwHill" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(2.08, 0, 0, 0, 1, 0, 0, 0, 2.6, 52, 0, 210)
+terrain_type = 5
+
+[node name="ElevationBrOuter" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(3.64, 0, 0, 0, 1, 0, 0, 0, 3.64, 190, 0, 210)
+terrain_type = 5
+
+[node name="ElevationBrInner" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(1.56, 0, 0, 0, 1, 0, 0, 0, 2.08, 192, 0, 212)
+terrain_type = 5
+
+[node name="SpawnFertile1" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(0.7518, 0, -0.2736, 0, 1, 0, 0.2052, 0, 0.5638, 22, 0, 21)
+terrain_type = 0
+
+[node name="SpawnFertile2" parent="TerrainRegions" instance=ExtResource("2_trgn")]
+transform = Transform3D(0.7518, 0, 0.2736, 0, 1, 0, -0.2052, 0, 0.5638, 234, 0, 235)
+terrain_type = 0

@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://terrainreg0001"]
+
+[ext_resource type="Script" path="res://source/match/terrain/TerrainRegion.gd" id="1_trgn"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_trbox"]
+size = Vector3(10.0, 2.0, 10.0)
+
+[node name="TerrainRegion" type="Area3D"]
+collision_layer = 8
+collision_mask = 2
+monitoring = true
+script = ExtResource("1_trgn")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_trbox")

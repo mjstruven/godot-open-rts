@@ -17,6 +17,7 @@ var attack_damage = null
 var attack_interval = null
 var attack_range = null
 var attack_domains = []
+var effect_radius = null
 var radius:
 	get = _get_radius
 var movement_domain:
@@ -37,6 +38,8 @@ var global_position_yless:
 		return global_position * Vector3(1, 0, 1)
 var type:
 	get = _get_type
+
+var action_queue: Array = []
 
 var _action_locked = false
 
@@ -171,6 +174,19 @@ func _setup_default_properties_from_constants():
 		set(property, default_properties[property])
 
 
+func queue_action(entry: Dictionary):
+	action_queue.append(entry)
+	if action == null:
+		_drain_action_queue()
+
+
+func _drain_action_queue():
+	if not action_queue.is_empty():
+		action_queue.pop_front()["create"].call()
+
+
 func _on_action_node_tree_exited(action_node):
 	assert(action_node == action, "unexpected action released")
 	action = null
+	if not _action_locked:
+		_drain_action_queue()

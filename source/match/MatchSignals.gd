@@ -24,3 +24,8 @@ signal unit_production_finished(unit, producer_unit)
 signal unit_construction_finished(unit)
 signal not_enough_resources_for_production(player)
 signal not_enough_resources_for_construction(player)
+signal formation_changed
+signal combat_command_requested(command)
+signal unit_focus_changed(focused_controlled_units)
+signal targeting_mode_changed(command)
+signal suppress_state_changed(unit, state, auto_refresh)

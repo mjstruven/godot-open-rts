@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=3 uid="uid://camns8fqod8d4"]
+[gd_scene load_steps=52 format=3 uid="uid://camns8fqod8d4"]
 
 [ext_resource type="Script" path="res://source/match/Match.gd" id="1_1555u"]
 [ext_resource type="Script" path="res://source/match/IsometricCamera3D.gd" id="1_qb2ry"]
@@ -30,6 +30,11 @@
 [ext_resource type="PackedScene" uid="uid://ck6vrgdyg7hja" path="res://source/match/handlers/UnitGroupSelectionHandler.tscn" id="27_j2drv"]
 [ext_resource type="PackedScene" uid="uid://b8p6lcwubx1tp" path="res://source/match/handlers/UnitVisibilityHandler.tscn" id="32_fci1c"]
 [ext_resource type="Script" path="res://source/match/economy/EconomySystem.gd" id="33_ecosy"]
+[ext_resource type="PackedScene" uid="uid://topbarart000001" path="res://source/match/hud/TopBar.tscn" id="34_topbar"]
+[ext_resource type="PackedScene" uid="uid://alertfeedart001" path="res://source/match/hud/AlertFeed.tscn" id="35_alertfeed"]
+[ext_resource type="PackedScene" uid="uid://leftpanelart0001" path="res://source/match/hud/LeftPanel.tscn" id="36_leftpanel"]
+[ext_resource type="PackedScene" uid="uid://unitinfobox00001" path="res://source/match/hud/UnitInfoBox.tscn" id="37_unitinfo"]
+[ext_resource type="PackedScene" uid="uid://chatbox00001" path="res://source/match/hud/ChatBox.tscn" id="38_chatbox"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ysb0j"]
 sun_angle_max = 200.0
@@ -119,6 +124,15 @@ shader_parameter/reference_texture = SubResource("ViewportTexture_vu2gm")
 [sub_resource type="ViewportTexture" id="ViewportTexture_8q44e"]
 viewport_path = NodePath("HUD/MarginContainer/Minimap/MarginContainer/MinimapViewport")
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_groundbase"]
+shading_mode = 0
+albedo_color = Color(0.55, 0.75, 0.35, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_groundbase"]
+material = SubResource("StandardMaterial3D_groundbase")
+size = Vector2(260, 260)
+center_offset = Vector3(128, 0, 128)
+
 [node name="Match" type="Node3D"]
 script = ExtResource("1_1555u")
 
@@ -148,6 +162,11 @@ directional_shadow_pancake_size = 100.0
 environment = SubResource("Environment_qxcnu")
 
 [node name="RectangularSelection3D" parent="." instance=ExtResource("5_yi0pu")]
+
+[node name="GroundBase" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, 0)
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_groundbase")
 
 [node name="Terrain" type="StaticBody3D" parent="."]
 collision_mask = 0
@@ -275,8 +294,8 @@ navigation_mesh = SubResource("NavigationMesh_exfwj")
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -215.0
-offset_right = 215.0
+offset_top = -150.0
+offset_right = 150.0
 grow_vertical = 0
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_bottom = 5
@@ -339,7 +358,8 @@ color = Color(0, 0, 0, 1)
 
 [node name="CameraIndicator" type="Line2D" parent="HUD/MarginContainer/Minimap/MarginContainer/MinimapViewport"]
 points = PackedVector2Array(5, 5, 5, 30, 30, 30, 30, 5, 5, 5)
-width = 1.0
+default_color = Color(1, 1, 1, 0.85)
+width = 1.5
 begin_cap_mode = 1
 end_cap_mode = 1
 antialiased = true
@@ -350,6 +370,7 @@ texture = SubResource("ViewportTexture_8q44e")
 stretch_mode = 5
 
 [node name="MarginContainer2" type="MarginContainer" parent="HUD"]
+visible = false
 offset_right = 40.0
 offset_bottom = 11.0
 theme_override_constants/margin_left = 5
@@ -396,16 +417,72 @@ grow_vertical = 0
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HUD/MarginContainer3"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MarginContainer3"]
+layout_mode = 2
+alignment = 2
+theme_override_constants/separation = 8
+
+[node name="UnitInfoBox" parent="HUD/MarginContainer3/HBoxContainer" instance=ExtResource("37_unitinfo")]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/MarginContainer3/HBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="ProductionQueue" parent="HUD/MarginContainer3/VBoxContainer" instance=ExtResource("13_qv3xn")]
+[node name="ProductionQueue" parent="HUD/MarginContainer3/HBoxContainer/VBoxContainer" instance=ExtResource("13_qv3xn")]
 layout_mode = 2
 
-[node name="UnitMenus" parent="HUD/MarginContainer3/VBoxContainer" instance=ExtResource("13_6cypl")]
+[node name="UnitMenus" parent="HUD/MarginContainer3/HBoxContainer/VBoxContainer" instance=ExtResource("13_6cypl")]
 layout_mode = 2
 size_flags_horizontal = 8
+
+[node name="TopBarContainer" type="MarginContainer" parent="HUD"]
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+grow_vertical = 1
+
+[node name="TopBar" parent="HUD/TopBarContainer" instance=ExtResource("34_topbar")]
+layout_mode = 2
+
+[node name="LeftPanelContainer" type="MarginContainer" parent="HUD"]
+offset_top = 65.0
+offset_right = 216.0
+offset_bottom = 350.0
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+
+[node name="LeftPanel" parent="HUD/LeftPanelContainer" instance=ExtResource("36_leftpanel")]
+layout_mode = 2
+
+[node name="ChatContainer" type="MarginContainer" parent="HUD"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -280.0
+offset_right = 290.0
+offset_bottom = -118.0
+grow_vertical = 0
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="ChatBox" parent="HUD/ChatContainer" instance=ExtResource("38_chatbox")]
+layout_mode = 2
+
+[node name="AlertContainer" type="MarginContainer" parent="HUD"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -420.0
+offset_right = 220.0
+offset_bottom = -220.0
+grow_vertical = 0
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="AlertFeed" parent="HUD/AlertContainer" instance=ExtResource("35_alertfeed")]
+layout_mode = 2
 
 [node name="Menu" parent="." instance=ExtResource("22_ofmlu")]
 visible = false

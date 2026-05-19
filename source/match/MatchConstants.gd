@@ -15,6 +15,24 @@ const MAPS = {
 		"players": 8,
 		"size": Vector2i(100, 100),
 	},
+	"res://source/match/maps/RoughMap1NotMirrored.tscn":
+	{
+		"name": "Rough Map 1 (Asymmetric)",
+		"players": 2,
+		"size": Vector2i(256, 256),
+	},
+	"res://source/match/maps/SiegeOfAshenmoor.tscn":
+	{
+		"name": "The Siege of Ashenmoor",
+		"players": 2,
+		"size": Vector2i(256, 256),
+	},
+	"res://source/match/maps/TheFertileCrescent.tscn":
+	{
+		"name": "The Fertile Crescent",
+		"players": 2,
+		"size": Vector2i(256, 256),
+	},
 }
 
 
@@ -72,15 +90,22 @@ class Resources:
 
 
 class Units:
+	const FLAG_COMMANDER_LIMIT = 1
 	const PRODUCTION_COSTS = {
 		"res://source/match/units/infantry.tscn": {"food": 15},
 		"res://source/match/units/archer.tscn": {"food": 10, "wood": 10},
 		"res://source/match/units/cavalry.tscn": {"food": 25, "gold": 5},
+		"res://source/match/units/engineer.tscn": {"food": 20, "wood": 10},
+		"res://source/match/units/supply_train.tscn": {"food": 80, "gold": 40},
+		"res://source/match/units/flag_commander/flag_commander.tscn": {"gold": 150},
 	}
 	const PRODUCTION_TIMES = {
 		"res://source/match/units/infantry.tscn": 6.0,
 		"res://source/match/units/archer.tscn": 12.0,
 		"res://source/match/units/cavalry.tscn": 12.0,
+		"res://source/match/units/engineer.tscn": 10.0,
+		"res://source/match/units/supply_train.tscn": 45.0,
+		"res://source/match/units/flag_commander/flag_commander.tscn": 30.0,
 	}
 	const PRODUCTION_QUEUE_LIMIT = 5
 	const STRUCTURE_BLUEPRINTS = {
@@ -90,7 +115,11 @@ class Units:
 		"res://source/match/units/structure-geometries/LumberMillGeometry.tscn",
 		"res://source/match/units/stone_mill.tscn":
 		"res://source/match/units/structure-geometries/StoneMillGeometry.tscn",
-		"res://source/match/units/town_center.tscn":
+		"res://source/match/units/house.tscn":
+		"res://source/match/units/structure-geometries/GrainMillGeometry.tscn",
+		"res://source/match/units/manor.tscn":
+		"res://source/match/units/structure-geometries/GrainMillGeometry.tscn",
+		"res://source/match/units/academy.tscn":
 		"res://source/match/units/structure-geometries/TownCenterGeometry.tscn",
 		"res://source/match/units/capital.tscn":
 		"res://source/match/units/structure-geometries/CapitalGeometry.tscn",
@@ -99,16 +128,18 @@ class Units:
 		"res://source/match/units/grain_mill.tscn": {"wood": 50, "stone": 20},
 		"res://source/match/units/lumber_mill.tscn": {"wood": 50, "stone": 20},
 		"res://source/match/units/stone_mill.tscn": {"wood": 20, "stone": 50},
-		"res://source/match/units/town_center.tscn": {"wood": 300, "stone": 200},
+		"res://source/match/units/house.tscn": {"wood": 100, "stone": 50},
+		"res://source/match/units/manor.tscn": {"stone": 100},
+		"res://source/match/units/academy.tscn": {"wood": 300, "stone": 200},
 		"res://source/match/units/capital.tscn": {"wood": 600, "stone": 400},
 	}
 	const DEFAULT_PROPERTIES = {
 		"res://source/match/units/infantry.tscn":
 		{
 			"sight_range": 7.0,
-			"hp": 6,
-			"hp_max": 6,
-			"attack_damage": 2,
+			"hp": 60,
+			"hp_max": 60,
+			"attack_damage": 20,
 			"attack_interval": 2.0,
 			"attack_range": 1.0,
 			"attack_domains": [Navigation.Domain.TERRAIN],
@@ -116,46 +147,98 @@ class Units:
 		"res://source/match/units/archer.tscn":
 		{
 			"sight_range": 12.0,
-			"hp": 4,
-			"hp_max": 4,
+			"hp": 40,
+			"hp_max": 40,
 			"attack_damage": 6,
 			"attack_interval": 6.0,
-			"attack_range": 10.0,
+			"attack_range": 15.0,
 			"attack_domains": [Navigation.Domain.TERRAIN],
 		},
 		"res://source/match/units/cavalry.tscn":
 		{
 			"sight_range": 8.0,
-			"hp": 16,
-			"hp_max": 16,
-			"attack_damage": 4,
+			"hp": 160,
+			"hp_max": 160,
+			"attack_damage": 40,
 			"attack_interval": 2.0,
 			"attack_range": 1.0,
 			"attack_domains": [Navigation.Domain.TERRAIN],
 		},
 		"res://source/match/units/supply_wagon_auto.tscn":
 		{
-			"sight_range": 5.0,
-			"hp": 8,
-			"hp_max": 8,
+			"sight_range": 2.5,
+			"hp": 80,
+			"hp_max": 80,
+		},
+		"res://source/match/units/supply_train_wagon.tscn":
+		{
+			"sight_range": 2.5,
+			"hp": 80,
+			"hp_max": 80,
+		},
+		"res://source/match/units/supply_train.tscn":
+		{
+			"sight_range": 10.0,
+			"hp": 500,
+			"hp_max": 500,
 		},
 		"res://source/match/units/engineer.tscn":
 		{
 			"sight_range": 6.0,
-			"hp": 8,
-			"hp_max": 8,
+			"hp": 80,
+			"hp_max": 80,
 		},
-		"res://source/match/units/grain_mill.tscn": {"sight_range": 5.0, "hp": 20, "hp_max": 20},
-		"res://source/match/units/lumber_mill.tscn": {"sight_range": 5.0, "hp": 20, "hp_max": 20},
-		"res://source/match/units/stone_mill.tscn": {"sight_range": 5.0, "hp": 20, "hp_max": 20},
-		"res://source/match/units/town_center.tscn": {"sight_range": 8.0, "hp": 400, "hp_max": 400},
-		"res://source/match/units/capital.tscn": {"sight_range": 10.0, "hp": 800, "hp_max": 800},
+		"res://source/match/units/laborer.tscn":
+		{
+			"sight_range": 4.0,
+			"hp": 12,
+			"hp_max": 12,
+		},
+		"res://source/match/units/grain_mill.tscn": {"sight_range": 5.0, "hp": 200, "hp_max": 200},
+		"res://source/match/units/lumber_mill.tscn": {"sight_range": 5.0, "hp": 200, "hp_max": 200},
+		"res://source/match/units/stone_mill.tscn": {"sight_range": 5.0, "hp": 200, "hp_max": 200},
+		"res://source/match/units/house.tscn": {"sight_range": 5.0, "hp": 800, "hp_max": 800},
+		"res://source/match/units/manor.tscn": {"sight_range": 6.0, "hp": 1000, "hp_max": 1000},
+		"res://source/match/units/academy.tscn": {"sight_range": 8.0, "hp": 4000, "hp_max": 4000},
+		"res://source/match/units/capital.tscn": {"sight_range": 10.0, "hp": 8000, "hp_max": 8000},
+		"res://source/match/units/flag_commander/flag_commander.tscn":
+		{
+			"sight_range": 8.0,
+			"hp": 32,
+			"hp_max": 32,
+			"attack_damage": 4,
+			"attack_interval": 2.0,
+			"attack_range": 1.0,
+			"attack_domains": [Navigation.Domain.TERRAIN],
+		},
 	}
+	const SUPPLY_TRAIN_BUILD_LIMIT = 2
+	# All upkeep values are per minute, applied once per 60-second economy tick.
 	const UPKEEP = {
-		"res://source/match/units/infantry.tscn": {"food": 1},
-		"res://source/match/units/archer.tscn": {"food": 1},
-		"res://source/match/units/cavalry.tscn": {"food": 2},
+		"res://source/match/units/infantry.tscn": {"food": 4},
+		"res://source/match/units/archer.tscn": {"food": 5, "gold": 1},
+		"res://source/match/units/cavalry.tscn": {"food": 8, "gold": 4},
+		"res://source/match/units/supply_train.tscn": {"food": 8, "gold": 6},
+		"res://source/match/units/flag_commander/flag_commander.tscn": {"gold": 2},
+		# Future units — add entries here when the scenes exist:
+		# "res://source/match/units/mercenary.tscn": {"food": 10, "gold": 8},
+		# "res://source/match/units/battering_ram.tscn": {"gold": 4},
+		# "res://source/match/units/trebuchet.tscn": {"gold": 8},
 	}
+	# Income from constructed buildings, per minute, applied each 60-second tick.
+	# Mill food/wood/stone income is handled separately via supply wagons (60/min each).
+	const BUILDING_INCOME = {
+		"res://source/match/units/capital.tscn": {"food": 60, "wood": 60, "stone": 60, "gold": 60},
+		"res://source/match/units/house.tscn": {"gold": 10},
+		"res://source/match/units/manor.tscn": {"gold": 100},
+		# Future buildings:
+		# "res://source/match/units/tavern.tscn": {"gold": 5},
+	}
+	const CAPITAL_INFLUENCE_RADIUS = 20.0
+	const POPULATION_PER_CAPITAL = 0
+	const POPULATION_PER_HOUSE = 10
+	const POPULATION_PER_MANOR = 25
+	const POPULATION_CAP_MAX = 100
 	const PROJECTILES = {}
 	const ADHERENCE_MARGIN_M = 0.3  # TODO: try lowering while fixing a 'push' problem
 	const NEW_RESOURCE_SEARCH_RADIUS_M = 30

@@ -5,6 +5,7 @@ const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTa
 
 func _ready():
 	await super()
+	add_to_group("population_units")
 	action_changed.connect(_on_action_changed)
 	action = WaitingForTargets.new()
 

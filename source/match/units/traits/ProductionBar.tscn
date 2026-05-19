@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://prodbarart00001"]
+
+[ext_resource type="Script" path="res://source/match/units/traits/ProductionBar.gd" id="1_pb"]
+
+[sub_resource type="Gradient" id="Gradient_pb"]
+resource_local_to_scene = true
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0)
+colors = PackedColorArray(1, 1, 1, 1, 0.15, 0.15, 0.15, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_pb"]
+resource_local_to_scene = true
+gradient = SubResource("Gradient_pb")
+width = 200
+height = 6
+
+[node name="ProductionBar" type="Node3D"]
+script = ExtResource("1_pb")
+
+[node name="ActualBar" type="Sprite3D" parent="."]
+billboard = 1
+transparent = false
+no_depth_test = true
+texture_filter = 1
+render_priority = 1
+texture = SubResource("GradientTexture2D_pb")

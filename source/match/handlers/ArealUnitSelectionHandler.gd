@@ -1,5 +1,7 @@
 extends Node3D
 
+const Structure = preload("res://source/match/units/Structure.gd")
+
 @export var rectangular_selection_3d: NodePath
 
 var _rectangular_selection_3d = null
@@ -39,6 +41,8 @@ func _get_controlled_units_from_navigation_domain_within_topdown_polygon_2d(
 	var units_within_polygon = Utils.Set.new()
 	for unit in get_tree().get_nodes_in_group("controlled_units"):
 		if not unit.visible or unit.movement_domain != navigation_domain:
+			continue
+		if unit is Structure:
 			continue
 		var unit_position_2d = Vector2(unit.transform.origin.x, unit.transform.origin.z)
 		if Geometry2D.is_point_in_polygon(unit_position_2d, topdown_polygon_2d):

@@ -7,6 +7,48 @@ mouse_filter = 2
 columns = 4
 script = ExtResource("1_engmu")
 
+[node name="PlaceGrainMillButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "GM"
+tooltip_text = "Grain Mill - Wood:50, Stone:20 [Q]"
+
+[node name="PlaceLumberMillButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "LM"
+tooltip_text = "Lumber Mill - Wood:50, Stone:20 [W]"
+
+[node name="PlaceStoneMillButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "SM"
+tooltip_text = "Stone Mill - Wood:20, Stone:50 [E]"
+
+[node name="PlaceTownCenterButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "ACD"
+tooltip_text = "Academy - Wood:300, Stone:200 [R]"
+
+[node name="PlaceCapitalButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "CAP"
+tooltip_text = "Capital - Wood:600, Stone:400 [A]"
+
+[node name="PlaceHouseButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "HSE"
+tooltip_text = "House - Wood:100, Stone:50 | +10 pop cap | +10g/min [S]"
+
+[node name="PlaceManorButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "MNR"
+tooltip_text = "Manor - Stone:100 | Place on a mill | +25 pop cap | +100g/min | +50% food [D]"
+
 [node name="Padding" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
@@ -52,38 +94,10 @@ custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="PlaceGrainMillButton" type="Button" parent="."]
-layout_mode = 2
-focus_mode = 0
-text = "GM"
-tooltip_text = "Grain Mill - Wood:50, Stone:20"
-
-[node name="PlaceLumberMillButton" type="Button" parent="."]
-layout_mode = 2
-focus_mode = 0
-text = "LM"
-tooltip_text = "Lumber Mill - Wood:50, Stone:20"
-
-[node name="PlaceStoneMillButton" type="Button" parent="."]
-layout_mode = 2
-focus_mode = 0
-text = "SM"
-tooltip_text = "Stone Mill - Wood:20, Stone:50"
-
-[node name="PlaceTownCenterButton" type="Button" parent="."]
-layout_mode = 2
-focus_mode = 0
-text = "TC"
-tooltip_text = "Town Center - Wood:300, Stone:200"
-
-[node name="PlaceCapitalButton" type="Button" parent="."]
-layout_mode = 2
-focus_mode = 0
-text = "CAP"
-tooltip_text = "Capital - Wood:600, Stone:400"
-
 [connection signal="pressed" from="PlaceGrainMillButton" to="." method="_on_place_grain_mill_button_pressed"]
 [connection signal="pressed" from="PlaceLumberMillButton" to="." method="_on_place_lumber_mill_button_pressed"]
 [connection signal="pressed" from="PlaceStoneMillButton" to="." method="_on_place_stone_mill_button_pressed"]
 [connection signal="pressed" from="PlaceTownCenterButton" to="." method="_on_place_town_center_button_pressed"]
 [connection signal="pressed" from="PlaceCapitalButton" to="." method="_on_place_capital_button_pressed"]
+[connection signal="pressed" from="PlaceHouseButton" to="." method="_on_place_house_button_pressed"]
+[connection signal="pressed" from="PlaceManorButton" to="." method="_on_place_manor_button_pressed"]

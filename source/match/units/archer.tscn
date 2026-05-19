@@ -24,7 +24,7 @@ size = Vector3(0.05, 0.6, 0.05)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_archcol"]
 height = 0.6
-radius = 0.4
+radius = 0.2
 
 [node name="Archer" type="Area3D"]
 collision_layer = 2
@@ -55,11 +55,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 radius = 0.4
 
 [node name="Movement" parent="." instance=ExtResource("4_archmv")]
-path_desired_distance = 0.25
-target_desired_distance = 0.25
+path_desired_distance = 0.125
+target_desired_distance = 0.125
 path_height_offset = 0.6
-path_max_distance = 0.26
-radius = 0.4
+path_max_distance = 0.13
+radius = 0.2
 neighbor_distance = 8.0
 max_neighbors = 40
 time_horizon_agents = 3.0

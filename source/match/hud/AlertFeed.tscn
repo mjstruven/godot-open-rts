@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://alertfeedart001"]
+
+[ext_resource type="Script" path="res://source/match/hud/AlertFeed.gd" id="1_alertfeed"]
+
+[node name="AlertFeed" type="VBoxContainer"]
+script = ExtResource("1_alertfeed")
+theme_override_constants/separation = 2

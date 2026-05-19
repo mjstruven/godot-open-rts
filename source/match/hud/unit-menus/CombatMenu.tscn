@@ -1,0 +1,88 @@
+[gd_scene load_steps=2 format=3 uid="uid://combatmenu00001"]
+
+[ext_resource type="Script" path="res://source/match/hud/unit-menus/CombatMenu.gd" id="1_cmbmnu"]
+
+[node name="CombatMenu" type="GridContainer"]
+mouse_filter = 2
+columns = 4
+script = ExtResource("1_cmbmnu")
+
+[node name="AttackMoveButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "AM"
+tooltip_text = "Attack Move [Q]"
+
+[node name="PatrolButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "PA"
+tooltip_text = "Patrol [W]"
+
+[node name="StandGroundButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "SG"
+tooltip_text = "Stand Ground [E]"
+
+[node name="CaptureButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+disabled = true
+text = "CA"
+tooltip_text = "Capture Structure [R] - Coming soon"
+
+[node name="SuppressButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "SP"
+tooltip_text = "Suppress [S]\nRoot archers. +2 range, +50% fire rate.\nCost: 1 wood per archer per period.\nDuration: 25s | Cooldown: 30s\nLeft-click: single use\nRight-click: auto-refresh"
+
+[node name="RallyButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "RL"
+tooltip_text = "Rally [F]\nBoost nearby allied units: +20% speed, +20% attack rate.\nRadius: 8 tiles. Duration: 15s. Cooldown: 45s."
+
+[node name="Pad6" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad7" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad8" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad9" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad10" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad11" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CancelButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "X"
+tooltip_text = "Cancel action"
+
+[connection signal="pressed" from="AttackMoveButton" to="." method="_on_attack_move_pressed"]
+[connection signal="pressed" from="PatrolButton" to="." method="_on_patrol_pressed"]
+[connection signal="pressed" from="StandGroundButton" to="." method="_on_stand_ground_pressed"]
+[connection signal="pressed" from="CaptureButton" to="." method="_on_capture_pressed"]
+[connection signal="pressed" from="RallyButton" to="." method="_handle_rally_click"]
+[connection signal="pressed" from="CancelButton" to="." method="_on_cancel_button_pressed"]

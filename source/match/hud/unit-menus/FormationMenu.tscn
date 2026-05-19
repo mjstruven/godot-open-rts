@@ -1,0 +1,98 @@
+[gd_scene load_steps=2 format=3 uid="uid://formationmenu001"]
+
+[ext_resource type="Script" path="res://source/match/hud/unit-menus/FormationMenu.gd" id="1_fmmnu"]
+
+[node name="FormationMenu" type="GridContainer"]
+mouse_filter = 2
+columns = 4
+script = ExtResource("1_fmmnu")
+
+[node name="Pass1" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass2" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass3" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass4" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass5" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass6" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass7" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass8" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass9" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass10" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass11" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass12" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="LineButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "LN"
+tooltip_text = "Line Formation [Z]"
+
+[node name="BoxButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "BX"
+tooltip_text = "Box Formation [X]"
+
+[node name="ScatterButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "SC"
+tooltip_text = "Scatter Toggle [C]"
+
+[node name="Pass16" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[connection signal="pressed" from="LineButton" to="." method="_on_line_pressed"]
+[connection signal="pressed" from="BoxButton" to="." method="_on_box_pressed"]
+[connection signal="pressed" from="ScatterButton" to="." method="_on_scatter_pressed"]

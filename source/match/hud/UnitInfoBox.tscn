@@ -1,0 +1,130 @@
+[gd_scene load_steps=2 format=3 uid="uid://unitinfobox00001"]
+
+[ext_resource type="Script" path="res://source/match/hud/UnitInfoBox.gd" id="1_unitinfo"]
+
+[node name="UnitInfoBox" type="PanelContainer"]
+script = ExtResource("1_unitinfo")
+custom_minimum_size = Vector2(230, 0)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="HeaderRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="UnitNameLabel" type="Label" parent="MarginContainer/VBoxContainer/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Unit Name"
+
+[node name="TabHintLabel" type="Label" parent="MarginContainer/VBoxContainer/HeaderRow"]
+layout_mode = 2
+text = "1/2 Tab"
+modulate = Color(0.6, 0.6, 0.6, 1)
+horizontal_alignment = 2
+
+[node name="HpLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "HP: 6 / 6"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="DamageRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="DamageLbl" type="Label" parent="MarginContainer/VBoxContainer/DamageRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Damage:"
+
+[node name="DamageVal" type="Label" parent="MarginContainer/VBoxContainer/DamageRow"]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 2
+
+[node name="AtkSpeedRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="AtkSpeedLbl" type="Label" parent="MarginContainer/VBoxContainer/AtkSpeedRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Atk Speed:"
+
+[node name="AtkSpeedVal" type="Label" parent="MarginContainer/VBoxContainer/AtkSpeedRow"]
+layout_mode = 2
+text = "0.0s"
+horizontal_alignment = 2
+
+[node name="AtkRangeRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="AtkRangeLbl" type="Label" parent="MarginContainer/VBoxContainer/AtkRangeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Atk Range:"
+
+[node name="AtkRangeVal" type="Label" parent="MarginContainer/VBoxContainer/AtkRangeRow"]
+layout_mode = 2
+text = "0.0"
+horizontal_alignment = 2
+
+[node name="SpeedRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpeedLbl" type="Label" parent="MarginContainer/VBoxContainer/SpeedRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Speed:"
+
+[node name="SpeedVal" type="Label" parent="MarginContainer/VBoxContainer/SpeedRow"]
+layout_mode = 2
+text = "0.00"
+horizontal_alignment = 2
+
+[node name="SightRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SightLbl" type="Label" parent="MarginContainer/VBoxContainer/SightRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Sight:"
+
+[node name="SightVal" type="Label" parent="MarginContainer/VBoxContainer/SightRow"]
+layout_mode = 2
+text = "0.0"
+horizontal_alignment = 2
+
+[node name="EffectRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="EffectLbl" type="Label" parent="MarginContainer/VBoxContainer/EffectRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Influence:"
+
+[node name="EffectVal" type="Label" parent="MarginContainer/VBoxContainer/EffectRow"]
+layout_mode = 2
+text = "0.0"
+horizontal_alignment = 2
+
+[node name="CargoRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="CargoLbl" type="Label" parent="MarginContainer/VBoxContainer/CargoRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cargo:"
+
+[node name="CargoVal" type="Label" parent="MarginContainer/VBoxContainer/CargoRow"]
+layout_mode = 2
+text = "Food"
+horizontal_alignment = 2

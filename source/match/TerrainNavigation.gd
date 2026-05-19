@@ -46,9 +46,14 @@ func bake(map):
 	_navigation_region.navigation_mesh.filter_baking_aabb = AABB(
 		Vector3.ZERO, Vector3(map.size.x, 5.0, map.size.y)
 	)
-	NavigationServer3D.parse_source_geometry_data(
-		_navigation_region.navigation_mesh, _map_geometry, get_tree().root
-	)
+	_map_geometry.add_faces(PackedVector3Array([
+		Vector3(0.0, 0.0, 0.0),
+		Vector3(map.size.x, 0.0, 0.0),
+		Vector3(0.0, 0.0, map.size.y),
+		Vector3(map.size.x, 0.0, 0.0),
+		Vector3(map.size.x, 0.0, map.size.y),
+		Vector3(0.0, 0.0, map.size.y),
+	]), Transform3D.IDENTITY)
 	for node in get_tree().get_nodes_in_group("terrain_navigation_input"):
 		node.remove_from_group("terrain_navigation_input")
 	NavigationServer3D.bake_from_source_geometry_data_async(

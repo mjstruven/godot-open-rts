@@ -8,8 +8,6 @@ class Actions:
 	const MovingToUnit = preload("res://source/match/units/actions/MovingToUnit.gd")
 
 
-const Drone = preload("res://source/match/units/Drone.gd")
-
 var _player = null
 var _blacklisted_drone_target_paths = {}
 
@@ -30,10 +28,8 @@ func _initialize_movement_of_current_drones():
 		_navigate_to_random_unit(drone)
 
 
-func _get_current_drones():
-	return get_tree().get_nodes_in_group("units").filter(
-		func(unit): return unit is Drone and unit.player == _player
-	)
+func _get_current_drones() -> Array:
+	return []
 
 
 func _attach_drone(drone):

@@ -2,12 +2,10 @@ extends "res://source/match/units/actions/Action.gd"
 
 enum State { NULL, MOVING_TO_RESOURCE, COLLECTING, MOVING_TO_CC }
 
-const CommandCenter = preload("res://source/match/units/CommandCenter.gd")
 const CollectingResourcesWhileInRange = preload(
 	"res://source/match/units/actions/CollectingResourcesWhileInRange.gd"
 )
 const MovingToUnit = preload("res://source/match/units/actions/MovingToUnit.gd")
-const Worker = preload("res://source/match/units/Worker.gd")
 const ResourceUnit = preload("res://source/match/units/non-player/ResourceUnit.gd")
 
 var _state := State.NULL
@@ -19,18 +17,13 @@ var _sub_action = null
 @onready var _unit = Utils.NodeEx.find_parent_with_group(self, "units")
 
 
-static func is_applicable(source_unit, target_unit):
-	return (
-		(source_unit is Worker and target_unit is ResourceUnit)
-		or (source_unit is Worker and target_unit is CommandCenter and target_unit.is_constructed())
-	)
+static func is_applicable(_src, _tgt):
+	return false
 
 
 func _init(unit):
 	if unit is ResourceUnit:
 		_set_resource_unit(unit)
-	elif unit is CommandCenter:
-		_set_cc_unit(unit)
 
 
 func _ready():
@@ -124,27 +117,8 @@ func _find_closest_resource_unit_in_nearby_area():
 	)
 
 
-static func _find_cc_closest_to_unit(unit):
-	var ccs_of_the_same_player = unit.get_tree().get_nodes_in_group("units").filter(
-		func(a_unit):
-			return (
-				a_unit is CommandCenter and a_unit.player == unit.player and a_unit.is_constructed()
-			)
-	)
-	if ccs_of_the_same_player.is_empty():
-		return null
-	var ccs_sorted_by_distance = ccs_of_the_same_player.map(
-		func(a_unit):
-			return {
-				"distance":
-				(unit.global_position * Vector3(1, 0, 1)).distance_to(
-					a_unit.global_position * Vector3(1, 0, 1)
-				),
-				"cc": a_unit
-			}
-	)
-	ccs_sorted_by_distance.sort_custom(func(a, b): return a["distance"] < b["distance"])
-	return ccs_sorted_by_distance[0]["cc"]
+static func _find_cc_closest_to_unit(_u):
+	return null
 
 
 func _handle_sub_action_finished_while_moving_to_resource():

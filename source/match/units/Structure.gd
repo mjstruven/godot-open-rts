@@ -7,8 +7,14 @@ const UNDER_CONSTRUCTION_MATERIAL = preload(
 )
 
 var _construction_progress = 1.0
+var builder_count: int = 0
+var has_builder: bool:
+	get: return builder_count > 0
 
 @onready var production_queue = find_child("ProductionQueue"):
+	set(_value):
+		pass
+@onready var production_toggle = find_child("ProductionToggle"):
 	set(_value):
 		pass
 
@@ -29,9 +35,9 @@ func mark_as_under_construction():
 func construct(progress):
 	assert(is_under_construction(), "structure must be under construction")
 
-	var expected_hp_before_progressing = int(_construction_progress * float(hp_max - 1))
+	var expected_hp_before_progressing = 1 + int(_construction_progress * float(hp_max - 1))
 	_construction_progress += progress
-	var expected_hp_after_progressing = int(_construction_progress * float(hp_max - 1))
+	var expected_hp_after_progressing = 1 + int(_construction_progress * float(hp_max - 1))
 	if expected_hp_after_progressing > expected_hp_before_progressing:
 		hp += 1
 	if _construction_progress >= 1.0:
@@ -42,6 +48,9 @@ func cancel_construction():
 	var scene_path = get_script().resource_path.replace(".gd", ".tscn")
 	var construction_cost = Constants.Match.Units.CONSTRUCTION_COSTS[scene_path]
 	player.add_resources(construction_cost)
+	if is_in_group("selected_units"):
+		remove_from_group("selected_units")
+		MatchSignals.unit_deselected.emit(self)
 	queue_free()
 
 
@@ -55,6 +64,7 @@ func is_under_construction():
 
 func _finish_construction():
 	_change_geometry_material(null)
+	hp = hp_max
 	if is_inside_tree():
 		constructed.emit()
 		MatchSignals.unit_construction_finished.emit(self)

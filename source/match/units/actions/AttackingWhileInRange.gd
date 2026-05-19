@@ -77,7 +77,14 @@ func _hit_target():
 		projectile.target_unit = _target_unit
 		_unit.add_child(projectile)
 	else:
-		_target_unit.hp -= _unit.attack_damage
+		var damage = _unit.attack_damage
+		# Elevation bonus: attacker on higher ground gains +5% damage.
+		if (
+			TerrainManager.get_elevation_at(_unit.global_position)
+			> TerrainManager.get_elevation_at(_target_unit.global_position)
+		):
+			damage = int(damage * 1.05)
+		_target_unit.hp -= damage
 	_schedule_hit()
 
 

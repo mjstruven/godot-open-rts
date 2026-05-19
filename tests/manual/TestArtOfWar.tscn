@@ -1,22 +1,18 @@
-[gd_scene load_steps=25 format=3 uid="uid://brzkv1napmc5d3"]
+[gd_scene load_steps=21 format=3 uid="uid://brzkv1napmc5d3"]
 
 [ext_resource type="PackedScene" uid="uid://camns8fqod8d4" path="res://source/match/Match.tscn" id="1_aow01"]
 [ext_resource type="Script" path="res://tests/manual/Match.gd" id="2_aow02"]
 [ext_resource type="Script" path="res://source/data-model/MatchSettings.gd" id="3_aow03"]
-[ext_resource type="PackedScene" uid="uid://cbe63rdjw7y4p" path="res://source/match/maps/PlainAndSimple.tscn" id="4_aow04"]
+[ext_resource type="PackedScene" uid="uid://roughmap0001" path="res://source/match/maps/RoughMap1NotMirrored.tscn" id="4_aow04"]
 [ext_resource type="Material" uid="uid://co8vfcoqqs5i8" path="res://source/match/resources/materials/terrain.material.tres" id="5_aow05"]
 [ext_resource type="PackedScene" uid="uid://dh8dedilkhuoy" path="res://source/match/players/human/Human.tscn" id="6_aow06"]
 [ext_resource type="PackedScene" uid="uid://1qlllsy6h5tc" path="res://source/match/players/simple-clairvoyant-ai/SimpleClairvoyantAI.tscn" id="7_aow07"]
-[ext_resource type="PackedScene" uid="uid://bnwgr4k5mj29a" path="res://source/match/units/infantry.tscn" id="9_aow09"]
-[ext_resource type="PackedScene" uid="uid://bpxhs6l7nk3b1" path="res://source/match/units/archer.tscn" id="10_aow10"]
 [ext_resource type="PackedScene" uid="uid://bqyjt8m9ol4c2" path="res://source/match/units/cavalry.tscn" id="11_aow11"]
 [ext_resource type="Shader" path="res://source/shaders/3d/simple_fog_of_war.gdshader" id="12_aow12"]
 [ext_resource type="Shader" path="res://source/shaders/2d/white_transparent.gdshader" id="13_aow13"]
-[ext_resource type="PackedScene" path="res://source/match/units/grain_mill.tscn" id="14_aow14"]
-[ext_resource type="PackedScene" path="res://source/match/units/lumber_mill.tscn" id="15_aow15"]
-[ext_resource type="PackedScene" path="res://source/match/units/stone_mill.tscn" id="16_aow16"]
 [ext_resource type="PackedScene" path="res://source/match/units/engineer.tscn" id="17_aow17"]
 [ext_resource type="PackedScene" path="res://source/match/units/capital.tscn" id="18_aow18"]
+[ext_resource type="PackedScene" uid="uid://housesceneart001" path="res://source/match/units/house.tscn" id="19_aow19"]
 
 [sub_resource type="Resource" id="Resource_aowar"]
 script = ExtResource("3_aow03")
@@ -27,8 +23,8 @@ visible_player = 0
 [sub_resource type="PlaneMesh" id="PlaneMesh_aowar"]
 resource_local_to_scene = true
 material = ExtResource("5_aow05")
-size = Vector2(50, 50)
-center_offset = Vector3(25, 0, 25)
+size = Vector2(260, 260)
+center_offset = Vector3(128, 0, 128)
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_fog"]
 viewport_path = NodePath("FogOfWar/CombinedViewport")
@@ -72,26 +68,32 @@ gold = 1000
 [node name="Engineer" parent="Players/Human" index="0" instance=ExtResource("17_aow17")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 9)
 
-[node name="Infantry" parent="Players/Human" index="1" instance=ExtResource("9_aow09")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 5)
+[node name="Engineer2" parent="Players/Human" index="1" instance=ExtResource("17_aow17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 9)
 
-[node name="Archer" parent="Players/Human" index="2" instance=ExtResource("10_aow10")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 5)
+[node name="Engineer3" parent="Players/Human" index="2" instance=ExtResource("17_aow17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 9)
 
 [node name="Cavalry" parent="Players/Human" index="3" instance=ExtResource("11_aow11")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 5)
 
-[node name="GrainMill" parent="Players/Human" index="4" instance=ExtResource("14_aow14")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, 4)
+[node name="Cavalry2" parent="Players/Human" index="4" instance=ExtResource("11_aow11")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 5)
 
-[node name="LumberMill" parent="Players/Human" index="5" instance=ExtResource("15_aow15")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, 7)
+[node name="Cavalry3" parent="Players/Human" index="5" instance=ExtResource("11_aow11")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 5)
 
-[node name="StoneMill" parent="Players/Human" index="6" instance=ExtResource("16_aow16")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, 10)
-
-[node name="Capital" parent="Players/Human" index="7" instance=ExtResource("18_aow18")]
+[node name="Capital" parent="Players/Human" index="6" instance=ExtResource("18_aow18")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 7)
+
+[node name="House" parent="Players/Human" index="7" instance=ExtResource("19_aow19")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 1)
+
+[node name="House2" parent="Players/Human" index="8" instance=ExtResource("19_aow19")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 7)
+
+[node name="House3" parent="Players/Human" index="9" instance=ExtResource("19_aow19")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 7)
 
 [node name="SimpleClairvoyantAI" parent="Players" index="1" instance=ExtResource("7_aow07")]
 food = 1000
@@ -102,26 +104,32 @@ gold = 1000
 [node name="Engineer" parent="Players/SimpleClairvoyantAI" index="0" instance=ExtResource("17_aow17")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 0, 41)
 
-[node name="Infantry" parent="Players/SimpleClairvoyantAI" index="1" instance=ExtResource("9_aow09")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 0, 45)
+[node name="Engineer2" parent="Players/SimpleClairvoyantAI" index="1" instance=ExtResource("17_aow17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 0, 41)
 
-[node name="Archer" parent="Players/SimpleClairvoyantAI" index="2" instance=ExtResource("10_aow10")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 45)
+[node name="Engineer3" parent="Players/SimpleClairvoyantAI" index="2" instance=ExtResource("17_aow17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 41)
 
 [node name="Cavalry" parent="Players/SimpleClairvoyantAI" index="3" instance=ExtResource("11_aow11")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 0, 45)
 
-[node name="GrainMill" parent="Players/SimpleClairvoyantAI" index="4" instance=ExtResource("14_aow14")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37, 0, 46)
+[node name="Cavalry2" parent="Players/SimpleClairvoyantAI" index="4" instance=ExtResource("11_aow11")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0, 45)
 
-[node name="LumberMill" parent="Players/SimpleClairvoyantAI" index="5" instance=ExtResource("15_aow15")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37, 0, 43)
+[node name="Cavalry3" parent="Players/SimpleClairvoyantAI" index="5" instance=ExtResource("11_aow11")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 45)
 
-[node name="StoneMill" parent="Players/SimpleClairvoyantAI" index="6" instance=ExtResource("16_aow16")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37, 0, 40)
-
-[node name="Capital" parent="Players/SimpleClairvoyantAI" index="7" instance=ExtResource("18_aow18")]
+[node name="Capital" parent="Players/SimpleClairvoyantAI" index="6" instance=ExtResource("18_aow18")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 43)
+
+[node name="House" parent="Players/SimpleClairvoyantAI" index="7" instance=ExtResource("19_aow19")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 37)
+
+[node name="House2" parent="Players/SimpleClairvoyantAI" index="8" instance=ExtResource("19_aow19")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 0, 43)
+
+[node name="House3" parent="Players/SimpleClairvoyantAI" index="9" instance=ExtResource("19_aow19")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 0, 43)
 
 [node name="ScreenOverlay" parent="FogOfWar" index="1"]
 material_override = SubResource("ShaderMaterial_fog")

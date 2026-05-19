@@ -16,5 +16,5 @@ func _on_terrain_targeted(target_position):
 	):
 		return
 	var node = MouseClickAnimation.instantiate()
-	node.global_transform = Transform3D(Basis(), target_position)
+	node.global_transform = Transform3D(Basis(), target_position + Vector3(0, 0.3, 0))
 	add_child(node)

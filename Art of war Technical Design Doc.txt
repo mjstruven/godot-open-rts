@@ -1,0 +1,495 @@
+﻿THE ART OF WAR — MVP BUILD PROMPT
+Instructions for Claude Code
+________________
+
+
+HOW TO USE THIS DOCUMENT
+This is your complete instruction set for building The Art of War MVP in Godot 4 using the godot-open-rts template as the foundation. Read it fully before writing any code. When in doubt about a game design decision, refer to the GDD (Game Design Document v0.3). When in doubt about implementation, follow the patterns already established in the existing codebase.
+Your working directory is the godot-open-rts project. Do not create a new project. Extend and modify what exists.
+Your guiding principle throughout: Build the simplest version of each system that proves the concept works. This is an MVP. Playable and correct beats polished and complex.
+________________
+
+
+WHAT THE TEMPLATE ALREADY GIVES YOU — DO NOT REBUILD THESE
+The godot-open-rts template has the following systems already implemented. Read and understand them before touching anything. Build on top of them, do not replace them:
+* Unit selection — drag-box multi-select, shift-click add/remove, click to select single unit
+* Unit movement — right-click to move, NavigationAgent3D pathfinding with RVO local avoidance
+* Queued commands — shift+click to queue move orders
+* Fog of war — viewport shader system, per-unit sight radius, shroud (explored but not currently visible), minimap integration
+* Match system — Match.gd and Match.tscn manage the game session lifecycle
+* Unit visibility — UnitVisibilityHandler controls what each player can see
+* Basic AI player — AI player system exists; extend it, do not rewrite it
+* HUD scaffold — heads-up display and production queue UI exist as starting points
+* Player system — human player input handling exists
+Study these files first: source/match/Match.gd, source/match/units/Unit.gd, source/match/players/HumanPlayer.gd. These are the spine of the codebase. Every system you add should integrate with them cleanly.
+________________
+
+
+WHAT YOU ARE BUILDING
+A 1v1 skirmish RTS where two players build economies, field armies, and capture the enemy capital. The game ends when one player captures the opponent's active capital building and the opponent fails to designate a new capital within 2 minutes.
+MVP scope is intentionally narrow. If something is not listed in the BUILD sections below, do not build it. Log it as a future feature comment instead.
+________________
+
+
+SECTION 1 — UNIT ROSTER
+Implement the following unit types by extending the existing Unit base class. Keep stats in external resource files (.tres or .gd constants file) so they can be tuned without touching code.
+Personnel Units
+Infantry
+* HP: 6 | Size: 1 | Damage: 2 | Attack Range: 1 tile | Attack Rate: 1 per 2 seconds | Move Speed: 1.25 tiles/sec
+* Upkeep: 4 food + 1 gold per minute
+* Special ability — Bolster: Unit stops moving and raises spears. Gains +5 temporary HP and deals 2 reflect damage to melee attackers. Lasts until unit moves. 5 second cooldown after deactivation.
+* Role: General purpose. Required to crew siege equipment and garrison/capture buildings.
+Archer
+* HP: 4 | Size: 1 | Damage: 6 | Attack Range: 10 tiles | Attack Rate: 1 per 6 seconds | Move Speed: 1.0 tiles/sec
+* AOE attack: Each volley targets a 3x3 tile zone. Each arrow has a 40% chance to hit each unit in the zone. Multiple archers firing at the same zone add their arrows independently (stacking hit probability per unit in zone). Friendly fire enabled.
+* Upkeep: 6 food + 2 gold per minute
+* Special ability — Fire at Will: Attack cooldown reduced 50% for 24 seconds. Unit cannot move while active.
+Cavalry
+* HP: 16 | Size: 2 | Damage: 4 | Attack Range: 1 tile | Attack Rate: 1 per 2 seconds | Move Speed: 2.0 tiles/sec
+* Upkeep: 8 food + 5 gold per minute
+* Special ability — Charge: Dash in a straight line toward target. +1 tile/sec speed, +6 damage, +1 tile trample AOE for 5 seconds. 20 second cooldown.
+Engineer
+* HP: 6 | Size: 1 | Damage: 1 | Attack Range: 1 tile | Attack Rate: 1 per 2 seconds | Move Speed: 1.0 tiles/sec
+* No upkeep cost
+* Special ability — Repair: When assigned to a damaged building, repairs it at 4 HP/second. Costs 1 wood per 10 HP repaired. Automatically cancels a building's scuttle order if building HP is above 25%.
+* Can construct all buildings (see Section 2).
+Mercenary
+* HP: 6 | Size: 1 | Damage: 3 | Attack Range: 1 tile | Attack Rate: 1 per 2 seconds | Move Speed: 1.25 tiles/sec
+* Upkeep: 10 food + 8 gold per minute (expensive — meant to be dismissed after use)
+* No special ability
+* Trains in 3 seconds (vs 6 for infantry). Build cost: 50 gold.
+Flag Commander
+* HP: 32 | Size: 2 | Damage: 4 | Attack Range: 1 tile | Attack Rate: 1 per 2 seconds
+* Move Speed: Matches speed of any group it is assigned to command. Default: 2.25 tiles/sec
+* Maximum 4 per player
+* Special ability — Rally: All allied units within 8 tiles gain +20% movement speed and +20% attack rate for 15 seconds. 45 second cooldown.
+Supply Wagon
+* HP: 32 | Size: 6 | Damage: 0 | Move Speed: 1.0 tiles/sec
+* Passive aura: All allied units within 8 tiles gain +5% to all combat stats
+* Cannot attack
+Siege Units
+MVP NOTE: Implement Battering Ram and Trebuchet first. Add others (Ballista, Mangonel, Siege Ladder, Siege Tower) in subsequent passes. Mark unimplemented siege as TODO comments.
+Battering Ram
+* HP: 64 | Size: 4 | Damage: 0 vs units, 100 vs gates and towers | Attack Rate: 1 per 6 seconds | Move Speed: 1.0 tiles/sec
+* Build cost: 100 wood + 50 gold | Crew: 5 infantry minimum to operate
+* Can transport up to 20 size-1 units inside for protection
+* Immune to archer damage
+* When destroyed, all loaded troops are destroyed with it
+Trebuchet
+* HP: 32 | Size: 6 | Damage: 32 | Attack Range: 10–20 tiles (25 tiles inaccurate range) | Attack Rate: 1 per 10 seconds | AOE: 3x3 tiles
+* Build cost: 300 wood + 200 gold | Crew: 5 infantry minimum to operate
+* Can only target buildings or attack-ground. Cannot target units directly.
+* Pack/unpack time: 30 seconds (must unpack to fire, must pack to move)
+* Accuracy degrades beyond 20 tiles — projectile scatters within a 3-tile radius of target
+* Units on struck wall sections also take damage
+* Move Speed: 1.0 tiles/sec (when packed)
+* Special ability — Flying Fire: Next 3 attacks leave burning oil at impact site dealing 6 damage/second for 20 seconds in 2x2 tile AOE
+________________
+
+
+SECTION 2 — BUILDINGS
+All buildings are placed by Engineers. Buildings snap to the tile grid. Implement building placement using the existing structure system in the template as a base.
+Core Data — All Buildings Share These Behaviors:
+Efficiency degradation by HP:
+* 76–100% HP → 100% efficiency (full output)
+* 51–75% HP → 85% efficiency
+* 26–50% HP → 65% efficiency
+* 1–25% HP → 40% efficiency (fire begins at this threshold)
+Fire:
+* Buildings at or below 25% HP automatically begin burning
+* Fire deals 2 HP/second passive damage
+* Fire stops when building is repaired above 25% HP threshold
+* Building at 0 HP → becomes a Ruin (impassable, no function, clearable by engineer in 60 seconds)
+Scuttle (self-destruct):
+* Any player can order their own building to scuttle via right-click context menu
+* Scuttling immediately begins fire damage at 2 HP/sec regardless of current HP
+* Visually identical to normal fire — enemy cannot distinguish scuttle from combat damage
+* Canceled by engineer repair if building is above 25% HP
+* Below 25% HP, fire continues even if scuttle is canceled — must repair past threshold to extinguish
+Capture:
+* When a capital is captured, all buildings within 12-tile radius immediately transfer to attacker
+* Transferred buildings: production queues cancel, training resets (even 90% complete units are lost)
+* Buildings mid-construction within radius flip to attacker if >10% complete; abandoned if ≤10%
+* Units in the field are NOT affected by building capture
+Building List
+Capital / Government Center
+* HP: 800 | Build cost: 600 wood + 400 stone | Footprint: 4x4 tiles
+* Cannot be destroyed — can only be captured (immune to all damage)
+* Captured by garrisoning 30 enemy infantry inside for 3 uninterrupted minutes
+* Garrison progress bar visible to both players on the building
+* Progress resets if infantry count drops below 30 at any moment
+* On capture: triggers 2-minute relocation window for losing player (see Section 4 — Win Conditions)
+* Capital bonus: All buildings within 12-tile radius gain +20% resource output and +20% production speed
+* Show capital influence radius as a subtle ground overlay
+Town Center
+* HP: 400 | Build cost: 300 wood + 200 stone | Footprint: 3x3 tiles
+* Maximum 3 town centers per player at all times (including active capital)
+* Can be designated as active capital for 300 gold + 200 stone (10 second conversion, instant during relocation window)
+* Trains: Infantry, Archers, Cavalry, Mercenaries
+* Training rates: Infantry 1/6 sec, Archer 1/12 sec, Cavalry 1/12 sec, Mercenary 1/3 sec
+Academy
+* HP: 80 | Build cost: 150 wood + 50 stone | Footprint: 2x2 tiles
+* Trains: Infantry, Archers, Cavalry
+* Same training rates as Town Center
+Siege Workshop
+* HP: 80 | Build cost: 200 wood + 100 stone | Footprint: 3x3 tiles
+* Produces all siege equipment
+Grain Mill
+* HP: 40 | Build cost: 100 wood | Footprint: 2x2 tiles
+* Must be placed on a Fertile Land terrain tile
+* Produces: 60 food/minute (modified by efficiency and capital bonus)
+* Supply wagon spawns automatically and travels to nearest depot or capital
+Lumber Mill
+* HP: 40 | Build cost: 100 wood | Footprint: 2x2 tiles
+* Must be placed on a Forest terrain tile
+* Produces: 60 wood/minute (modified by efficiency)
+Stone Mill
+* HP: 40 | Build cost: 100 wood | Footprint: 2x2 tiles
+* Must be placed on a Rocky/Mountain terrain tile
+* Produces: 60 stone/minute (modified by efficiency)
+House
+* HP: 20 | Build cost: 50 wood | Footprint: 1x1 tiles
+* Increases civilian housing capacity (enables civilian population growth)
+Manor
+* HP: 60 | Build cost: 150 wood + 50 stone | Footprint: 2x2 tiles
+* Functions as: Academy + Watch Tower + House combined
+* Must be placed outside capital radius AND within a Grain Mill's radius
+Watch Tower
+* HP: 80 | Build cost: 80 wood + 40 stone | Footprint: 1x1 tiles
+* Auto-fires arrows equivalent to 5 archers (same AOE volley system)
+* Buildable anywhere on map
+Wall (per tile segment)
+* HP: 40 | Build cost: 50 wood + 25 stone per tile | Footprint: 1 tile wide
+* Only damageable by trebuchet or engineer sappers (future feature — flag as TODO)
+* 4 size-1 units can garrison each wall tile
+* Garrisoned units gain 50% dodge chance vs ranged attacks
+* Walls can be scuttled
+Gate
+* HP: 100 | Build cost: 80 wood + 40 stone | Footprint: 2x1 tiles
+* Only damageable by trebuchet or battering ram
+* Side towers auto-fire (5 archer equivalent)
+* Opens/closes by owning player command
+Wall Tower
+* HP: 120 | Build cost: 100 wood + 50 stone | Footprint: 1x1 tiles
+* Maximum 1 per 5 wall tiles
+* Auto-fires arrows (5 archer equivalent)
+Supply Depot
+* HP: 60 | Build cost: 80 wood + 40 stone | Footprint: 2x2 tiles
+* Relay point for supply chains from distant resource nodes
+* Stores up to 500 of each resource as a buffer
+MVP NOTE: Keep (Castle), Trade Workshop are future scope. Add as TODO stubs.
+________________
+
+
+SECTION 3 — ECONOMY SYSTEM
+Resources
+Four resource types: Food, Wood, Stone, Gold.
+Display in HUD as: current stockpile | income per minute | expenditure per minute | net per minute. Resources update once per minute (synced to supply chain arrival pulse). The stockpile number ticks up visually once per minute, not continuously.
+Resource Collection
+* Resource mills produce a trickle once per minute when connected to a supply chain
+* Base rate: 60 of the relevant resource per minute per mill
+* Modified by: building efficiency (HP-based), capital bonus (+20% if in radius)
+* Supply chain: an automated wagon entity travels from the mill to the nearest Supply Depot or Capital. On arrival it delivers the cargo. It then returns. Round trip = 1 minute at base speed.
+* If a supply wagon's route is blocked or the wagon is destroyed for more than 2 continuous minutes, that mill's trickle suspends until route is restored.
+* Supply wagon stats: HP 8, move speed 2.0 tiles/sec, respawns at source mill after 60 seconds if destroyed
+Gold
+* Gold is not collected by buildings
+* Gold trickles in passively based on civilian population
+* Placeholder formula: 1 gold per minute per 100 civilians
+* Civilian population grows automatically when housing capacity exists and food stockpile is positive
+* Do not implement full civilian simulation for MVP — use a simplified counter that grows by 10 civilians/minute when food net income is positive, shrinks by 10/minute when food is in deficit
+Army Upkeep
+Deducted from stockpile once per minute:
+* Infantry: 4 food + 1 gold
+* Archer: 6 food + 2 gold
+* Cavalry: 8 food + 5 gold
+* Mercenary: 10 food + 8 gold
+* Siege (battering ram, trebuchet): 5 gold each
+If a resource stockpile hits zero and upkeep cannot be paid, apply a -10% combat penalty to all units (resource deficit debuff). Show a clear HUD warning.
+Raiding Resource Nodes
+When an enemy destroys, raids, or captures a resource building:
+* Destroy: Remove 5% of the target player's total stockpile of that resource. Fast action, no troops required beyond combat.
+* Raid: Requires 10 infantry assigned. Takes 60 seconds. Removes 5% of enemy stockpile and transfers 2.5% to raider's stockpile via next supply chain delivery.
+* Capture: Requires 25 infantry assigned. Takes 120 seconds. Removes 5% of enemy stockpile and transfers it all to attacker. Building changes ownership and connects to attacker's supply network.
+________________
+
+
+SECTION 4 — WIN CONDITIONS
+Primary Win Condition: Capital Capture
+1. Attacker assigns 30+ infantry to garrison inside enemy Capital building
+2. Garrison progress fills over 3 minutes (progress bar visible on building to both players)
+3. Progress resets instantly if infantry count drops below 30 for any reason
+4. On successful capture: capital and all buildings in 12-tile radius transfer to attacker immediately
+Relocation Window
+5. Losing player gets a 2-minute countdown timer displayed prominently on screen (large, center-top)
+6. Player must designate a new capital before timer expires by:
+   * Converting an existing Town Center (300 gold + 200 stone, 10 seconds during relocation window)
+   * OR completing construction of a new Town Center and designating it
+7. If new capital is designated: game continues, timer disappears
+8. If timer expires with no new capital: player is defeated — show defeat screen
+Loss Conditions
+* Relocation timer expires
+* Player surrenders (menu option available at any time)
+Implementation Notes
+* Track garrison progress as a float 0.0 to 1.0 per capital building instance
+* Each tick with 30+ infantry inside: progress += delta / 180.0 (180 seconds total)
+* Progress resets to 0.0 when infantry count drops below 30
+* Town center count is enforced as a hard cap of 3 (including the active capital)
+________________
+
+
+SECTION 5 — COMBAT MODIFIER SYSTEM
+This is the game's core differentiator. Implement as a modifier stack on each unit. When calculating damage, effective damage = base damage × (1.0 + sum of all positive modifiers - sum of all negative modifiers). Clamp total modifier bonus/penalty to ±30% (not counting wall garrison dodge which is separate).
+Modifiers to Implement for MVP
+Condition
+	Effect
+	Notes
+	Grassy terrain
+	+5% move speed
+	Check unit's current tile terrain type
+	Rocky terrain
+	-5% move speed
+	
+
+	Recently encamped (stationary 10+ min)
+	+5% combat stats
+	Clears immediately on any move order
+	Supply Wagon nearby (8 tile radius)
+	+5% combat stats
+	While wagon in range
+	Gold deficit (player stockpile = 0 gold)
+	-5% combat stats (all units)
+	Applied as national morale hit
+	Flanking (attacking rear arc)
+	+10% combat stats
+	Rear arc = 180° behind unit facing
+	Elevation advantage (downhill attack)
+	+5% combat stats
+	Attacker on higher tile than defender
+	Wall garrison
+	+50% ranged dodge
+	Only while garrisoned on wall battlements
+	Resource deficit (any resource at 0)
+	-10% combat stats
+	When upkeep cannot be paid
+	Implement as an enum of modifier types. Each unit holds an Array of active {type, value, source} dicts. Recalculate effective stats whenever the modifier stack changes.
+________________
+
+
+SECTION 6 — MORALE SYSTEM
+Morale is a per-player integer score that affects all units. Update once per minute.
+Morale Score Inputs
+Input
+	Value
+	Gold deficit
+	-5
+	Food stockpile positive (>200)
+	+3
+	Military:civilian ratio poor (<1:5)
+	-10
+	Recent skirmish victory (last 5 min)
+	+3 per victory, max +9
+	Recent skirmish defeat (last 5 min)
+	-3 per defeat, max -9
+	Supply lines cut (any)
+	-3 per cut line, max -9
+	Capital under siege (garrison in progress)
+	-5
+	Morale States
+State
+	Score Range
+	Effect
+	Catastrophic
+	< -20
+	-15% combat all units
+	Poor
+	-20 to -10
+	-8% combat all units
+	Neutral
+	-10 to +10
+	No modifier
+	Good
+	+10 to +20
+	+5% combat all units
+	Excellent
+	> +20
+	+10% combat all units
+	Apply morale combat effect as a modifier in each unit's modifier stack, updated each minute when morale state changes.
+Display morale state name and score in HUD top-left.
+________________
+
+
+SECTION 7 — WEATHER SYSTEM
+Weather events trigger randomly. Average frequency: one event per 15–25 minutes (randomize interval on match start). Duration is randomized per event. Show a weather notification banner when an event starts/ends.
+Event
+	Duration
+	Effects
+	Rain
+	10–20 min
+	All move speed -10%, archer range -20%, trebuchet accuracy -15%
+	Heat Wave
+	10–15 min
+	Food upkeep +15%, morale -3 flat while active
+	Cold Snap
+	10–20 min
+	Cavalry move speed -20%, combat -5% all, trebuchet pack/unpack +10s
+	Fog
+	10–20 min
+	All unit vision radius -40%, ambush bonus +10% combat
+	Storm (rare, 10% chance)
+	5–10 min
+	Rain + Cold Snap combined, no siege fire possible, move -20%, morale -5
+	Implement weather as a single WeatherManager autoload singleton. It holds current weather state and exposes a get_modifiers() method that returns the active modifier stack additions for the current weather. Units and buildings query this each update cycle.
+________________
+
+
+SECTION 8 — HUD REQUIREMENTS
+Extend the existing HUD scaffold in the template. Do not replace it — add panels to it.
+Required HUD Elements
+Top Center — Resource Bar Show for each resource (Food, Wood, Stone, Gold):
+* Current stockpile amount
+* Net income per minute (green if positive, red if negative)
+* Example: "Food: 847 | +42/min"
+Top Left — Morale Indicator
+* State name (e.g., "GOOD") in corresponding color
+* Numeric score in parentheses
+* Color scale: red (Catastrophic) → orange (Poor) → white (Neutral) → light green (Good) → bright green (Excellent)
+Top Right — Population & Capital Status
+* Civilian population count
+* Military unit count / cap (e.g., "342 / 1000")
+* Town center count (e.g., "TC: 2/3")
+* Capital indicator: green dot when safe, pulsing red when garrison in progress
+Center Screen — Relocation Timer (conditional)
+* Only visible when player's capital has been captured
+* Large countdown MM:SS
+* Red color, prominent position
+* Urgent sound effect when under 30 seconds
+Bottom Center — Selection Panel
+* Selected unit(s) name, HP bar, ability cooldown
+* If building selected: HP bar, production queue, efficiency indicator
+Alert Feed — Left Side
+* Supply line disrupted (with minimap ping)
+* Capital under siege warning
+* Morale state changed
+* Building on fire
+* Resource deficit warning
+________________
+
+
+SECTION 9 — MAP SETUP
+For MVP, create one handcrafted test map. Do not implement procedural generation yet — that is future scope.
+Test Map Specification
+* Size: 128x128 tiles (256m x 256m at 2m per tile)
+* Layout: Symmetrical. Player 1 starts bottom-left, Player 2 starts top-right.
+* Each player start area contains:
+   * 1 Capital building (pre-placed)
+   * 1 additional Town Center slot (build space)
+   * 1 Fertile Land resource tile (easy — close to start)
+   * 1 Forest resource tile (easy — close to start)
+   * 1 Rocky resource tile (medium — moderate distance)
+* Central contested area contains:
+   * 2 Fertile Land tiles
+   * 2 Forest tiles
+   * 2 Rocky tiles
+* Terrain variety: mix of Grassland (default), Forest patches, Rocky outcroppings, 1 river (crossable at 2 shallow fords)
+Terrain Types and Effects
+Implement as a TerrainType enum. Each tile stores its terrain type. Effects applied to units on those tiles:
+Terrain
+	Move Effect
+	Combat Effect
+	Notes
+	Grassland
+	+5% speed
+	None
+	Default
+	Forest
+	-10% speed
+	+10% ranged dodge
+	Conceals unit markers until <5 tiles
+	Rocky
+	-5% speed
+	-5% combat
+	Required for Stone Mill
+	River
+	-30% speed
+	No cavalry charge
+	Crossable at ford tiles only
+	Fertile Land
+	None
+	None
+	Required for Grain Mill
+	Road
+	+10% speed
+	None
+	Future scope — stub as Grassland for now
+	________________
+
+
+SECTION 10 — AI OPPONENT
+Extend the existing AI player system in the template. The MVP AI does not need to be good — it needs to be functional enough to playtest the game systems against something.
+MVP AI Behavior (Priority Order)
+1. Build economy first: Construct 1 Grain Mill, 1 Lumber Mill, 1 Stone Mill as first actions
+2. Train infantry: Begin training infantry at Town Center once mills are built
+3. Attack when ready: When army reaches 20+ infantry, march toward enemy capital
+4. Don't manage supply wagons: AI treats resource income as automatic (simplification for MVP)
+5. React to attacks: If own buildings are attacked and army is idle, send army to defend
+The AI should not manage morale, upkeep optimization, or flanking for MVP. It is a placeholder to make the game testable.
+________________
+
+
+SECTION 11 — WHAT IS OUT OF SCOPE FOR MVP
+Do not build these. Add a # TODO: Future feature comment stub where the system would connect:
+* Multiplayer networking (build single-player vs AI only for MVP)
+* Ballista, Mangonel, Siege Ladder, Siege Tower (stub as TODO in siege workshop)
+* Keep / Castle building
+* Trade Workshop
+* Wall sapping by engineers (engineers can repair, not sap, for MVP)
+* Procedural map generation
+* Campaign mode
+* Cosmetic skin system
+* Veteran/experience system
+* Formation system
+* Field works (palisades, trenches, caltrops, bridges)
+* Research/tech tree (stub as empty menu with TODO)
+* Full civilian simulation (use simplified counter per Section 3)
+________________
+
+
+SECTION 12 — CODING STANDARDS
+Follow the patterns already established in the godot-open-rts codebase. Specifically:
+* GDScript only. No C#.
+* Scene-based architecture. Every unit type, building type, and UI panel is its own .tscn scene with an attached .gd script.
+* Signals for communication. Systems communicate via Godot signals, not direct references where avoidable. Follow the existing signal patterns in Match.gd.
+* Resource files for data. Unit stats, building stats, and modifier values live in .tres Resource files or a central GameData.gd constants file — not hardcoded in scripts.
+* No magic numbers. All tunable values (damage, range, upkeep costs, timer durations) must be named constants or exported variables.
+* Comments on non-obvious logic. The modifier stack calculation, garrison progress, and supply chain logic particularly need clear inline comments.
+* One responsibility per script. A unit's movement script does not also handle its combat. Follow the existing separation of concerns.
+File Naming Convention
+Follow existing conventions in the project:
+* Scenes: PascalCase.tscn
+* Scripts: snake_case.gd
+* Resource files: unit_infantry.tres, building_grain_mill.tres etc.
+________________
+
+
+SECTION 13 — BUILD ORDER RECOMMENDATION
+Build in this sequence. Each milestone should produce something runnable:
+Phase 1 — Get units on the map Add Infantry, Archer, Cavalry as unit types. Get them selecting, moving, and attacking each other using the existing template framework. Confirm fog of war works per unit.
+Phase 2 — Economy Add resource mills, supply wagons, the resource HUD bar, upkeep deduction. Confirm resources tick correctly and deficit applies combat penalty.
+Phase 3 — Buildings and placement Add all buildings. Engineer construction. Scuttle and fire mechanic. Building capture on capital fall.
+Phase 4 — Capital system and win condition Garrison mechanic, capture transfer, relocation timer, defeat condition. This is the game loop.
+Phase 5 — Combat modifiers and morale Modifier stack system, terrain effects, morale score and HUD display.
+Phase 6 — AI opponent Basic AI that builds economy and attacks. Enough to playtest against.
+Phase 7 — Weather and remaining units Weather events, remaining personnel units (Engineer, Mercenary, Flag Commander, Supply Wagon), Trebuchet and Battering Ram.
+Phase 8 — Polish pass HUD completeness, alerts, sound stubs, basic visual feedback on fire/scuttle/garrison progress.
+________________
+
+
+REFERENCE DOCUMENTS
+Both of the following documents provide additional design context. If this prompt conflicts with them, this prompt takes priority (it is the MVP-scoped version):
+* Game Design Document v0.3 — full design intent, unit flavor text, all planned future features
+* Technical Design Document v1.0 — architecture reference (note: written for UE5, but data architecture and simulation loop order are engine-agnostic and still relevant)
+________________
+
+
+End of Claude Code Prompt Document — Art of War MVP Version 1.0 | Use alongside GDD v0.3 and TDD v1.0

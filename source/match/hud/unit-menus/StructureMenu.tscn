@@ -1,0 +1,75 @@
+[gd_scene load_steps=2 format=3 uid="uid://structmenu001"]
+
+[ext_resource type="Script" path="res://source/match/hud/unit-menus/StructureMenu.gd" id="1_strmnu"]
+
+[node name="StructureMenu" type="GridContainer"]
+columns = 4
+script = ExtResource("1_strmnu")
+
+[node name="StopConstructionButton" type="Button" parent="."]
+layout_mode = 2
+tooltip_text = "Stop construction and refund all resources [Q]"
+focus_mode = 0
+text = "STOP"
+
+[node name="Padding" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding2" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding3" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding4" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding5" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding6" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding7" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding8" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding9" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding10" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding11" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding12" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding13" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding14" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[node name="Padding15" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+
+[connection signal="pressed" from="StopConstructionButton" to="." method="_on_stop_construction_button_pressed"]

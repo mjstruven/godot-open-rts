@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://source/match/units/supply_wagon_auto.gd" id="1_wgon"]
 [ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="2_wghi"]
+[ext_resource type="PackedScene" uid="uid://3c1h14nqdumt" path="res://source/match/units/traits/Selection.tscn" id="3_wgse"]
 [ext_resource type="PackedScene" uid="uid://ivlo0e66qocl" path="res://source/match/units/traits/Movement.tscn" id="4_wgmv"]
-[ext_resource type="PackedScene" uid="uid://c3ssj2p6voauk" path="res://source/match/units/traits/HealthBar.tscn" id="5_wghb"]
 [ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="6_wgta"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wgbody"]
@@ -61,20 +61,20 @@ shape = SubResource("CylinderShape3D_wgcol")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 radius = 0.5
 
+[node name="Selection" parent="." instance=ExtResource("3_wgse")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.5
+
 [node name="Movement" parent="." instance=ExtResource("4_wgmv")]
 path_desired_distance = 0.3
 target_desired_distance = 0.3
 path_height_offset = 0.4
 path_max_distance = 0.31
-radius = 0.5
+radius = 0.05
 neighbor_distance = 8.0
 max_neighbors = 40
 time_horizon_agents = 3.0
-speed = 1.5
-
-[node name="HealthBar" parent="." instance=ExtResource("5_wghb")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.20, 0)
-size = Vector2(80, 10)
+speed = 0.75
 
 [node name="Targetability" parent="." instance=ExtResource("6_wgta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)

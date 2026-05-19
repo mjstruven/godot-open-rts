@@ -1,0 +1,81 @@
+[gd_scene load_steps=14 format=3 uid="uid://housesceneart001"]
+
+[ext_resource type="Script" path="res://source/match/units/house.gd" id="1_house"]
+[ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="2_mnhi"]
+[ext_resource type="PackedScene" uid="uid://3c1h14nqdumt" path="res://source/match/units/traits/Selection.tscn" id="3_mnse"]
+[ext_resource type="PackedScene" uid="uid://d4cwip5hpxlmo" path="res://source/match/units/traits/MovementObstacle.tscn" id="4_mnmo"]
+[ext_resource type="PackedScene" uid="uid://c3ssj2p6voauk" path="res://source/match/units/traits/HealthBar.tscn" id="5_mnhb"]
+[ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="6_mnta"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hsbase"]
+albedo_color = Color(0.99, 0.81, 0.48, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hswall"]
+albedo_color = Color(0.78, 0.76, 0.70, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hsroof"]
+albedo_color = Color(0.45, 0.32, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hsplatform"]
+material = SubResource("StandardMaterial3D_hsbase")
+size = Vector3(0.8, 0.1, 0.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hswall"]
+material = SubResource("StandardMaterial3D_hswall")
+size = Vector3(0.6, 0.55, 0.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hsroof"]
+material = SubResource("StandardMaterial3D_hsroof")
+size = Vector3(0.7, 0.25, 0.7)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_hscol"]
+height = 0.7
+radius = 0.6
+
+[node name="House" type="Area3D"]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_house")
+
+[node name="Geometry" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+
+[node name="Platform" type="MeshInstance3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = SubResource("BoxMesh_hsplatform")
+
+[node name="Walls" type="MeshInstance3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
+mesh = SubResource("BoxMesh_hswall")
+
+[node name="Roof" type="MeshInstance3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.775, 0)
+mesh = SubResource("BoxMesh_hsroof")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+shape = SubResource("CylinderShape3D_hscol")
+
+[node name="Highlight" parent="." instance=ExtResource("2_mnhi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.6
+
+[node name="Selection" parent="." instance=ExtResource("3_mnse")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.6
+
+[node name="MovementObstacle" parent="." instance=ExtResource("4_mnmo")]
+radius = 0.6
+vertices = PackedVector3Array(0, 0, -0.6, 0.42, 0, -0.42, 0.6, 0, 0, 0.42, 0, 0.42, 0, 0, 0.6, -0.42, 0, 0.42, -0.6, 0, 0, -0.42, 0, -0.42)
+affect_navigation_mesh = true
+path_height_offset = 0.3
+
+[node name="HealthBar" parent="." instance=ExtResource("5_mnhb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+size = Vector2(90, 8)
+
+[node name="Targetability" parent="." instance=ExtResource("6_mnta")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.6
+
+[editable path="Geometry"]

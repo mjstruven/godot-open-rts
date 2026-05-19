@@ -21,7 +21,7 @@ script = ExtResource("1_md17c")
 billboard = 1
 transparent = false
 no_depth_test = true
-texture_filter = 2
+texture_filter = 1
 render_priority = 1
 texture = SubResource("GradientTexture2D_p6fyg")
 
@@ -34,6 +34,3 @@ pixel_size = 0.01
 font_size = 28
 modulate = Color(1, 1, 1, 1)
 outline_size = 3
-
-[node name="Timer" type="Timer" parent="."]
-one_shot = true

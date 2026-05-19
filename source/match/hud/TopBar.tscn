@@ -1,0 +1,247 @@
+[gd_scene load_steps=2 format=3 uid="uid://topbarart000001"]
+
+[ext_resource type="Script" path="res://source/match/hud/TopBar.gd" id="1_topbar"]
+
+[node name="TopBar" type="PanelContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+grow_vertical = 1
+custom_minimum_size = Vector2(0, 60)
+script = ExtResource("1_topbar")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FoodBlock" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(155, 0)
+theme_override_constants/separation = 2
+
+[node name="Row1" type="HBoxContainer" parent="MarginContainer/HBoxContainer/FoodBlock"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="FoodColor" type="ColorRect" parent="MarginContainer/HBoxContainer/FoodBlock/Row1"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_vertical = 4
+color = Color(0.2, 0.8, 0.2, 1)
+
+[node name="FoodNameLabel" type="Label" parent="MarginContainer/HBoxContainer/FoodBlock/Row1"]
+layout_mode = 2
+text = "FOOD"
+
+[node name="FoodStockLabel" type="Label" parent="MarginContainer/HBoxContainer/FoodBlock/Row1"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+text = "0"
+
+[node name="Row2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/FoodBlock"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="FoodIncomeLabel" type="Label" parent="MarginContainer/HBoxContainer/FoodBlock/Row2"]
+layout_mode = 2
+mouse_filter = 0
+modulate = Color(0.2, 0.9, 0.2, 1)
+text = "+0"
+
+[node name="FoodExpendLabel" type="Label" parent="MarginContainer/HBoxContainer/FoodBlock/Row2"]
+layout_mode = 2
+mouse_filter = 0
+modulate = Color(0.9, 0.2, 0.2, 1)
+text = "-0"
+
+[node name="FoodNetLabel" type="Label" parent="MarginContainer/HBoxContainer/FoodBlock/Row2"]
+layout_mode = 2
+text = "=0"
+
+[node name="VSeparator" type="VSeparator" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="WoodBlock" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(155, 0)
+theme_override_constants/separation = 2
+
+[node name="Row1" type="HBoxContainer" parent="MarginContainer/HBoxContainer/WoodBlock"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="WoodColor" type="ColorRect" parent="MarginContainer/HBoxContainer/WoodBlock/Row1"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_vertical = 4
+color = Color(0.5, 0.3, 0.1, 1)
+
+[node name="WoodNameLabel" type="Label" parent="MarginContainer/HBoxContainer/WoodBlock/Row1"]
+layout_mode = 2
+text = "WOOD"
+
+[node name="WoodStockLabel" type="Label" parent="MarginContainer/HBoxContainer/WoodBlock/Row1"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+text = "0"
+
+[node name="Row2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/WoodBlock"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="WoodIncomeLabel" type="Label" parent="MarginContainer/HBoxContainer/WoodBlock/Row2"]
+layout_mode = 2
+mouse_filter = 0
+modulate = Color(0.2, 0.9, 0.2, 1)
+text = "+0"
+
+[node name="WoodExpendLabel" type="Label" parent="MarginContainer/HBoxContainer/WoodBlock/Row2"]
+layout_mode = 2
+modulate = Color(0.9, 0.2, 0.2, 1)
+text = "-0"
+
+[node name="WoodNetLabel" type="Label" parent="MarginContainer/HBoxContainer/WoodBlock/Row2"]
+layout_mode = 2
+text = "=0"
+
+[node name="VSeparator2" type="VSeparator" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="StoneBlock" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(155, 0)
+theme_override_constants/separation = 2
+
+[node name="Row1" type="HBoxContainer" parent="MarginContainer/HBoxContainer/StoneBlock"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="StoneColor" type="ColorRect" parent="MarginContainer/HBoxContainer/StoneBlock/Row1"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_vertical = 4
+color = Color(0.6, 0.6, 0.6, 1)
+
+[node name="StoneNameLabel" type="Label" parent="MarginContainer/HBoxContainer/StoneBlock/Row1"]
+layout_mode = 2
+text = "STONE"
+
+[node name="StoneStockLabel" type="Label" parent="MarginContainer/HBoxContainer/StoneBlock/Row1"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+text = "0"
+
+[node name="Row2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/StoneBlock"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="StoneIncomeLabel" type="Label" parent="MarginContainer/HBoxContainer/StoneBlock/Row2"]
+layout_mode = 2
+mouse_filter = 0
+modulate = Color(0.2, 0.9, 0.2, 1)
+text = "+0"
+
+[node name="StoneExpendLabel" type="Label" parent="MarginContainer/HBoxContainer/StoneBlock/Row2"]
+layout_mode = 2
+modulate = Color(0.9, 0.2, 0.2, 1)
+text = "-0"
+
+[node name="StoneNetLabel" type="Label" parent="MarginContainer/HBoxContainer/StoneBlock/Row2"]
+layout_mode = 2
+text = "=0"
+
+[node name="VSeparator3" type="VSeparator" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="GoldBlock" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(155, 0)
+theme_override_constants/separation = 2
+
+[node name="Row1" type="HBoxContainer" parent="MarginContainer/HBoxContainer/GoldBlock"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="GoldColor" type="ColorRect" parent="MarginContainer/HBoxContainer/GoldBlock/Row1"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_vertical = 4
+color = Color(1, 0.85, 0, 1)
+
+[node name="GoldNameLabel" type="Label" parent="MarginContainer/HBoxContainer/GoldBlock/Row1"]
+layout_mode = 2
+text = "GOLD"
+
+[node name="GoldStockLabel" type="Label" parent="MarginContainer/HBoxContainer/GoldBlock/Row1"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+text = "0"
+
+[node name="Row2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/GoldBlock"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="GoldIncomeLabel" type="Label" parent="MarginContainer/HBoxContainer/GoldBlock/Row2"]
+layout_mode = 2
+mouse_filter = 0
+modulate = Color(0.2, 0.9, 0.2, 1)
+text = "+0"
+
+[node name="GoldExpendLabel" type="Label" parent="MarginContainer/HBoxContainer/GoldBlock/Row2"]
+layout_mode = 2
+mouse_filter = 0
+modulate = Color(0.9, 0.2, 0.2, 1)
+text = "-0"
+
+[node name="GoldNetLabel" type="Label" parent="MarginContainer/HBoxContainer/GoldBlock/Row2"]
+layout_mode = 2
+text = "=0"
+
+[node name="VSeparator4" type="VSeparator" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="PopBlock" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+theme_override_constants/separation = 2
+
+[node name="PopTitle" type="Label" parent="MarginContainer/HBoxContainer/PopBlock"]
+layout_mode = 2
+text = "POPULATION"
+
+[node name="PopRow" type="HBoxContainer" parent="MarginContainer/HBoxContainer/PopBlock"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CivLabel" type="Label" parent="MarginContainer/HBoxContainer/PopBlock/PopRow"]
+layout_mode = 2
+text = "Civ: 0"
+
+[node name="MilLabel" type="Label" parent="MarginContainer/HBoxContainer/PopBlock/PopRow"]
+layout_mode = 2
+text = "Mil: 0"
+
+[node name="AcdLabel" type="Label" parent="MarginContainer/HBoxContainer/PopBlock/PopRow"]
+layout_mode = 2
+text = "Acd: 0"
+
+[node name="Spacer" type="Control" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TimerLabel" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+text = "0:00:00"
+horizontal_alignment = 2

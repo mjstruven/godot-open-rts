@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(grep -E \"\\\\.gd$\")",
+      "Bash(Remove-Item -Force -ErrorAction SilentlyContinue source/match/units/Helicopter.tscn, source/match/units/Helicopter.gd, source/match/units/Tank.tscn, source/match/units/Tank.gd, source/match/units/Drone.tscn, source/match/units/Drone.gd, source/match/units/Worker.tscn, source/match/units/Worker.gd, source/match/units/CommandCenter.tscn, source/match/units/CommandCenter.gd, source/match/units/VehicleFactory.tscn, source/match/units/VehicleFactory.gd, source/match/units/AircraftFactory.tscn, source/match/units/AircraftFactory.gd, source/match/units/AntiGroundTurret.tscn, source/match/units/AntiGroundTurret.gd, source/match/units/AntiAirTurret.tscn, source/match/units/AntiAirTurret.gd)",
+      "Bash(Remove-Item -Recurse -Force -ErrorAction SilentlyContinue source/match/units/projectiles)",
+      "Bash(Remove-Item -Force -ErrorAction SilentlyContinue source/match/units/structure-geometries/CommandCenter.tscn, source/match/units/structure-geometries/VehicleFactory.tscn, source/match/units/structure-geometries/AircraftFactory.tscn, source/match/units/structure-geometries/AntiGroundTurret.tscn, source/match/units/structure-geometries/AntiAirTurret.tscn)",
+      "Bash(Remove-Item -Force -ErrorAction SilentlyContinue source/match/hud/unit-menus/CommandCenterMenu.gd, source/match/hud/unit-menus/CommandCenterMenu.tscn, source/match/hud/unit-menus/VehicleFactoryMenu.gd, source/match/hud/unit-menus/VehicleFactoryMenu.tscn, source/match/hud/unit-menus/AircraftFactoryMenu.gd, source/match/hud/unit-menus/AircraftFactoryMenu.tscn, source/match/hud/unit-menus/WorkerMenu.gd, source/match/hud/unit-menus/WorkerMenu.tscn)",
+      "Bash(xargs grep -l \"StructurePlacementHandler\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\matti\\\\godot-open-rts\\\\source\\\\match\" -Recurse -File)",
+      "Bash(Select-Object -First 20)",
+      "Bash(Format-Table Name, FullName)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\matti\\\\godot-open-rts\\\\source\\\\match\" -Recurse -File | Select-Object -First 30 Name, @{Name=\"Path\";Expression={$_.FullName}} | Format-Table -AutoSize)",
+      "Bash(awk '{print $NF}')",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\matti\\\\godot-open-rts\\\\source\\\\match\\\\hud\" -Recurse)",
+      "Bash(Select-Object FullName)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\matti\\\\godot-open-rts\\\\source\\\\match\\\\hud\" -File)",
+      "Bash(Select-Object Name)",
+      "Bash(xargs grep -l \"MOUSE_BUTTON_RIGHT\\\\|right.*click\\\\|terrain_targeted\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\matti\\\\godot-open-rts\" -Directory)",
+      "Bash(xargs grep -l \"class\\\\|extends\")",
+      "Bash(xargs grep -l \"terrain_targeted\\\\|WaypointPathRenderer\\\\|RectangularSelection\")",
+      "Bash([ -f \"/c/Users/matti/godot-open-rts/$f\" ])",
+      "Bash(Select-String -Path \"C:\\\\Users\\\\matti\\\\godot-open-rts\\\\source\\\\match\\\\maps\\\\RoughMap1NotMirrored.tscn\" -Pattern \"node name=.*parent=\\\\\"TerrainRegions\\\\\"\")",
+      "Bash(Measure-Object)",
+      "Bash(Select-Object -ExpandProperty Count)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\matti\\\\godot-open-rts\" -Recurse -Filter \"*.tscn\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(dir /s /b \"C:\\\\Users\\\\matti\\\\godot-open-rts\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\matti\\\\godot-open-rts\" -Recurse -Filter \"project.godot\")",
+      "Bash(Select-Object -First 1 -ExpandProperty FullName)",
+      "Bash(Test-Path *)"
+    ]
+  }
+}

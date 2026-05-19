@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3 uid="uid://leftpanelart0001"]
+
+[ext_resource type="Script" path="res://source/match/hud/LeftPanel.gd" id="1_leftpanel"]
+
+[node name="LeftPanel" type="PanelContainer"]
+script = ExtResource("1_leftpanel")
+custom_minimum_size = Vector2(200, 0)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="MoraleTitle" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "MORALE"
+
+[node name="MoraleStateLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Good"
+modulate = Color(0.2, 0.9, 0.2, 1)
+
+[node name="MoraleScoreLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "100 / 100"
+
+[node name="MoraleFactorLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "All good"
+modulate = Color(0.7, 0.7, 0.7, 1)
+

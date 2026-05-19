@@ -53,6 +53,8 @@ func _handle_event(event):
 func _on_unit_damaged(unit):
 	if unit.player != _player:
 		return
+	if unit.has_method("is_under_construction") and unit.is_under_construction():
+		return
 	var current_timestamp = Time.get_ticks_msec()
 	if (
 		current_timestamp - _last_under_attack_notification_timestamp

@@ -6,13 +6,9 @@ const Player = preload("res://source/match/players/Player.gd")
 const Human = preload("res://source/match/players/human/Human.gd")
 
 const Engineer = preload("res://source/match/units/engineer.tscn")
-const Infantry = preload("res://source/match/units/infantry.tscn")
-const Archer = preload("res://source/match/units/archer.tscn")
 const Cavalry = preload("res://source/match/units/cavalry.tscn")
-const GrainMill = preload("res://source/match/units/grain_mill.tscn")
-const LumberMill = preload("res://source/match/units/lumber_mill.tscn")
-const StoneMill = preload("res://source/match/units/stone_mill.tscn")
 const Capital = preload("res://source/match/units/capital.tscn")
+const House = preload("res://source/match/units/house.tscn")
 
 @export var settings: Resource = null
 
@@ -48,13 +44,37 @@ func _ready():
 	if settings.visibility == settings.Visibility.FULL:
 		fog_of_war.reveal()
 	MatchSignals.match_started.emit()
+	GameLogger.info(
+		GameLogger.Category.STARTUP,
+		"Terrain regions registered",
+		{"count": TerrainManager.get_regions().size()}
+	)
 
 
 func _unhandled_input(event):
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F1:
+		fog_of_war.reveal()
+		var uv_handler = find_child("UnitVisibilityHandler")
+		if uv_handler != null:
+			uv_handler.visible = false
+		var count = TerrainManager.get_regions().size()
+		print("[TERRAIN] F1 reveal — %d terrain regions registered" % count)
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE:
+		_center_camera_on_selected_units()
+		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		if Input.is_action_pressed("shift_selecting"):
 			return
 		MatchSignals.deselect_all_units.emit()
+
+
+func _center_camera_on_selected_units():
+	var selected = get_tree().get_nodes_in_group("selected_units")
+	if selected.is_empty():
+		return
+	var pivot = Utils.Match.Unit.Movement.calculate_aabb_crowd_pivot_yless(selected)
+	_camera.set_position_safely(pivot)
 
 
 func _set_map(a_map):
@@ -157,29 +177,25 @@ func _build_zigzag_indices(count: int) -> Array:
 func _spawn_player_units(player, spawn_transform):
 	_setup_and_spawn_unit(Engineer.instantiate(), spawn_transform, player)
 	_setup_and_spawn_unit(
-		Infantry.instantiate(), spawn_transform.translated(Vector3(2, 0, 0)), player
+		Engineer.instantiate(), spawn_transform.translated(Vector3(2, 0, 0)), player
 	)
 	_setup_and_spawn_unit(
-		Infantry.instantiate(), spawn_transform.translated(Vector3(-2, 0, 0)), player
-	)
-	_setup_and_spawn_unit(
-		Archer.instantiate(), spawn_transform.translated(Vector3(0, 0, -2)), player
+		Engineer.instantiate(), spawn_transform.translated(Vector3(-2, 0, 0)), player
 	)
 	_setup_and_spawn_unit(
 		Cavalry.instantiate(), spawn_transform.translated(Vector3(0, 0, 2)), player
 	)
 	_setup_and_spawn_unit(
-		Capital.instantiate(), spawn_transform.translated(Vector3(-4, 0, 2)), player, false
+		Cavalry.instantiate(), spawn_transform.translated(Vector3(2, 0, 2)), player
 	)
 	_setup_and_spawn_unit(
-		GrainMill.instantiate(), spawn_transform.translated(Vector3(3, 0, 4)), player, false
+		Cavalry.instantiate(), spawn_transform.translated(Vector3(-2, 0, 2)), player
 	)
-	_setup_and_spawn_unit(
-		LumberMill.instantiate(), spawn_transform.translated(Vector3(3, 0, 0)), player, false
-	)
-	_setup_and_spawn_unit(
-		StoneMill.instantiate(), spawn_transform.translated(Vector3(3, 0, -4)), player, false
-	)
+	var capital_transform = spawn_transform.translated(Vector3(-4, 0, 2))
+	_setup_and_spawn_unit(Capital.instantiate(), capital_transform, player, false)
+	_setup_and_spawn_unit(House.instantiate(), capital_transform.translated(Vector3(0, 0, -6)), player, false)
+	_setup_and_spawn_unit(House.instantiate(), capital_transform.translated(Vector3(-6, 0, 0)), player, false)
+	_setup_and_spawn_unit(House.instantiate(), capital_transform.translated(Vector3(6, 0, 0)), player, false)
 
 
 func _setup_and_spawn_unit(unit, a_transform, player, mark_structure_under_construction = true):

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://chatbox00001"]
+
+[ext_resource type="Script" path="res://source/match/hud/ChatBox.gd" id="1_chat"]
+
+[node name="ChatBox" type="Control"]
+script = ExtResource("1_chat")

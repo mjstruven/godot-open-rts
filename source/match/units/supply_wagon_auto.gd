@@ -1,8 +1,17 @@
 extends "res://source/match/units/Unit.gd"
 
+
+func _get_type():
+	return "supply_wagon"
+
 const RETARGET_INTERVAL = 5.0
 
 var cargo = {}
+var cargo_label: String:
+	get:
+		if cargo.is_empty():
+			return ""
+		return cargo.keys()[0].capitalize()
 
 var _retarget_timer = null
 var _delivery_target = null

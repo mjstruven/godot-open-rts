@@ -1,15 +1,23 @@
 extends Node3D
 
+const Circle3D = preload("res://source/generic-scenes-and-nodes/3d/Circle3D.gd")
+
 enum BlueprintPositionValidity {
 	VALID,
 	COLLIDES_WITH_OBJECT,
 	NOT_NAVIGABLE,
 	NOT_ENOUGH_RESOURCES,
 	OUT_OF_MAP,
+	NO_MILL_AT_LOCATION,
+	WITHIN_CAPITAL_INFLUENCE,
+	INVALID_TERRAIN_TYPE,
+	TOO_CLOSE_TO_SAME_TYPE,
 }
 
 const ROTATION_BY_KEY_STEP = 45.0
+const SAME_TYPE_EXCLUSION_RADIUS = Constants.Match.Units.CAPITAL_INFLUENCE_RADIUS
 const ROTATION_DEAD_ZONE_DISTANCE = 0.1
+const MANOR_SNAP_RADIUS = 10.0
 
 const MATERIALS_ROOT = "res://source/match/resources/materials/"
 const BLUEPRINT_VALID_PATH = MATERIALS_ROOT + "blueprint_valid.material.tres"
@@ -20,6 +28,8 @@ var _pending_structure_radius = null
 var _pending_structure_navmap_rid = null
 var _pending_structure_prototype = null
 var _blueprint_rotating = false
+var _placement_selections = []
+var _exclusion_circles: Array = []
 
 @onready var _player = get_parent()
 @onready var _match = find_parent("Match")
@@ -96,6 +106,15 @@ func _calculate_blueprint_position_validity():
 		return BlueprintPositionValidity.OUT_OF_MAP
 	if not _player_has_enough_resources():
 		return BlueprintPositionValidity.NOT_ENOUGH_RESOURCES
+	if _is_placing_manor():
+		return _calculate_manor_placement_validity()
+	if _is_placing_mill():
+		if not TerrainManager.is_valid_mill_placement(
+			_active_blueprint_node.global_position, _get_mill_type()
+		):
+			return BlueprintPositionValidity.INVALID_TERRAIN_TYPE
+		if _too_close_to_same_type_mill():
+			return BlueprintPositionValidity.TOO_CLOSE_TO_SAME_TYPE
 	var placement_validity = Utils.Match.Unit.Placement.validate_agent_placement_position(
 		_active_blueprint_node.global_position,
 		_pending_structure_radius,
@@ -107,6 +126,93 @@ func _calculate_blueprint_position_validity():
 	if placement_validity == Utils.Match.Unit.Placement.NOT_NAVIGABLE:
 		return BlueprintPositionValidity.NOT_NAVIGABLE
 	return BlueprintPositionValidity.VALID
+
+
+func _is_placing_manor() -> bool:
+	return (
+		_pending_structure_prototype != null
+		and _pending_structure_prototype.resource_path.ends_with("manor.tscn")
+	)
+
+
+func _is_placing_mill() -> bool:
+	if _pending_structure_prototype == null:
+		return false
+	var path = _pending_structure_prototype.resource_path
+	return (
+		path.ends_with("grain_mill.tscn")
+		or path.ends_with("lumber_mill.tscn")
+		or path.ends_with("stone_mill.tscn")
+	)
+
+
+func _get_mill_type() -> String:
+	if _pending_structure_prototype == null:
+		return ""
+	var path = _pending_structure_prototype.resource_path
+	if path.ends_with("grain_mill.tscn"):
+		return "grain_mill"
+	if path.ends_with("lumber_mill.tscn"):
+		return "lumber_mill"
+	if path.ends_with("stone_mill.tscn"):
+		return "stone_mill"
+	return ""
+
+
+func _calculate_manor_placement_validity():
+	var pos = _active_blueprint_node.global_position
+	if not _has_player_mill_at(pos):
+		return BlueprintPositionValidity.NO_MILL_AT_LOCATION
+	if _within_capital_influence(pos):
+		return BlueprintPositionValidity.WITHIN_CAPITAL_INFLUENCE
+	return BlueprintPositionValidity.VALID
+
+
+func _has_player_mill_at(pos: Vector3) -> bool:
+	for mill in get_tree().get_nodes_in_group("mills"):
+		if mill.player != _player or not mill.is_constructed():
+			continue
+		var dist = (mill.global_position * Vector3(1, 0, 1)).distance_to(pos * Vector3(1, 0, 1))
+		if dist <= mill.radius + 1.0:
+			return true
+	return false
+
+
+func _get_same_type_exclusion_radius() -> float:
+	if _get_mill_type() == "grain_mill":
+		return CultivationManager.GRAIN_MILL_EXCLUSION_RADIUS
+	return SAME_TYPE_EXCLUSION_RADIUS
+
+
+func _too_close_to_same_type_mill() -> bool:
+	var mill_type: String = _get_mill_type()
+	if mill_type.is_empty():
+		return false
+	var pos: Vector3 = _active_blueprint_node.global_position
+	var exclusion_r := _get_same_type_exclusion_radius()
+	for mill in get_tree().get_nodes_in_group("mills"):
+		if not mill.is_constructed():
+			continue
+		if mill.type != mill_type:
+			continue
+		var dist: float = (mill.global_position * Vector3(1, 0, 1)).distance_to(pos * Vector3(1, 0, 1))
+		if dist < exclusion_r:
+			return true
+	return false
+
+
+func _within_capital_influence(pos: Vector3) -> bool:
+	for unit in get_tree().get_nodes_in_group("units"):
+		if unit.player != _player:
+			continue
+		if not unit.get_script().resource_path.ends_with("capital.gd"):
+			continue
+		if not unit.has_method("is_constructed") or not unit.is_constructed():
+			continue
+		var dist = (unit.global_position * Vector3(1, 0, 1)).distance_to(pos * Vector3(1, 0, 1))
+		if dist <= Constants.Match.Units.CAPITAL_INFLUENCE_RADIUS:
+			return true
+	return false
 
 
 func _player_has_enough_resources():
@@ -137,6 +243,20 @@ func _update_feedback_label(blueprint_position_validity):
 			_feedback_label.text = tr("BLUEPRINT_NOT_ENOUGH_RESOURCES")
 		BlueprintPositionValidity.OUT_OF_MAP:
 			_feedback_label.text = tr("BLUEPRINT_OUT_OF_MAP")
+		BlueprintPositionValidity.NO_MILL_AT_LOCATION:
+			_feedback_label.text = "Must be placed on a mill"
+		BlueprintPositionValidity.WITHIN_CAPITAL_INFLUENCE:
+			_feedback_label.text = "Too close to capital"
+		BlueprintPositionValidity.INVALID_TERRAIN_TYPE:
+			match _get_mill_type():
+				"grain_mill":
+					_feedback_label.text = "Grain Mills must be placed on Grassland"
+				"lumber_mill":
+					_feedback_label.text = "Lumber Mills must be placed adjacent to Forest (not inside)"
+				"stone_mill":
+					_feedback_label.text = "Stone Mills must be placed adjacent to Rocky terrain (not inside)"
+		BlueprintPositionValidity.TOO_CLOSE_TO_SAME_TYPE:
+			_feedback_label.text = "Too close to another %s" % _get_mill_type().replace("_", " ")
 
 
 func _start_structure_placement(structure_prototype):
@@ -165,6 +285,52 @@ func _start_structure_placement(structure_prototype):
 		. get_navigation_map_rid_by_domain(temporary_structure_instance.movement_domain)
 	)
 	temporary_structure_instance.free()
+	_show_placement_range_circles()
+	_show_same_type_exclusion_circles()
+
+
+func _show_placement_range_circles():
+	for unit in get_tree().get_nodes_in_group("units"):
+		if unit.is_in_group("mills"):
+			continue
+		if not ("effect_radius" in unit) or unit.effect_radius == null or unit.effect_radius <= 0.0:
+			continue
+		var sel = unit.find_child("Selection")
+		if sel != null and sel.has_method("show_range_for_placement"):
+			sel.show_range_for_placement()
+			_placement_selections.append(sel)
+
+
+func _hide_placement_range_circles():
+	for sel in _placement_selections:
+		if is_instance_valid(sel):
+			sel.hide_range_for_placement()
+	_placement_selections.clear()
+
+
+func _show_same_type_exclusion_circles() -> void:
+	if not _is_placing_mill():
+		return
+	var mill_type: String = _get_mill_type()
+	var exclusion_r := _get_same_type_exclusion_radius()
+	for mill in get_tree().get_nodes_in_group("mills"):
+		if not mill.is_constructed() or mill.type != mill_type:
+			continue
+		var circle := Circle3D.new()
+		circle.radius = exclusion_r
+		circle.width = 3.0
+		circle.color = Color.WHITE
+		circle.render_priority = 3
+		add_child(circle)
+		circle.global_position = Vector3(mill.global_position.x, 0.1, mill.global_position.z)
+		_exclusion_circles.append(circle)
+
+
+func _hide_same_type_exclusion_circles() -> void:
+	for circle in _exclusion_circles:
+		if is_instance_valid(circle):
+			circle.queue_free()
+	_exclusion_circles.clear()
 
 
 func _set_blueprint_position_based_on_mouse_pos():
@@ -172,8 +338,27 @@ func _set_blueprint_position_based_on_mouse_pos():
 	var mouse_pos_3d = get_viewport().get_camera_3d().get_ray_intersection(mouse_pos_2d)
 	if mouse_pos_3d == null:
 		return
+	if _is_placing_manor():
+		var snap = _find_nearest_player_mill(mouse_pos_3d)
+		if snap != null:
+			_active_blueprint_node.global_transform.origin = snap
+			_feedback_label.global_transform.origin = snap
+			return
 	_active_blueprint_node.global_transform.origin = mouse_pos_3d
 	_feedback_label.global_transform.origin = mouse_pos_3d
+
+
+func _find_nearest_player_mill(mouse_pos: Vector3):
+	var nearest = null
+	var nearest_dist = MANOR_SNAP_RADIUS
+	for mill in get_tree().get_nodes_in_group("mills"):
+		if mill.player != _player or not mill.is_constructed():
+			continue
+		var dist = (mill.global_position * Vector3(1, 0, 1)).distance_to(mouse_pos * Vector3(1, 0, 1))
+		if dist < nearest_dist:
+			nearest_dist = dist
+			nearest = mill
+	return nearest.global_position if nearest != null else null
 
 
 func _update_blueprint_color(blueprint_position_is_valid):
@@ -189,6 +374,8 @@ func _update_blueprint_color(blueprint_position_is_valid):
 
 func _cancel_structure_placement():
 	if _structure_placement_started():
+		_hide_placement_range_circles()
+		_hide_same_type_exclusion_circles()
 		_feedback_label.hide()
 		_active_blueprint_node.queue_free()
 		_active_blueprint_node = null
@@ -205,6 +392,11 @@ func _finish_structure_placement():
 			_active_blueprint_node.global_transform,
 			_player
 		)
+		if Input.is_key_pressed(KEY_SHIFT):
+			var proto = _pending_structure_prototype
+			_cancel_structure_placement()
+			_start_structure_placement(proto)
+			return
 	_cancel_structure_placement()
 
 
