@@ -1,7 +1,7 @@
 extends Node
 
 var _mesh_instance: MeshInstance3D
-var _material: StandardMaterial3D
+var _material: ShaderMaterial
 
 
 func _ready() -> void:
@@ -23,17 +23,24 @@ func _build_mesh() -> void:
 	plane.center_offset = Vector3(128.0, 0.0, 128.0)
 	_mesh_instance.mesh = plane
 
-	var img := Image.create(256, 256, false, Image.FORMAT_RGB8)
+	var color_img := Image.create(256, 256, false, Image.FORMAT_RGB8)
+	var height_img := Image.create(256, 256, false, Image.FORMAT_RF)
 	for z in range(256):
 		for x in range(256):
 			var terrain_type := TerrainManager.get_terrain_type_at(Vector3(x + 0.5, 0.0, z + 0.5))
-			img.set_pixel(x, z, _terrain_to_color(terrain_type))
-	var terrain_texture := ImageTexture.create_from_image(img)
+			color_img.set_pixel(x, z, _terrain_to_color(terrain_type))
+			height_img.set_pixel(x, z, Color(_terrain_to_height(terrain_type), 0.0, 0.0))
+	_box_blur_image(height_img, 3)
 
-	var mat := StandardMaterial3D.new()
-	mat.albedo_texture = terrain_texture
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	var color_texture := ImageTexture.create_from_image(color_img)
+	var height_texture := ImageTexture.create_from_image(height_img)
+
+	var shader := load("res://source/match/terrain/terrain_elevation.gdshader") as Shader
+	var mat := ShaderMaterial.new()
+	mat.shader = shader
+	mat.set_shader_parameter("color_texture", color_texture)
+	mat.set_shader_parameter("height_texture", height_texture)
+	mat.set_shader_parameter("height_scale", 1.0)
 	_mesh_instance.material_override = mat
 	_material = mat
 
@@ -120,6 +127,41 @@ func _pick_tree_texture(rng: RandomNumberGenerator) -> Texture2D:
 	else:
 		pool = TerrainRegion._bare_textures
 	return pool[rng.randi() % pool.size()]
+
+
+func _terrain_to_height(terrain_type: int) -> float:
+	match terrain_type:
+		TerrainRegion.Type.GRASSLAND:
+			return 0.0
+		TerrainRegion.Type.FOREST:
+			return 0.3
+		TerrainRegion.Type.ROCKY:
+			return 0.8
+		TerrainRegion.Type.FERTILE_LAND:
+			return 0.0
+		TerrainRegion.Type.FORD:
+			return -0.5
+		TerrainRegion.Type.ELEVATED:
+			return 2.0
+	return 0.0
+
+
+func _box_blur_image(img: Image, passes: int) -> void:
+	var w := img.get_width()
+	var h := img.get_height()
+	for _pass in range(passes):
+		var src := img.duplicate() as Image
+		for y in range(h):
+			for x in range(w):
+				var sum := 0.0
+				var count := 0
+				for dy in range(-1, 2):
+					for dx in range(-1, 2):
+						var sx := clampi(x + dx, 0, w - 1)
+						var sy := clampi(y + dy, 0, h - 1)
+						sum += src.get_pixel(sx, sy).r
+						count += 1
+				img.set_pixel(x, y, Color(sum / count, 0.0, 0.0))
 
 
 func _terrain_to_color(terrain_type: int) -> Color:
