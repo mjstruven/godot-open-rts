@@ -146,8 +146,7 @@ func _add_terrain_details() -> void:
 	var sx: float = global_transform.basis.x.length()
 	var sz: float = global_transform.basis.z.length()
 	match terrain_type:
-		Type.FOREST:
-			_add_forest_details(rng, gpos, sx, sz)
+		# FOREST: handled by TerrainVisualSystem MultiMesh system
 		Type.ROCKY:
 			_add_rocky_details(rng, gpos, sx, sz)
 		Type.FERTILE_LAND:

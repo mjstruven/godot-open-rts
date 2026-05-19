@@ -12,6 +12,7 @@ func _ready() -> void:
 	if terrain_plane:
 		terrain_plane.visible = false
 	_build_mesh()
+	_spawn_forest_trees()
 
 
 func _build_mesh() -> void:
@@ -40,6 +41,85 @@ func _build_mesh() -> void:
 		"texture_size": "256x256",
 		"mesh_size": "260x260",
 	})
+
+
+func _spawn_forest_trees() -> void:
+	var total_mmis := 0
+	var total_instances := 0
+	for region in TerrainManager.get_regions():
+		if region.terrain_type != TerrainRegion.Type.FOREST:
+			continue
+		var gpos: Vector3 = region.global_position
+		var sx: float = region.global_transform.basis.x.length()
+		var sz: float = region.global_transform.basis.z.length()
+		var area: float = (10.0 * sx) * (10.0 * sz)
+		var target_count: int = clampi(int(area / 8.0), 5, 60)
+
+		var rng := RandomNumberGenerator.new()
+		rng.seed = hash(Vector2(gpos.x, gpos.z))
+
+		var placed: Array[Vector2] = []
+		var attempts := 0
+		while placed.size() < target_count and attempts < target_count * 20:
+			attempts += 1
+			var tx: float = gpos.x + rng.randf_range(-5.0 * sx, 5.0 * sx)
+			var tz: float = gpos.z + rng.randf_range(-5.0 * sz, 5.0 * sz)
+			var p2d := Vector2(tx, tz)
+			var ok := true
+			for q: Vector2 in placed:
+				if p2d.distance_to(q) < 1.2:
+					ok = false
+					break
+			if ok:
+				placed.append(p2d)
+
+		var quad := QuadMesh.new()
+		quad.size = Vector2(2.5, 3.5)
+
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.mesh = quad
+		mm.instance_count = placed.size()
+
+		for i in range(placed.size()):
+			var scale: float = rng.randf_range(0.8, 1.4)
+			# Y = half-height * scale so tree base sits at ground level
+			var pos := Vector3(placed[i].x, 1.75 * scale + gpos.y, placed[i].y)
+			var basis := Basis.IDENTITY.scaled(Vector3(scale, scale, scale))
+			mm.set_instance_transform(i, Transform3D(basis, pos))
+
+		var mat := StandardMaterial3D.new()
+		mat.albedo_texture = _pick_tree_texture(rng)
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+		mat.alpha_scissor_threshold = 0.15
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+
+		var mmi := MultiMeshInstance3D.new()
+		mmi.multimesh = mm
+		mmi.material_override = mat
+		mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(mmi)
+
+		total_mmis += 1
+		total_instances += placed.size()
+
+	GameLogger.info(GameLogger.Category.STARTUP, "Forest trees spawned", {
+		"multimesh_nodes": total_mmis,
+		"tree_instances": total_instances,
+	})
+
+
+func _pick_tree_texture(rng: RandomNumberGenerator) -> Texture2D:
+	var roll: float = rng.randf()
+	var pool: Array
+	if roll < 0.55:
+		pool = TerrainRegion._conifer_textures
+	elif roll < 0.95:
+		pool = TerrainRegion._deciduous_textures
+	else:
+		pool = TerrainRegion._bare_textures
+	return pool[rng.randi() % pool.size()]
 
 
 func _terrain_to_color(terrain_type: int) -> Color:
