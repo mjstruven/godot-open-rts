@@ -63,9 +63,6 @@ func _build_mesh() -> void:
 
 	_build_terrain_collider()
 
-	print("[ISSUE-B2] GroundMesh global_origin=", _mesh_instance.global_transform.origin,
-		" local_position=", _mesh_instance.position)
-
 	GameLogger.info(GameLogger.Category.STARTUP, "TerrainVisualSystem generated", {
 		"map_size": "%dx%d" % [map_size.x, map_size.y],
 		"mesh_size": "%dx%d" % [mesh_w, mesh_h],
@@ -94,14 +91,12 @@ func get_visual_height_at(world_pos: Vector3) -> float:
 
 
 func _build_terrain_collider() -> void:
-	print("[P2.1] building terrain collider...")
-
 	if _terrain_collider != null and is_instance_valid(_terrain_collider):
 		_terrain_collider.queue_free()
 		_terrain_collider = null
 
 	const GRID_SIZE: int = 129
-	const LAYER_TERRAIN_SURFACE: int = 16  # physics layer 5 ("TerrainSurface")
+	const LAYER_TERRAIN_SURFACE: int = 16
 
 	var map_data: PackedFloat32Array = PackedFloat32Array()
 	map_data.resize(GRID_SIZE * GRID_SIZE)
@@ -111,19 +106,10 @@ func _build_terrain_collider() -> void:
 			var wz: float = float(z) / float(GRID_SIZE - 1) * _map_size_cached.y
 			map_data[z * GRID_SIZE + x] = get_visual_height_at(Vector3(wx, 0.0, wz))
 
-	print("[P2.1] map_data size=", map_data.size(),
-		" sample[0]=", map_data[0],
-		" sample[mid]=", map_data[GRID_SIZE * GRID_SIZE / 2],
-		" sample[last]=", map_data[map_data.size() - 1])
-
 	var shape: HeightMapShape3D = HeightMapShape3D.new()
 	shape.map_width = GRID_SIZE
 	shape.map_depth = GRID_SIZE
 	shape.map_data = map_data
-
-	print("[P2.1] shape map_width=", shape.map_width,
-		" map_depth=", shape.map_depth,
-		" map_data.size()=", shape.map_data.size())
 
 	var cell_size_x: float = _map_size_cached.x / float(GRID_SIZE - 1)
 	var cell_size_z: float = _map_size_cached.y / float(GRID_SIZE - 1)
@@ -134,10 +120,6 @@ func _build_terrain_collider() -> void:
 		Basis.IDENTITY.scaled(Vector3(cell_size_x, 1.0, cell_size_z)),
 		Vector3.ZERO
 	)
-
-	print("[P2.1] cs.shape=", cs.shape,
-		" cs.transform.basis.x.length()=", cs.transform.basis.x.length(),
-		" cs.transform.basis.z.length()=", cs.transform.basis.z.length())
 
 	var body: StaticBody3D = StaticBody3D.new()
 	body.collision_layer = LAYER_TERRAIN_SURFACE
@@ -150,53 +132,11 @@ func _build_terrain_collider() -> void:
 	add_child(body)
 	_terrain_collider = body
 
-	print("[P2.1] body.collision_layer=", body.collision_layer,
-		" body.global_position=", body.global_position,
-		" body.get_parent()=", body.get_parent(),
-		" body.is_inside_tree()=", body.is_inside_tree())
-	print("[P2.1] body.get_child_count()=", body.get_child_count(),
-		" child[0]=", body.get_child(0),
-		" child[0].shape=", (body.get_child(0) as CollisionShape3D).shape)
-	var cs_global: Transform3D = cs.global_transform
-	print("[P2.1] cs.global_transform origin=", cs_global.origin,
-		" basis.x=", cs_global.basis.x,
-		" basis.y=", cs_global.basis.y,
-		" basis.z=", cs_global.basis.z)
-	print("[P2.1] terrain collider built: ", _terrain_collider)
-
-	# Check physics space registration
-	var body_space_rid: RID = PhysicsServer3D.body_get_space(body.get_rid())
-	var world_space_rid: RID = get_viewport().world_3d.space
-	print("[P2.1] body_space_rid.is_valid()=", body_space_rid.is_valid(),
-		" matches_world_space=", (body_space_rid == world_space_rid))
-
-	# Immediate self-test raycast — may fail if physics hasn't ticked yet
-	_self_test_raycast("immediate")
-
-	# Deferred self-test — runs after next physics step
-	call_deferred("_self_test_raycast", "deferred")
-
 	GameLogger.info(GameLogger.Category.STARTUP, "Terrain surface collider built", {
 		"grid": "%dx%d" % [GRID_SIZE, GRID_SIZE],
 		"layer": 5,
 		"cell_size": "%.3fx%.3f" % [cell_size_x, cell_size_z],
 	})
-
-
-func _self_test_raycast(label: String) -> void:
-	var cx: float = _map_size_cached.x / 2.0
-	var cz: float = _map_size_cached.y / 2.0
-	var space: PhysicsDirectSpaceState3D = get_viewport().world_3d.direct_space_state
-	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(
-		Vector3(cx, 50.0, cz), Vector3(cx, -10.0, cz)
-	)
-	query.collision_mask = 16
-	var result: Dictionary = space.intersect_ray(query)
-	if result.is_empty():
-		print("[P2.1] self-test (", label, "): NO HIT — collider not queryable")
-	else:
-		print("[P2.1] self-test (", label, "): HIT at ", result["position"],
-			" collider=", result.get("collider"))
 
 
 func _get_map_size() -> Vector2:
@@ -302,7 +242,6 @@ func _spawn_forest_trees() -> void:
 		mm.mesh = quad
 		mm.instance_count = placed.size()
 
-		var printed_tree_diag: bool = (total_mmis > 0)
 		for i in range(placed.size()):
 			var scale: float = rng.randf_range(0.8, 1.4)
 			var ground_y := get_visual_height_at(Vector3(placed[i].x, 0.0, placed[i].y))
@@ -310,13 +249,6 @@ func _spawn_forest_trees() -> void:
 			var pos := Vector3(placed[i].x, 1.75 * scale + gpos.y + ground_y, placed[i].y)
 			var basis := Basis.IDENTITY.scaled(Vector3(scale, scale, scale))
 			mm.set_instance_transform(i, Transform3D(basis, pos))
-			if not printed_tree_diag:
-				printed_tree_diag = true
-				print("[ISSUE-B2] tree[0] xz=(", placed[i].x, ",", placed[i].y, ")",
-					" gpos.y=", gpos.y,
-					" ground_y(from heightmap)=", ground_y,
-					" tree_base_y=", gpos.y + ground_y,
-					" tree_center_y=", pos.y)
 
 		var mat := StandardMaterial3D.new()
 		mat.albedo_texture = _pick_tree_texture(rng)
