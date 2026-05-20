@@ -1,5 +1,8 @@
 extends Node
 
+const HEIGHTMAP_SCALE := 5.0
+const HEIGHTMAP_DIR := "res://assets/heightmaps/"
+
 var _mesh_instance: MeshInstance3D
 var _material: ShaderMaterial
 
@@ -16,20 +19,26 @@ func _ready() -> void:
 
 
 func _build_mesh() -> void:
+	var map_size := _get_map_size()
+	var mesh_w := map_size.x + 4.0
+	var mesh_h := map_size.y + 4.0
+
 	var plane := PlaneMesh.new()
-	plane.size = Vector2(260.0, 260.0)
+	plane.size = Vector2(mesh_w, mesh_h)
 	plane.subdivide_width = 128
 	plane.subdivide_depth = 128
-	plane.center_offset = Vector3(128.0, 0.0, 128.0)
+	plane.center_offset = Vector3(map_size.x / 2.0, 0.0, map_size.y / 2.0)
 	_mesh_instance.mesh = plane
 
 	var color_img := Image.create(256, 256, false, Image.FORMAT_RGB8)
-	var height_img := Image.create(256, 256, false, Image.FORMAT_RF)
 	for z in range(256):
 		for x in range(256):
-			var terrain_type := TerrainManager.get_terrain_type_at(Vector3(x + 0.5, 0.0, z + 0.5))
+			var wx: float = (x + 0.5) / 256.0 * map_size.x
+			var wz: float = (z + 0.5) / 256.0 * map_size.y
+			var terrain_type := TerrainManager.get_terrain_type_at(Vector3(wx, 0.0, wz))
 			color_img.set_pixel(x, z, _terrain_to_color(terrain_type))
-			height_img.set_pixel(x, z, Color(_terrain_to_height(terrain_type), 0.0, 0.0))
+
+	var height_img := _load_height_image()
 	_box_blur_image(height_img, 3)
 
 	var color_texture := ImageTexture.create_from_image(color_img)
@@ -40,14 +49,79 @@ func _build_mesh() -> void:
 	mat.shader = shader
 	mat.set_shader_parameter("color_texture", color_texture)
 	mat.set_shader_parameter("height_texture", height_texture)
-	mat.set_shader_parameter("height_scale", 1.0)
+	mat.set_shader_parameter("height_scale", HEIGHTMAP_SCALE)
 	_mesh_instance.material_override = mat
 	_material = mat
 
 	GameLogger.info(GameLogger.Category.STARTUP, "TerrainVisualSystem generated", {
-		"texture_size": "256x256",
-		"mesh_size": "260x260",
+		"map_size": "%dx%d" % [map_size.x, map_size.y],
+		"mesh_size": "%dx%d" % [mesh_w, mesh_h],
 	})
+
+
+func _get_map_size() -> Vector2:
+	var map_node := get_node_or_null("../Map")
+	if map_node == null:
+		GameLogger.info(GameLogger.Category.STARTUP,
+				"TerrainVisualSystem: no Map node found, defaulting to 256x256")
+		return Vector2(256.0, 256.0)
+	return Vector2(map_node.size)
+
+
+func _load_height_image() -> Image:
+	var flat := Image.create(256, 256, false, Image.FORMAT_RF)
+
+	var map_node := get_node_or_null("../Map")
+	if map_node == null:
+		GameLogger.info(GameLogger.Category.STARTUP,
+				"TerrainVisualSystem: no Map node found, using flat heightmap")
+		return flat
+
+	var scene_path: String = map_node.scene_file_path
+	if scene_path.is_empty():
+		GameLogger.info(GameLogger.Category.STARTUP,
+				"TerrainVisualSystem: Map has no scene_file_path, using flat heightmap")
+		return flat
+
+	var map_name: String = scene_path.get_file().get_basename()
+	var heightmap_path: String = HEIGHTMAP_DIR + map_name + ".png"
+
+	if not FileAccess.file_exists(heightmap_path):
+		GameLogger.info(GameLogger.Category.STARTUP,
+				"TerrainVisualSystem: no heightmap found, using flat", {
+					"looked_for": heightmap_path,
+				})
+		return flat
+
+	var src_img := Image.load_from_file(heightmap_path)
+	if src_img == null:
+		GameLogger.info(GameLogger.Category.STARTUP,
+				"TerrainVisualSystem: heightmap failed to load, using flat", {
+					"path": heightmap_path,
+				})
+		return flat
+
+	if src_img.get_width() != 256 or src_img.get_height() != 256:
+		GameLogger.info(GameLogger.Category.STARTUP,
+				"TerrainVisualSystem: heightmap wrong size — resizing to 256x256", {
+					"path": heightmap_path,
+					"original_size": "%dx%d" % [src_img.get_width(), src_img.get_height()],
+				})
+		src_img.resize(256, 256, Image.INTERPOLATE_BILINEAR)
+
+	var height_img := Image.create(256, 256, false, Image.FORMAT_RF)
+	for y in range(256):
+		for x in range(256):
+			var gray: float = src_img.get_pixel(x, y).r
+			height_img.set_pixel(x, y, Color(gray, 0.0, 0.0))
+
+	GameLogger.info(GameLogger.Category.STARTUP,
+			"TerrainVisualSystem: heightmap loaded", {
+				"path": heightmap_path,
+				"height_scale": HEIGHTMAP_SCALE,
+			})
+
+	return height_img
 
 
 func _spawn_forest_trees() -> void:
@@ -129,21 +203,17 @@ func _pick_tree_texture(rng: RandomNumberGenerator) -> Texture2D:
 	return pool[rng.randi() % pool.size()]
 
 
-func _terrain_to_height(terrain_type: int) -> float:
-	match terrain_type:
-		TerrainRegion.Type.GRASSLAND:
-			return 0.0
-		TerrainRegion.Type.FOREST:
-			return 0.0
-		TerrainRegion.Type.ROCKY:
-			return 0.0
-		TerrainRegion.Type.FERTILE_LAND:
-			return 0.0
-		TerrainRegion.Type.FORD:
-			return 0.0
-		TerrainRegion.Type.ELEVATED:
-			return 0.0
-	return 0.0
+# DEPRECATED — replaced by PNG heightmap loading in _load_height_image().
+# Kept as reference for per-type fallback values during transition.
+#func _terrain_to_height(terrain_type: int) -> float:
+#	match terrain_type:
+#		TerrainRegion.Type.GRASSLAND:    return 0.0
+#		TerrainRegion.Type.FOREST:       return 0.0
+#		TerrainRegion.Type.ROCKY:        return 0.0
+#		TerrainRegion.Type.FERTILE_LAND: return 0.0
+#		TerrainRegion.Type.FORD:         return 0.0
+#		TerrainRegion.Type.ELEVATED:     return 0.0
+#	return 0.0
 
 
 func _box_blur_image(img: Image, passes: int) -> void:
