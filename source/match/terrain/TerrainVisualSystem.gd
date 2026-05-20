@@ -8,6 +8,7 @@ var _material: ShaderMaterial
 var _height_img: Image = null
 var _map_size_cached: Vector2 = Vector2(256.0, 256.0)
 var height_ready: bool = false
+var _terrain_collider: StaticBody3D = null
 
 
 func _ready() -> void:
@@ -59,6 +60,8 @@ func _build_mesh() -> void:
 	mat.set_shader_parameter("height_scale", HEIGHTMAP_SCALE)
 	_mesh_instance.material_override = mat
 	_material = mat
+
+	_build_terrain_collider()
 
 	GameLogger.info(GameLogger.Category.STARTUP, "TerrainVisualSystem generated", {
 		"map_size": "%dx%d" % [map_size.x, map_size.y],
@@ -120,6 +123,55 @@ func get_terrain_ray_hit(ray_origin: Vector3, ray_dir: Vector3) -> Variant:
 			return Vector3(refined.x, get_visual_height_at(refined), refined.z)
 		prev_pos = pos
 	return null
+
+
+func _build_terrain_collider() -> void:
+	if _terrain_collider != null and is_instance_valid(_terrain_collider):
+		_terrain_collider.queue_free()
+		_terrain_collider = null
+
+	const GRID_SIZE: int = 129
+	const LAYER_TERRAIN_SURFACE: int = 16  # physics layer 5 ("TerrainSurface")
+
+	var map_data: PackedFloat32Array = PackedFloat32Array()
+	map_data.resize(GRID_SIZE * GRID_SIZE)
+	for z in range(GRID_SIZE):
+		for x in range(GRID_SIZE):
+			var wx: float = float(x) / float(GRID_SIZE - 1) * _map_size_cached.x
+			var wz: float = float(z) / float(GRID_SIZE - 1) * _map_size_cached.y
+			map_data[z * GRID_SIZE + x] = get_visual_height_at(Vector3(wx, 0.0, wz))
+
+	var shape: HeightMapShape3D = HeightMapShape3D.new()
+	shape.map_width = GRID_SIZE
+	shape.map_depth = GRID_SIZE
+	shape.map_data = map_data
+
+	var cell_size_x: float = _map_size_cached.x / float(GRID_SIZE - 1)
+	var cell_size_z: float = _map_size_cached.y / float(GRID_SIZE - 1)
+
+	var cs: CollisionShape3D = CollisionShape3D.new()
+	cs.shape = shape
+	cs.transform = Transform3D(
+		Basis.IDENTITY.scaled(Vector3(cell_size_x, 1.0, cell_size_z)),
+		Vector3.ZERO
+	)
+
+	var body: StaticBody3D = StaticBody3D.new()
+	body.collision_layer = LAYER_TERRAIN_SURFACE
+	body.collision_mask = 0
+	body.transform = Transform3D(
+		Basis.IDENTITY,
+		Vector3(_map_size_cached.x / 2.0, 0.0, _map_size_cached.y / 2.0)
+	)
+	body.add_child(cs)
+	add_child(body)
+	_terrain_collider = body
+
+	GameLogger.info(GameLogger.Category.STARTUP, "Terrain surface collider built", {
+		"grid": "%dx%d" % [GRID_SIZE, GRID_SIZE],
+		"layer": 5,
+		"cell_size": "%.3fx%.3f" % [cell_size_x, cell_size_z],
+	})
 
 
 func _get_map_size() -> Vector2:
