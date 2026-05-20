@@ -64,8 +64,8 @@ func _calibrate_indicator_width() -> void:
 	var rect_size: Vector2 = (_texture_rect as Control).size
 	if vp_size.x <= 0.0 or rect_size.x <= 0.0:
 		return
-	var scale := minf(rect_size.x / vp_size.x, rect_size.y / vp_size.y)
-	_camera_indicator.width = 2.0 / scale
+	var fit_scale := minf(rect_size.x / vp_size.x, rect_size.y / vp_size.y)
+	_camera_indicator.width = 2.0 / fit_scale
 	_indicator_width_calibrated = true
 
 
@@ -111,7 +111,7 @@ func _add_terrain_overlays(viewport: SubViewport) -> void:
 				var d: float = max(abs(local.x) / HALF, abs(local.z) / HALF)
 				if d > 1.0:
 					continue
-				var col: Color = color
+				var col: Color = color as Color
 				var alpha: float = col.a
 				if d > FADE_START:
 					alpha *= 1.0 - (d - FADE_START) / (1.0 - FADE_START)
@@ -202,7 +202,8 @@ func _update_camera_indicator() -> void:
 		)
 		if hit == null:
 			return
-		pts.append(Vector2(hit.x, hit.z) * MINIMAP_PIXELS_PER_WORLD_METER)
+		var hit_pos := hit as Vector3
+		pts.append(Vector2(hit_pos.x, hit_pos.z) * MINIMAP_PIXELS_PER_WORLD_METER)
 	for i in range(pts.size()):
 		_camera_indicator.set_point_position(i, pts[i])
 
