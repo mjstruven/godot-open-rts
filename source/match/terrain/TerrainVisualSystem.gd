@@ -91,6 +91,8 @@ func get_visual_height_at(world_pos: Vector3) -> float:
 
 
 func _build_terrain_collider() -> void:
+	print("[P2.1] building terrain collider...")
+
 	if _terrain_collider != null and is_instance_valid(_terrain_collider):
 		_terrain_collider.queue_free()
 		_terrain_collider = null
@@ -106,10 +108,19 @@ func _build_terrain_collider() -> void:
 			var wz: float = float(z) / float(GRID_SIZE - 1) * _map_size_cached.y
 			map_data[z * GRID_SIZE + x] = get_visual_height_at(Vector3(wx, 0.0, wz))
 
+	print("[P2.1] map_data size=", map_data.size(),
+		" sample[0]=", map_data[0],
+		" sample[mid]=", map_data[GRID_SIZE * GRID_SIZE / 2],
+		" sample[last]=", map_data[map_data.size() - 1])
+
 	var shape: HeightMapShape3D = HeightMapShape3D.new()
 	shape.map_width = GRID_SIZE
 	shape.map_depth = GRID_SIZE
 	shape.map_data = map_data
+
+	print("[P2.1] shape map_width=", shape.map_width,
+		" map_depth=", shape.map_depth,
+		" map_data.size()=", shape.map_data.size())
 
 	var cell_size_x: float = _map_size_cached.x / float(GRID_SIZE - 1)
 	var cell_size_z: float = _map_size_cached.y / float(GRID_SIZE - 1)
@@ -121,6 +132,10 @@ func _build_terrain_collider() -> void:
 		Vector3.ZERO
 	)
 
+	print("[P2.1] cs.shape=", cs.shape,
+		" cs.transform.basis.x.length()=", cs.transform.basis.x.length(),
+		" cs.transform.basis.z.length()=", cs.transform.basis.z.length())
+
 	var body: StaticBody3D = StaticBody3D.new()
 	body.collision_layer = LAYER_TERRAIN_SURFACE
 	body.collision_mask = 0
@@ -131,6 +146,15 @@ func _build_terrain_collider() -> void:
 	body.add_child(cs)
 	add_child(body)
 	_terrain_collider = body
+
+	print("[P2.1] body.collision_layer=", body.collision_layer,
+		" body.global_position=", body.global_position,
+		" body.get_parent()=", body.get_parent(),
+		" body.is_inside_tree()=", body.is_inside_tree())
+	print("[P2.1] body.get_child_count()=", body.get_child_count(),
+		" child[0]=", body.get_child(0),
+		" child[0].shape=", (body.get_child(0) as CollisionShape3D).shape)
+	print("[P2.1] terrain collider built: ", _terrain_collider)
 
 	GameLogger.info(GameLogger.Category.STARTUP, "Terrain surface collider built", {
 		"grid": "%dx%d" % [GRID_SIZE, GRID_SIZE],
