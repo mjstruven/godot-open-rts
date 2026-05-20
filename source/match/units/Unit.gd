@@ -77,6 +77,12 @@ func _update_visual_height() -> void:
 	for node in _visual_ui_nodes:
 		if is_instance_valid(node):
 			node.position.y = h
+	if randf() < 0.01:
+		print("[ISSUE-B] ", name,
+			" global_pos=", global_position,
+			" sampled_h=", h,
+			" geometry.y=", (_geometry as Node3D).position.y,
+			" tvs_ready=", (_tvs.height_ready if _tvs else "no tvs"))
 
 
 func _collect_visual_ui_nodes() -> void:
