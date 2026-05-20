@@ -33,7 +33,13 @@
       "Bash(Test-Path *)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\matti\\\\godot-open-rts\\\\assets\\\\textures\\\\terrain\" -ErrorAction SilentlyContinue)",
       "Bash(Get-ChildItem *)",
-      "PowerShell(New-Item *)"
+      "PowerShell(New-Item *)",
+      "Bash(Get-Content source\\\\match\\\\units\\\\archer.tscn)",
+      "Bash(Select-Object -First 15)",
+      "Bash(Get-Command godot *)",
+      "Bash(Select-Object Source)",
+      "Bash(Get-Content *)",
+      "Bash(xargs grep -l \"NavigationRegion\\\\|bake\\\\|nav_mesh\\\\|navigation_mesh\")"
     ]
   }
 }
