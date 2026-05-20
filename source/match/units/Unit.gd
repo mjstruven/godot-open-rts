@@ -78,11 +78,21 @@ func _update_visual_height() -> void:
 		if is_instance_valid(node):
 			node.position.y = h
 	if randf() < 0.01:
-		print("[ISSUE-B] ", name,
-			" global_pos=", global_position,
-			" sampled_h=", h,
-			" geometry.y=", (_geometry as Node3D).position.y,
-			" tvs_ready=", (_tvs.height_ready if _tvs else "no tvs"))
+		var root_y: float = global_position.y
+		var geom_global_y: float = (_geometry as Node3D).global_position.y
+		var space: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+		var ray_q: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(
+			Vector3(global_position.x, 50.0, global_position.z),
+			Vector3(global_position.x, -10.0, global_position.z)
+		)
+		ray_q.collision_mask = 16
+		var ray_r: Dictionary = space.intersect_ray(ray_q)
+		var terrain_y: float = (ray_r["position"] as Vector3).y if not ray_r.is_empty() else -999.0
+		print("[ISSUE-B2] ", name,
+			" root_y=", root_y,
+			" geom_global_y=", geom_global_y,
+			" terrain_y=", terrain_y,
+			" (geom_global_y - terrain_y)=", geom_global_y - terrain_y)
 
 
 func _collect_visual_ui_nodes() -> void:

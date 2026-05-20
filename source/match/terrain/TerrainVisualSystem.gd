@@ -63,6 +63,9 @@ func _build_mesh() -> void:
 
 	_build_terrain_collider()
 
+	print("[ISSUE-B2] GroundMesh global_origin=", _mesh_instance.global_transform.origin,
+		" local_position=", _mesh_instance.position)
+
 	GameLogger.info(GameLogger.Category.STARTUP, "TerrainVisualSystem generated", {
 		"map_size": "%dx%d" % [map_size.x, map_size.y],
 		"mesh_size": "%dx%d" % [mesh_w, mesh_h],
@@ -299,6 +302,7 @@ func _spawn_forest_trees() -> void:
 		mm.mesh = quad
 		mm.instance_count = placed.size()
 
+		var printed_tree_diag: bool = (total_mmis > 0)
 		for i in range(placed.size()):
 			var scale: float = rng.randf_range(0.8, 1.4)
 			var ground_y := get_visual_height_at(Vector3(placed[i].x, 0.0, placed[i].y))
@@ -306,6 +310,13 @@ func _spawn_forest_trees() -> void:
 			var pos := Vector3(placed[i].x, 1.75 * scale + gpos.y + ground_y, placed[i].y)
 			var basis := Basis.IDENTITY.scaled(Vector3(scale, scale, scale))
 			mm.set_instance_transform(i, Transform3D(basis, pos))
+			if not printed_tree_diag:
+				printed_tree_diag = true
+				print("[ISSUE-B2] tree[0] xz=(", placed[i].x, ",", placed[i].y, ")",
+					" gpos.y=", gpos.y,
+					" ground_y(from heightmap)=", ground_y,
+					" tree_base_y=", gpos.y + ground_y,
+					" tree_center_y=", pos.y)
 
 		var mat := StandardMaterial3D.new()
 		mat.albedo_texture = _pick_tree_texture(rng)
