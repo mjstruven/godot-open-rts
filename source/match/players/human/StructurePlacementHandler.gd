@@ -398,7 +398,7 @@ func _finish_structure_placement():
 			_pending_structure_prototype.resource_path
 		]
 		_player.subtract_resources(construction_cost)
-		var spawn_transform := _active_blueprint_node.global_transform
+		var spawn_transform: Transform3D = _active_blueprint_node.global_transform
 		spawn_transform.origin.y = 0.0
 		MatchSignals.setup_and_spawn_unit.emit(
 			_pending_structure_prototype.instantiate(),
