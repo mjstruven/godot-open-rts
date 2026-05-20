@@ -28,6 +28,7 @@ func _ready():
 
 
 func _process(_delta):
+	super._process(_delta)
 	if _delivery_target == null or not is_instance_valid(_delivery_target):
 		return
 	var delivery_range = (_delivery_target.radius if _delivery_target.radius != null else 1.0) + 1.0

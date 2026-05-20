@@ -5,9 +5,12 @@ const HEIGHTMAP_DIR := "res://assets/heightmaps/"
 
 var _mesh_instance: MeshInstance3D
 var _material: ShaderMaterial
+var _height_img: Image = null
+var _map_size_cached: Vector2 = Vector2(256.0, 256.0)
 
 
 func _ready() -> void:
+	add_to_group("terrain_visual_system")
 	_mesh_instance = $GroundMesh
 	await get_tree().process_frame
 	await get_tree().process_frame
@@ -40,6 +43,8 @@ func _build_mesh() -> void:
 
 	var height_img := _load_height_image()
 	_box_blur_image(height_img, 3)
+	_height_img = height_img
+	_map_size_cached = map_size
 
 	var color_texture := ImageTexture.create_from_image(color_img)
 	var height_texture := ImageTexture.create_from_image(height_img)
@@ -57,6 +62,16 @@ func _build_mesh() -> void:
 		"map_size": "%dx%d" % [map_size.x, map_size.y],
 		"mesh_size": "%dx%d" % [mesh_w, mesh_h],
 	})
+
+
+func get_visual_height_at(world_pos: Vector3) -> float:
+	if _height_img == null:
+		return 0.0
+	var u := clampf(world_pos.x / _map_size_cached.x, 0.0, 1.0)
+	var v := clampf(world_pos.z / _map_size_cached.y, 0.0, 1.0)
+	var px := int(u * 255.0)
+	var py := int(v * 255.0)
+	return _height_img.get_pixel(px, py).r * HEIGHTMAP_SCALE
 
 
 func _get_map_size() -> Vector2:
@@ -164,8 +179,9 @@ func _spawn_forest_trees() -> void:
 
 		for i in range(placed.size()):
 			var scale: float = rng.randf_range(0.8, 1.4)
+			var ground_y := get_visual_height_at(Vector3(placed[i].x, 0.0, placed[i].y))
 			# Y = half-height * scale so tree base sits at ground level
-			var pos := Vector3(placed[i].x, 1.75 * scale + gpos.y, placed[i].y)
+			var pos := Vector3(placed[i].x, 1.75 * scale + gpos.y + ground_y, placed[i].y)
 			var basis := Basis.IDENTITY.scaled(Vector3(scale, scale, scale))
 			mm.set_instance_transform(i, Transform3D(basis, pos))
 

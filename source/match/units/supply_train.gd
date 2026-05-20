@@ -40,6 +40,7 @@ func _ready():
 
 
 func _process(delta):
+	super._process(delta)
 	_wagon_timer += delta
 	if _wagon_timer >= WAGON_SPAWN_INTERVAL:
 		_wagon_timer = 0.0

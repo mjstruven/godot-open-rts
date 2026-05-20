@@ -15,6 +15,7 @@ func _ready():
 
 
 func _process(delta):
+	super._process(delta)
 	if _arrived:
 		return
 	if not is_instance_valid(target_train):

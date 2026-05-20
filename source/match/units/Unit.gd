@@ -39,11 +39,16 @@ var global_position_yless:
 var type:
 	get = _get_type
 
+const _TERRAIN_HEIGHT_EXTENSION := 5.5
+
 var action_queue: Array = []
 
 var _action_locked = false
+var _tvs = null
+var _visual_ui_nodes: Array[Node3D] = []
 
 @onready var _match = find_parent("Match")
+@onready var _geometry: Node3D = find_child("Geometry")
 
 
 func _ready():
@@ -52,6 +57,53 @@ func _ready():
 	_setup_color()
 	_setup_default_properties_from_constants()
 	assert(_safety_checks())
+	_collect_visual_ui_nodes()
+	_extend_collision_for_terrain_elevation()
+
+
+func _process(_delta: float) -> void:
+	_update_visual_height()
+
+
+func _update_visual_height() -> void:
+	if _tvs == null:
+		_tvs = get_tree().get_first_node_in_group("terrain_visual_system")
+	if _tvs == null or _geometry == null:
+		return
+	var h := _tvs.get_visual_height_at(global_position)
+	_geometry.position.y = h
+	for node in _visual_ui_nodes:
+		if is_instance_valid(node):
+			node.position.y = h
+
+
+func _collect_visual_ui_nodes() -> void:
+	for child in get_children():
+		if child == _geometry:
+			continue
+		if child is CollisionShape3D:
+			continue
+		if child is NavigationObstacle3D:
+			continue
+		if child is Node3D:
+			_visual_ui_nodes.append(child)
+
+
+func _extend_collision_for_terrain_elevation() -> void:
+	var cs := find_child("CollisionShape3D") as CollisionShape3D
+	if cs == null or cs.shape == null:
+		return
+	var shape := cs.shape.duplicate()
+	if shape is CylinderShape3D:
+		shape.height += _TERRAIN_HEIGHT_EXTENSION
+	elif shape is BoxShape3D:
+		shape.size.y += _TERRAIN_HEIGHT_EXTENSION
+	elif shape is CapsuleShape3D:
+		shape.height += _TERRAIN_HEIGHT_EXTENSION
+	else:
+		return
+	cs.position.y += _TERRAIN_HEIGHT_EXTENSION / 2.0
+	cs.shape = shape
 
 
 func is_revealing():
