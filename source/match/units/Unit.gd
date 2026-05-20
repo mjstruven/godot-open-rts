@@ -70,6 +70,8 @@ func _update_visual_height() -> void:
 		_tvs = get_tree().get_first_node_in_group("terrain_visual_system")
 	if _tvs == null or _geometry == null:
 		return
+	if not _tvs.height_ready:
+		return
 	var h: float = _tvs.get_visual_height_at(global_position)
 	(_geometry as Node3D).position.y = h
 	for node in _visual_ui_nodes:

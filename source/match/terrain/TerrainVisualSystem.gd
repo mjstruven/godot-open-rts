@@ -7,6 +7,7 @@ var _mesh_instance: MeshInstance3D
 var _material: ShaderMaterial
 var _height_img: Image = null
 var _map_size_cached: Vector2 = Vector2(256.0, 256.0)
+var height_ready: bool = false
 
 
 func _ready() -> void:
@@ -45,6 +46,7 @@ func _build_mesh() -> void:
 	_box_blur_image(height_img, 3)
 	_height_img = height_img
 	_map_size_cached = map_size
+	height_ready = true
 
 	var color_texture := ImageTexture.create_from_image(color_img)
 	var height_texture := ImageTexture.create_from_image(height_img)
@@ -69,9 +71,19 @@ func get_visual_height_at(world_pos: Vector3) -> float:
 		return 0.0
 	var u := clampf(world_pos.x / _map_size_cached.x, 0.0, 1.0)
 	var v := clampf(world_pos.z / _map_size_cached.y, 0.0, 1.0)
-	var px := int(u * 255.0)
-	var py := int(v * 255.0)
-	return _height_img.get_pixel(px, py).r * HEIGHTMAP_SCALE
+	var fx := u * 255.0
+	var fy := v * 255.0
+	var px0 := int(fx)
+	var py0 := int(fy)
+	var px1 := mini(px0 + 1, 255)
+	var py1 := mini(py0 + 1, 255)
+	var tx := fx - float(px0)
+	var ty := fy - float(py0)
+	var h00 := _height_img.get_pixel(px0, py0).r
+	var h10 := _height_img.get_pixel(px1, py0).r
+	var h01 := _height_img.get_pixel(px0, py1).r
+	var h11 := _height_img.get_pixel(px1, py1).r
+	return lerp(lerp(h00, h10, tx), lerp(h01, h11, tx), ty) * HEIGHTMAP_SCALE
 
 
 func _get_map_size() -> Vector2:

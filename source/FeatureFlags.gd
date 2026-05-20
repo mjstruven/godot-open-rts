@@ -13,3 +13,4 @@ extends Node
 @export_group("Match/Debug")
 @export var frame_incrementer = false
 @export var god_mode = false
+@export var skip_placement_validation = false

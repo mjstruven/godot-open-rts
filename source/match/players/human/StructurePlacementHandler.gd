@@ -102,6 +102,8 @@ func _blueprint_rotation_started():
 
 
 func _calculate_blueprint_position_validity():
+	if FeatureFlags.skip_placement_validation:
+		return BlueprintPositionValidity.VALID
 	if _active_bluprint_out_of_map():
 		return BlueprintPositionValidity.OUT_OF_MAP
 	if not _player_has_enough_resources():
@@ -333,6 +335,13 @@ func _hide_same_type_exclusion_circles() -> void:
 	_exclusion_circles.clear()
 
 
+func _get_visual_height_at(pos: Vector3) -> float:
+	var tvs = get_tree().get_first_node_in_group("terrain_visual_system")
+	if tvs == null or not tvs.height_ready:
+		return 0.0
+	return tvs.get_visual_height_at(pos)
+
+
 func _set_blueprint_position_based_on_mouse_pos():
 	var mouse_pos_2d = get_viewport().get_mouse_position()
 	var mouse_pos_3d = get_viewport().get_camera_3d().get_ray_intersection(mouse_pos_2d)
@@ -341,11 +350,13 @@ func _set_blueprint_position_based_on_mouse_pos():
 	if _is_placing_manor():
 		var snap = _find_nearest_player_mill(mouse_pos_3d)
 		if snap != null:
-			_active_blueprint_node.global_transform.origin = snap
-			_feedback_label.global_transform.origin = snap
+			var snap_y := _get_visual_height_at(snap)
+			_active_blueprint_node.global_transform.origin = Vector3(snap.x, snap_y, snap.z)
+			_feedback_label.global_transform.origin = Vector3(snap.x, snap_y, snap.z)
 			return
-	_active_blueprint_node.global_transform.origin = mouse_pos_3d
-	_feedback_label.global_transform.origin = mouse_pos_3d
+	var visual_y := _get_visual_height_at(mouse_pos_3d)
+	_active_blueprint_node.global_transform.origin = Vector3(mouse_pos_3d.x, visual_y, mouse_pos_3d.z)
+	_feedback_label.global_transform.origin = Vector3(mouse_pos_3d.x, visual_y, mouse_pos_3d.z)
 
 
 func _find_nearest_player_mill(mouse_pos: Vector3):
@@ -387,9 +398,11 @@ func _finish_structure_placement():
 			_pending_structure_prototype.resource_path
 		]
 		_player.subtract_resources(construction_cost)
+		var spawn_transform := _active_blueprint_node.global_transform
+		spawn_transform.origin.y = 0.0
 		MatchSignals.setup_and_spawn_unit.emit(
 			_pending_structure_prototype.instantiate(),
-			_active_blueprint_node.global_transform,
+			spawn_transform,
 			_player
 		)
 		if Input.is_key_pressed(KEY_SHIFT):

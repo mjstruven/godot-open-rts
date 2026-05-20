@@ -15,6 +15,12 @@ func _on_terrain_targeted(target_position):
 		. is_empty()
 	):
 		return
+	var tvs = get_tree().get_first_node_in_group("terrain_visual_system")
+	var visual_y: float = (
+		tvs.get_visual_height_at(target_position)
+		if tvs != null and tvs.height_ready
+		else target_position.y
+	)
 	var node = MouseClickAnimation.instantiate()
-	node.global_transform = Transform3D(Basis(), target_position + Vector3(0, 0.3, 0))
+	node.global_transform = Transform3D(Basis(), Vector3(target_position.x, visual_y + 0.3, target_position.z))
 	add_child(node)
