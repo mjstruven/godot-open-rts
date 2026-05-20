@@ -154,13 +154,46 @@ func _build_terrain_collider() -> void:
 	print("[P2.1] body.get_child_count()=", body.get_child_count(),
 		" child[0]=", body.get_child(0),
 		" child[0].shape=", (body.get_child(0) as CollisionShape3D).shape)
+	var cs_global: Transform3D = cs.global_transform
+	print("[P2.1] cs.global_transform origin=", cs_global.origin,
+		" basis.x=", cs_global.basis.x,
+		" basis.y=", cs_global.basis.y,
+		" basis.z=", cs_global.basis.z)
 	print("[P2.1] terrain collider built: ", _terrain_collider)
+
+	# Check physics space registration
+	var body_space_rid: RID = PhysicsServer3D.body_get_space(body.get_rid())
+	var world_space_rid: RID = get_world_3d().space
+	print("[P2.1] body_space_rid.is_valid()=", body_space_rid.is_valid(),
+		" matches_world_space=", (body_space_rid == world_space_rid))
+
+	# Immediate self-test raycast — may fail if physics hasn't ticked yet
+	_self_test_raycast("immediate")
+
+	# Deferred self-test — runs after next physics step
+	call_deferred("_self_test_raycast", "deferred")
 
 	GameLogger.info(GameLogger.Category.STARTUP, "Terrain surface collider built", {
 		"grid": "%dx%d" % [GRID_SIZE, GRID_SIZE],
 		"layer": 5,
 		"cell_size": "%.3fx%.3f" % [cell_size_x, cell_size_z],
 	})
+
+
+func _self_test_raycast(label: String) -> void:
+	var cx: float = _map_size_cached.x / 2.0
+	var cz: float = _map_size_cached.y / 2.0
+	var space: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(
+		Vector3(cx, 50.0, cz), Vector3(cx, -10.0, cz)
+	)
+	query.collision_mask = 16
+	var result: Dictionary = space.intersect_ray(query)
+	if result.is_empty():
+		print("[P2.1] self-test (", label, "): NO HIT — collider not queryable")
+	else:
+		print("[P2.1] self-test (", label, "): HIT at ", result["position"],
+			" collider=", result.get("collider"))
 
 
 func _get_map_size() -> Vector2:
