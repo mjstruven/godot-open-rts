@@ -163,7 +163,7 @@ func _build_terrain_collider() -> void:
 
 	# Check physics space registration
 	var body_space_rid: RID = PhysicsServer3D.body_get_space(body.get_rid())
-	var world_space_rid: RID = get_world_3d().space
+	var world_space_rid: RID = get_viewport().world_3d.space
 	print("[P2.1] body_space_rid.is_valid()=", body_space_rid.is_valid(),
 		" matches_world_space=", (body_space_rid == world_space_rid))
 
@@ -183,7 +183,7 @@ func _build_terrain_collider() -> void:
 func _self_test_raycast(label: String) -> void:
 	var cx: float = _map_size_cached.x / 2.0
 	var cz: float = _map_size_cached.y / 2.0
-	var space: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+	var space: PhysicsDirectSpaceState3D = get_viewport().world_3d.direct_space_state
 	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(
 		Vector3(cx, 50.0, cz), Vector3(cx, -10.0, cz)
 	)
