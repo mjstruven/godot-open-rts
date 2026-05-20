@@ -89,41 +89,6 @@ func get_visual_height_at(world_pos: Vector3) -> float:
 	return lerp(lerp(h00, h10, tx), lerp(h01, h11, tx), ty) * HEIGHTMAP_SCALE
 
 
-func get_terrain_ray_hit(ray_origin: Vector3, ray_dir: Vector3) -> Variant:
-	if not height_ready:
-		return Plane(Vector3.UP, 0.0).intersects_ray(ray_origin, ray_dir)
-	if ray_dir.y >= 0.0:
-		return null
-	const STEP: float = 0.5
-	const MAX_STEPS: int = 1000
-	const BISECT_STEPS: int = 5
-	var prev_pos: Vector3 = ray_origin
-	for i in range(MAX_STEPS):
-		var pos: Vector3 = ray_origin + ray_dir * (STEP * float(i + 1))
-		if pos.y < -1.0:
-			break
-		if (
-			pos.x < -2.0
-			or pos.x > _map_size_cached.x + 2.0
-			or pos.z < -2.0
-			or pos.z > _map_size_cached.y + 2.0
-		):
-			break
-		var terrain_y: float = get_visual_height_at(pos)
-		if pos.y <= terrain_y:
-			var lo: Vector3 = prev_pos
-			var hi: Vector3 = pos
-			for _b in range(BISECT_STEPS):
-				var mid: Vector3 = (lo + hi) * 0.5
-				if mid.y <= get_visual_height_at(mid):
-					hi = mid
-				else:
-					lo = mid
-			var refined: Vector3 = (lo + hi) * 0.5
-			return Vector3(refined.x, get_visual_height_at(refined), refined.z)
-		prev_pos = pos
-	return null
-
 
 func _build_terrain_collider() -> void:
 	if _terrain_collider != null and is_instance_valid(_terrain_collider):
