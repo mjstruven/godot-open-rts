@@ -39,12 +39,24 @@ func _get_controlled_units_from_navigation_domain_within_topdown_polygon_2d(
 	if topdown_polygon_2d == null:
 		return Utils.Set.new()
 	var units_within_polygon = Utils.Set.new()
+	var is_terrain := navigation_domain == Constants.Match.Navigation.Domain.TERRAIN
+	var camera = get_viewport().get_camera_3d() if is_terrain else null
 	for unit in get_tree().get_nodes_in_group("controlled_units"):
 		if not unit.visible or unit.movement_domain != navigation_domain:
 			continue
 		if unit is Structure:
 			continue
-		var unit_position_2d = Vector2(unit.transform.origin.x, unit.transform.origin.z)
+		var unit_position_2d: Vector2
+		if is_terrain:
+			var geometry := unit.find_child("Geometry")
+			var visual_pos: Vector3 = geometry.global_position if geometry else unit.global_position
+			var screen_pos: Vector2 = camera.unproject_position(visual_pos)
+			var plane_point = camera.get_ray_intersection_with_plane(screen_pos, Constants.Match.Terrain.PLANE)
+			if plane_point == null:
+				continue
+			unit_position_2d = Vector2(plane_point.x, plane_point.z)
+		else:
+			unit_position_2d = Vector2(unit.transform.origin.x, unit.transform.origin.z)
 		if Geometry2D.is_point_in_polygon(unit_position_2d, topdown_polygon_2d):
 			units_within_polygon.add(unit)
 	return units_within_polygon
