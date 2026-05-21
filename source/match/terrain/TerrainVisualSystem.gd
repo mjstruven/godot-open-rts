@@ -2,8 +2,9 @@ extends Node
 
 const HEIGHTMAP_SCALE := 5.0
 const HEIGHTMAP_DIR := "res://assets/heightmaps/"
-const SLOPE_MAX_DELTA: float = 0.10  # max normalized height diff per adjacent texel (~0.5 WU at HEIGHTMAP_SCALE=5)
-const SLOPE_CLAMP_PASSES: int = 5
+const SLOPE_MAX_DELTA: float = 0.10      # max normalized height diff per adjacent texel (~0.5 WU at HEIGHTMAP_SCALE=5)
+const SLOPE_CLAMP_MAX_PASSES: int = 200  # safety cap; typical terrain converges in ~10-20 passes
+const SLOPE_CLAMP_EPSILON: float = 0.0001
 
 var _mesh_instance: MeshInstance3D
 var _material: ShaderMaterial
@@ -303,25 +304,50 @@ func _pick_tree_texture(rng: RandomNumberGenerator) -> Texture2D:
 func _clamp_heightmap_slopes(img: Image) -> void:
 	var w: int = img.get_width()
 	var h: int = img.get_height()
-	for _p in range(SLOPE_CLAMP_PASSES):
+	for _p in range(SLOPE_CLAMP_MAX_PASSES):
+		var converged: bool = true
+
+		# Lower sweep: pull down any pixel that is too HIGH above a neighbor.
+		# Reads from a snapshot so all decisions are made from the same state,
+		# making the pass fully order-independent.
 		var src: Image = img.duplicate() as Image
 		for y in range(h):
 			for x in range(w):
-				var val: float = src.get_pixel(x, y).r
-				var nh: float
+				var orig: float = src.get_pixel(x, y).r
+				var val: float = orig
 				if x > 0:
-					nh = src.get_pixel(x - 1, y).r
-					val = clampf(val, nh - SLOPE_MAX_DELTA, nh + SLOPE_MAX_DELTA)
+					val = minf(val, src.get_pixel(x - 1, y).r + SLOPE_MAX_DELTA)
 				if x < w - 1:
-					nh = src.get_pixel(x + 1, y).r
-					val = clampf(val, nh - SLOPE_MAX_DELTA, nh + SLOPE_MAX_DELTA)
+					val = minf(val, src.get_pixel(x + 1, y).r + SLOPE_MAX_DELTA)
 				if y > 0:
-					nh = src.get_pixel(x, y - 1).r
-					val = clampf(val, nh - SLOPE_MAX_DELTA, nh + SLOPE_MAX_DELTA)
+					val = minf(val, src.get_pixel(x, y - 1).r + SLOPE_MAX_DELTA)
 				if y < h - 1:
-					nh = src.get_pixel(x, y + 1).r
-					val = clampf(val, nh - SLOPE_MAX_DELTA, nh + SLOPE_MAX_DELTA)
+					val = minf(val, src.get_pixel(x, y + 1).r + SLOPE_MAX_DELTA)
+				if absf(val - orig) > SLOPE_CLAMP_EPSILON:
+					converged = false
 				img.set_pixel(x, y, Color(val, 0.0, 0.0))
+
+		# Raise sweep: pull up any pixel that is too LOW below a neighbor.
+		# Reads from the post-lower-sweep state so both sweeps compound.
+		src = img.duplicate() as Image
+		for y in range(h):
+			for x in range(w):
+				var orig: float = src.get_pixel(x, y).r
+				var val: float = orig
+				if x > 0:
+					val = maxf(val, src.get_pixel(x - 1, y).r - SLOPE_MAX_DELTA)
+				if x < w - 1:
+					val = maxf(val, src.get_pixel(x + 1, y).r - SLOPE_MAX_DELTA)
+				if y > 0:
+					val = maxf(val, src.get_pixel(x, y - 1).r - SLOPE_MAX_DELTA)
+				if y < h - 1:
+					val = maxf(val, src.get_pixel(x, y + 1).r - SLOPE_MAX_DELTA)
+				if absf(val - orig) > SLOPE_CLAMP_EPSILON:
+					converged = false
+				img.set_pixel(x, y, Color(val, 0.0, 0.0))
+
+		if converged:
+			break
 
 
 func _box_blur_image(img: Image, passes: int) -> void:
