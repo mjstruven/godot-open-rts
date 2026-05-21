@@ -2,6 +2,8 @@ extends Node
 
 const HEIGHTMAP_SCALE := 5.0
 const HEIGHTMAP_DIR := "res://assets/heightmaps/"
+const SLOPE_MAX_DELTA: float = 0.10  # max normalized height diff per adjacent texel (~0.5 WU at HEIGHTMAP_SCALE=5)
+const SLOPE_CLAMP_PASSES: int = 5
 
 var _mesh_instance: MeshInstance3D
 var _material: ShaderMaterial
@@ -45,6 +47,7 @@ func _build_mesh() -> void:
 
 	var height_img := _load_height_image()
 	_box_blur_image(height_img, 3)
+	_clamp_heightmap_slopes(height_img)
 	_height_img = height_img
 	_map_size_cached = map_size
 	height_ready = true
@@ -295,6 +298,30 @@ func _pick_tree_texture(rng: RandomNumberGenerator) -> Texture2D:
 #		TerrainRegion.Type.FORD:         return 0.0
 #		TerrainRegion.Type.ELEVATED:     return 0.0
 #	return 0.0
+
+
+func _clamp_heightmap_slopes(img: Image) -> void:
+	var w: int = img.get_width()
+	var h: int = img.get_height()
+	for _p in range(SLOPE_CLAMP_PASSES):
+		var src: Image = img.duplicate() as Image
+		for y in range(h):
+			for x in range(w):
+				var val: float = src.get_pixel(x, y).r
+				var nh: float
+				if x > 0:
+					nh = src.get_pixel(x - 1, y).r
+					val = clampf(val, nh - SLOPE_MAX_DELTA, nh + SLOPE_MAX_DELTA)
+				if x < w - 1:
+					nh = src.get_pixel(x + 1, y).r
+					val = clampf(val, nh - SLOPE_MAX_DELTA, nh + SLOPE_MAX_DELTA)
+				if y > 0:
+					nh = src.get_pixel(x, y - 1).r
+					val = clampf(val, nh - SLOPE_MAX_DELTA, nh + SLOPE_MAX_DELTA)
+				if y < h - 1:
+					nh = src.get_pixel(x, y + 1).r
+					val = clampf(val, nh - SLOPE_MAX_DELTA, nh + SLOPE_MAX_DELTA)
+				img.set_pixel(x, y, Color(val, 0.0, 0.0))
 
 
 func _box_blur_image(img: Image, passes: int) -> void:

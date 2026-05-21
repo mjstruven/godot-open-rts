@@ -46,6 +46,7 @@ var action_queue: Array = []
 var _action_locked = false
 var _tvs = null
 var _visual_ui_nodes: Array[Node3D]
+var _visual_ui_base_y: Array[float]
 
 @onready var _match = find_parent("Match")
 @onready var _geometry = find_child("Geometry")
@@ -73,10 +74,12 @@ func _update_visual_height() -> void:
 	if not _tvs.height_ready:
 		return
 	var h: float = _tvs.get_visual_height_at(global_position)
-	(_geometry as Node3D).position.y = h - global_position.y
-	for node in _visual_ui_nodes:
+	var offset: float = h - global_position.y
+	(_geometry as Node3D).position.y = offset
+	for i: int in range(_visual_ui_nodes.size()):
+		var node: Node3D = _visual_ui_nodes[i]
 		if is_instance_valid(node):
-			node.position.y = h - global_position.y
+			node.position.y = _visual_ui_base_y[i] + offset
 
 
 func _collect_visual_ui_nodes() -> void:
@@ -88,7 +91,9 @@ func _collect_visual_ui_nodes() -> void:
 		if child is NavigationObstacle3D:
 			continue
 		if child is Node3D:
-			_visual_ui_nodes.append(child as Node3D)
+			var n: Node3D = child as Node3D
+			_visual_ui_nodes.append(n)
+			_visual_ui_base_y.append(n.position.y)
 
 
 func _extend_collision_for_terrain_elevation() -> void:
