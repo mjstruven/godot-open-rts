@@ -212,7 +212,7 @@ class Units:
 		"res://source/match/units/manor.tscn": {"sight_range": 6.0, "hp": 1000, "hp_max": 1000},
 		"res://source/match/units/academy.tscn": {"sight_range": 8.0, "hp": 4000, "hp_max": 4000},
 		"res://source/match/units/capital.tscn": {"sight_range": 10.0, "hp": 8000, "hp_max": 8000},
-		"res://source/match/units/command_post.tscn": {"sight_range": 10.0, "hp": 400, "hp_max": 400},
+		"res://source/match/units/command_post.tscn": {"sight_range": 10.0, "hp": 4000, "hp_max": 4000},
 		"res://source/match/units/flag_commander/flag_commander.tscn":
 		{
 			"sight_range": 8.0,
