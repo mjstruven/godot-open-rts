@@ -74,11 +74,15 @@ func _on_hire_mercenary_button_pressed():
 	var available = units.filter(func(u): return u.is_constructed())
 	if available.is_empty():
 		return
+	var player = available[0].player
+	var cost = Constants.Match.Units.PRODUCTION_COSTS[MercenaryScene.resource_path]
+	if not player.has_resources(cost):
+		return
 	var target = available.reduce(func(a, b):
 		return a if a.production_queue.size() <= b.production_queue.size() else b
 	)
-	for _i in range(MERCENARY_BATCH_SIZE):
-		target.production_queue.produce(MercenaryScene, true)
+	player.subtract_resources(cost)
+	target.production_queue.produce(MercenaryScene, false, MERCENARY_BATCH_SIZE)
 
 
 func _on_produce_flag_commander_button_pressed():

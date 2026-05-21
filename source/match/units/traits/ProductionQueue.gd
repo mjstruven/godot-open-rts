@@ -14,6 +14,7 @@ class ProductionQueueElement:
 		set(value):
 			time_left = value
 			emit_changed()
+	var batch_count: int = 1
 
 	func progress():
 		return (time_total - time_left) / time_total
@@ -42,11 +43,12 @@ func get_elements():
 	return _queue
 
 
-func produce(unit_prototype, ignore_limit = false):
+func produce(unit_prototype, ignore_limit = false, batch_count: int = 1):
 	if not ignore_limit and _queue.size() >= Constants.Match.Units.PRODUCTION_QUEUE_LIMIT:
 		return
 	var queue_element = ProductionQueueElement.new()
 	queue_element.unit_prototype = unit_prototype
+	queue_element.batch_count = batch_count
 	queue_element.time_total = Constants.Match.Units.PRODUCTION_TIMES[unit_prototype.resource_path]
 	queue_element.time_left = Constants.Match.Units.PRODUCTION_TIMES[unit_prototype.resource_path]
 	_enqueue_element(queue_element)
@@ -75,30 +77,29 @@ func _remove_element(element):
 
 
 func _finalize_production(former_queue_element):
-	var produced_unit = former_queue_element.unit_prototype.instantiate()
-	var placement_position = (
-		Utils
-		. Match
-		. Unit
-		. Placement
-		. find_valid_position_radially_yet_skip_starting_radius(
-			_unit.global_position,
-			_unit.radius,
-			produced_unit.radius,
-			0.1,
-			Vector3(0, 0, 1),
-			false,
-			find_parent("Match").navigation.get_navigation_map_rid_by_domain(
-				produced_unit.movement_domain
-			),
-			get_tree()
-		)
-	)
-	MatchSignals.setup_and_spawn_unit.emit(
-		produced_unit, Transform3D(Basis(), placement_position), _unit.player
-	)
-	MatchSignals.unit_production_finished.emit(produced_unit, _unit)
-
+	var nav_map = find_parent("Match").navigation
 	var rally_point = _unit.find_child("RallyPoint")
-	if rally_point != null:
-		MatchSignals.navigate_unit_to_rally_point.emit(produced_unit, rally_point)
+	for _i in range(former_queue_element.batch_count):
+		var produced_unit = former_queue_element.unit_prototype.instantiate()
+		var placement_position = (
+			Utils
+			. Match
+			. Unit
+			. Placement
+			. find_valid_position_radially_yet_skip_starting_radius(
+				_unit.global_position,
+				_unit.radius,
+				produced_unit.radius,
+				0.1,
+				Vector3(0, 0, 1),
+				false,
+				nav_map.get_navigation_map_rid_by_domain(produced_unit.movement_domain),
+				get_tree()
+			)
+		)
+		MatchSignals.setup_and_spawn_unit.emit(
+			produced_unit, Transform3D(Basis(), placement_position), _unit.player
+		)
+		MatchSignals.unit_production_finished.emit(produced_unit, _unit)
+		if rally_point != null:
+			MatchSignals.navigate_unit_to_rally_point.emit(produced_unit, rally_point)

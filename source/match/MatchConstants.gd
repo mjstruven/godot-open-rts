@@ -104,7 +104,7 @@ class Units:
 		"res://source/match/units/engineer.tscn": {"food": 20, "wood": 10},
 		"res://source/match/units/supply_train.tscn": {"food": 80, "gold": 40},
 		"res://source/match/units/flag_commander/flag_commander.tscn": {"gold": 150},
-		"res://source/match/units/mercenary.tscn": {"gold": 50},
+		"res://source/match/units/mercenary.tscn": {"gold": 250},
 	}
 	const PRODUCTION_TIMES = {
 		"res://source/match/units/infantry.tscn": 6.0,
@@ -113,7 +113,7 @@ class Units:
 		"res://source/match/units/engineer.tscn": 10.0,
 		"res://source/match/units/supply_train.tscn": 45.0,
 		"res://source/match/units/flag_commander/flag_commander.tscn": 30.0,
-		"res://source/match/units/mercenary.tscn": 2.0,
+		"res://source/match/units/mercenary.tscn": 10.0,
 	}
 	const PRODUCTION_QUEUE_LIMIT = 5
 	const STRUCTURE_BLUEPRINTS = {
