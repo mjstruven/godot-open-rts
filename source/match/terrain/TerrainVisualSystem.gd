@@ -322,13 +322,39 @@ func _max_adjacent_delta(img: Image) -> float:
 func _clamp_heightmap_slopes(img: Image) -> void:
 	print("[CLAMP] starting, SLOPE_MAX_DELTA=", SLOPE_MAX_DELTA,
 		" MAX_PASSES=", SLOPE_CLAMP_MAX_PASSES)
+	print("[CLAMP] image format=", img.get_format())
 	var w: int = img.get_width()
 	var h: int = img.get_height()
+
+	# Find the cliff-edge pixel (one side of the steepest adjacent pair) for tracing.
+	var trace_x: int = 0
+	var trace_y: int = 0
+	var trace_max_d: float = 0.0
+	for ty in range(h):
+		for tx in range(w):
+			var v: float = img.get_pixel(tx, ty).r
+			if tx < w - 1:
+				var d: float = absf(v - img.get_pixel(tx + 1, ty).r)
+				if d > trace_max_d:
+					trace_max_d = d
+					trace_x = tx
+					trace_y = ty
+			if ty < h - 1:
+				var d: float = absf(v - img.get_pixel(tx, ty + 1).r)
+				if d > trace_max_d:
+					trace_max_d = d
+					trace_x = tx
+					trace_y = ty
+	print("[CLAMP-TRACE] tracking pixel (", trace_x, ",", trace_y, ") initial=",
+		img.get_pixel(trace_x, trace_y).r, " max_delta=", trace_max_d)
+
 	var passes_run: int = 0
 	for _p in range(SLOPE_CLAMP_MAX_PASSES):
 		passes_run += 1
 		var converged: bool = true
 		var pass_max_change: float = 0.0
+
+		var val_before_pass: float = img.get_pixel(trace_x, trace_y).r
 
 		# Lower sweep: pull down any pixel that is too HIGH above a neighbor.
 		var src: Image = img.duplicate() as Image
@@ -350,6 +376,8 @@ func _clamp_heightmap_slopes(img: Image) -> void:
 				pass_max_change = maxf(pass_max_change, change)
 				img.set_pixel(x, y, Color(val, 0.0, 0.0))
 
+		var val_after_lower: float = img.get_pixel(trace_x, trace_y).r
+
 		# Raise sweep: pull up any pixel that is too LOW below a neighbor.
 		src = img.duplicate() as Image
 		for y in range(h):
@@ -369,6 +397,12 @@ func _clamp_heightmap_slopes(img: Image) -> void:
 					converged = false
 				pass_max_change = maxf(pass_max_change, change)
 				img.set_pixel(x, y, Color(val, 0.0, 0.0))
+
+		var val_after_raise: float = img.get_pixel(trace_x, trace_y).r
+		if passes_run <= 3:
+			print("[CLAMP-TRACE] px(", trace_x, ",", trace_y, ") pass ", passes_run,
+				" start=", val_before_pass, " post-lower=", val_after_lower,
+				" post-raise=", val_after_raise)
 
 		if passes_run <= 5 or passes_run % 10 == 0:
 			print("[CLAMP] pass ", passes_run, " max_change=", pass_max_change)
