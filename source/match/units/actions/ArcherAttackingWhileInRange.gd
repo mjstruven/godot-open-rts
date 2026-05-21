@@ -121,8 +121,9 @@ func _fire_arrow():
 	arrow_mesh.material_override = mat
 	arrow_root.add_child(arrow_mesh)
 	arrow_root.global_position = archer_pos
-	if archer_pos.distance_to(landing_point) > 0.01:
-		arrow_root.look_at(landing_point, Vector3.UP)
+	var flat_target = Vector3(landing_point.x, archer_pos.y, landing_point.z)
+	if archer_pos.distance_to(flat_target) > 0.01:
+		arrow_root.look_at(flat_target, Vector3.UP)
 	match_node.add_child(arrow_root)
 
 	var circle = Circle3D.new()

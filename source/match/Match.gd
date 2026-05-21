@@ -10,6 +10,9 @@ const Cavalry = preload("res://source/match/units/cavalry.tscn")
 const Capital = preload("res://source/match/units/capital.tscn")
 const House = preload("res://source/match/units/house.tscn")
 
+# DEBUG: set to false to disable the DELETE-key instant-kill tool
+const DEBUG_KILL_KEY_ENABLED = true
+
 @export var settings: Resource = null
 
 var map:
@@ -52,6 +55,11 @@ func _ready():
 
 
 func _unhandled_input(event):
+	if DEBUG_KILL_KEY_ENABLED and event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_DELETE:
+		for unit in get_tree().get_nodes_in_group("selected_units"):
+			if is_instance_valid(unit) and unit.hp != null:
+				unit.hp = 0
+		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F1:
 		fog_of_war.reveal()
 		var uv_handler = find_child("UnitVisibilityHandler")
