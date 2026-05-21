@@ -68,9 +68,9 @@ func _ready():
 	_collect_visual_ui_nodes()
 	_extend_collision_for_terrain_elevation()
 	# Claim the first infantry unit for diagnostics.
-	if not Unit._diag_unit_claimed and type == "infantry":
+	if not _diag_unit_claimed and type == "infantry":
 		_is_diag_unit = true
-		Unit._diag_unit_claimed = true
+		_diag_unit_claimed = true
 		print("[DIAG] claimed unit: ", name, " (", type, ")")
 
 
@@ -129,7 +129,7 @@ func _diag_raycast_y() -> float:
 	var result := space.intersect_ray(query)
 	if result.is_empty():
 		return -999.0
-	return result["position"].y
+	return (result["position"] as Vector3).y
 
 
 func _collect_visual_ui_nodes() -> void:
