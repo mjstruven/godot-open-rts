@@ -24,9 +24,11 @@ focus_mode = 0
 text = "FC"
 tooltip_text = "Flag Commander | 30s | 150 gold [E]"
 
-[node name="Padding" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
+[node name="HireMercenaryButton" type="Button" parent="."]
 layout_mode = 2
+focus_mode = 0
+text = "MERC"
+tooltip_text = "Hire Mercenaries | x5 | 10s | 250 gold [R]"
 
 [node name="Padding2" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
@@ -79,3 +81,4 @@ layout_mode = 2
 [connection signal="pressed" from="ProduceEngineerButton" to="." method="_on_produce_engineer_button_pressed"]
 [connection signal="pressed" from="ProduceSupplyTrainButton" to="." method="_on_produce_supply_train_button_pressed"]
 [connection signal="pressed" from="ProduceFlagCommanderButton" to="." method="_on_produce_flag_commander_button_pressed"]
+[connection signal="pressed" from="HireMercenaryButton" to="." method="_on_hire_mercenary_button_pressed"]

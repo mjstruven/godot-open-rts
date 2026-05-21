@@ -5,6 +5,8 @@ const SupplyTrainScene = preload("res://source/match/units/supply_train.tscn")
 const FlagCommanderScene = preload(
 	"res://source/match/units/flag_commander/flag_commander.tscn"
 )
+const MercenaryScene = preload("res://source/match/units/mercenary.tscn")
+const MERCENARY_BATCH_SIZE = 5
 
 var units = []:
 	set(value):
@@ -37,6 +39,9 @@ func _unhandled_input(event):
 		KEY_E:
 			_on_produce_flag_commander_button_pressed()
 			get_viewport().set_input_as_handled()
+		KEY_R:
+			_on_hire_mercenary_button_pressed()
+			get_viewport().set_input_as_handled()
 
 
 func _on_produce_engineer_button_pressed():
@@ -63,6 +68,17 @@ func _on_produce_supply_train_button_pressed():
 		return a if a.production_queue.size() <= b.production_queue.size() else b
 	)
 	target.production_queue.produce(SupplyTrainScene)
+
+
+func _on_hire_mercenary_button_pressed():
+	var available = units.filter(func(u): return u.is_constructed())
+	if available.is_empty():
+		return
+	var target = available.reduce(func(a, b):
+		return a if a.production_queue.size() <= b.production_queue.size() else b
+	)
+	for _i in range(MERCENARY_BATCH_SIZE):
+		target.production_queue.produce(MercenaryScene, true)
 
 
 func _on_produce_flag_commander_button_pressed():
