@@ -67,11 +67,11 @@ func _ready():
 	assert(_safety_checks())
 	_collect_visual_ui_nodes()
 	_extend_collision_for_terrain_elevation()
-	# Claim the first infantry unit for diagnostics.
-	if not _diag_unit_claimed and type == "infantry":
+	# Claim the first mobile unit of any type for diagnostics.
+	if not _diag_unit_claimed and _is_movable():
 		_is_diag_unit = true
 		_diag_unit_claimed = true
-		print("[DIAG] claimed unit: ", name, " (", type, ")")
+		print("[DIAG] claimed unit: ", name, " type=", type)
 
 
 func _process(delta: float) -> void:
