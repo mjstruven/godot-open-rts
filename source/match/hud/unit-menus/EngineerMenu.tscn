@@ -31,11 +31,11 @@ focus_mode = 0
 text = "ACD"
 tooltip_text = "Academy - Wood:300, Stone:200 [R]"
 
-[node name="PlaceCapitalButton" type="Button" parent="."]
+[node name="PlaceCommandPostButton" type="Button" parent="."]
 layout_mode = 2
 focus_mode = 0
-text = "CAP"
-tooltip_text = "Capital - Wood:600, Stone:400 [A]"
+text = "CP"
+tooltip_text = "Command Post - Wood:600, Stone:400 [A]"
 
 [node name="PlaceHouseButton" type="Button" parent="."]
 layout_mode = 2
@@ -99,7 +99,7 @@ mouse_filter = 2
 [connection signal="pressed" from="PlaceLumberMillButton" to="." method="_on_place_lumber_mill_button_pressed"]
 [connection signal="pressed" from="PlaceStoneMillButton" to="." method="_on_place_stone_mill_button_pressed"]
 [connection signal="pressed" from="PlaceTownCenterButton" to="." method="_on_place_town_center_button_pressed"]
-[connection signal="pressed" from="PlaceCapitalButton" to="." method="_on_place_capital_button_pressed"]
+[connection signal="pressed" from="PlaceCommandPostButton" to="." method="_on_place_command_post_button_pressed"]
 [connection signal="pressed" from="PlaceHouseButton" to="." method="_on_place_house_button_pressed"]
 [connection signal="pressed" from="PlaceManorButton" to="." method="_on_place_manor_button_pressed"]
 [connection signal="pressed" from="DismissButton" to="." method="_on_dismiss_pressed"]

@@ -1,5 +1,7 @@
 extends "res://source/match/units/Structure.gd"
 
+@export var is_win_condition_building: bool = false
+
 
 func _ready():
 	await super()

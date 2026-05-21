@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://cpgeoart00001"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cpbase"]
+albedo_color = Color(0.52, 0.54, 0.58, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cptower"]
+albedo_color = Color(0.30, 0.32, 0.36, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cpwall"]
+albedo_color = Color(0.40, 0.42, 0.46, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cpbase"]
+material = SubResource("StandardMaterial3D_cpbase")
+size = Vector3(2.8, 1.0, 2.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cptower"]
+material = SubResource("StandardMaterial3D_cptower")
+size = Vector3(0.7, 1.8, 0.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cpwall"]
+material = SubResource("StandardMaterial3D_cpwall")
+size = Vector3(1.8, 1.4, 0.4)
+
+[node name="Geometry" type="Node3D"]
+
+[node name="Base" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_cpbase")
+
+[node name="TowerNW" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, 0.9, -1.05)
+mesh = SubResource("BoxMesh_cptower")
+
+[node name="TowerNE" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0.9, -1.05)
+mesh = SubResource("BoxMesh_cptower")
+
+[node name="TowerSW" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, 0.9, 1.05)
+mesh = SubResource("BoxMesh_cptower")
+
+[node name="TowerSE" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0.9, 1.05)
+mesh = SubResource("BoxMesh_cptower")
+
+[node name="WallN" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, -1.2)
+mesh = SubResource("BoxMesh_cpwall")
+
+[node name="WallS" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 1.2)
+mesh = SubResource("BoxMesh_cpwall")

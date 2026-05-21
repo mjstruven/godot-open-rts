@@ -8,7 +8,7 @@ const StoneMillUnit = preload("res://source/match/units/stone_mill.tscn")
 const HouseUnit = preload("res://source/match/units/house.tscn")
 const ManorUnit = preload("res://source/match/units/manor.tscn")
 const AcademyUnit = preload("res://source/match/units/academy.tscn")
-const CapitalUnit = preload("res://source/match/units/capital.tscn")
+const CommandPostUnit = preload("res://source/match/units/command_post.tscn")
 
 @onready var _grain_mill_btn = find_child("PlaceGrainMillButton")
 @onready var _lumber_mill_btn = find_child("PlaceLumberMillButton")
@@ -16,7 +16,7 @@ const CapitalUnit = preload("res://source/match/units/capital.tscn")
 @onready var _house_btn = find_child("PlaceHouseButton")
 @onready var _manor_btn = find_child("PlaceManorButton")
 @onready var _academy_btn = find_child("PlaceTownCenterButton")
-@onready var _capital_btn = find_child("PlaceCapitalButton")
+@onready var _command_post_btn = find_child("PlaceCommandPostButton")
 @onready var _dismiss_btn = find_child("DismissButton")
 
 var units: Array = []:
@@ -50,7 +50,7 @@ func _process(_delta):
 	_refresh_button(_house_btn, HouseUnit, player)
 	_refresh_button(_manor_btn, ManorUnit, player)
 	_refresh_button(_academy_btn, AcademyUnit, player)
-	_refresh_button(_capital_btn, CapitalUnit, player)
+	_refresh_button(_command_post_btn, CommandPostUnit, player)
 
 
 func _refresh_button(btn: Button, scene: PackedScene, player):
@@ -77,7 +77,7 @@ func _unhandled_input(event):
 			_on_place_town_center_button_pressed()
 			get_viewport().set_input_as_handled()
 		KEY_A:
-			_on_place_capital_button_pressed()
+			_on_place_command_post_button_pressed()
 			get_viewport().set_input_as_handled()
 		KEY_S:
 			_on_place_house_button_pressed()
@@ -111,8 +111,8 @@ func _on_place_town_center_button_pressed():
 	MatchSignals.place_structure.emit(AcademyUnit)
 
 
-func _on_place_capital_button_pressed():
-	MatchSignals.place_structure.emit(CapitalUnit)
+func _on_place_command_post_button_pressed():
+	MatchSignals.place_structure.emit(CommandPostUnit)
 
 
 func _get_dismissible_units() -> Array:

@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://dismtrait0001"]
+[gd_scene format=3 uid="uid://dismtrait0001"]
 
 [ext_resource type="Script" path="res://source/match/units/traits/Dismiss.gd" id="1_dismgd"]
 
