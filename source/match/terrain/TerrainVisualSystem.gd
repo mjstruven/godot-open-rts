@@ -48,7 +48,11 @@ func _build_mesh() -> void:
 
 	var height_img := _load_height_image()
 	_box_blur_image(height_img, 3)
+	print("[CLAMP] max adjacent delta BEFORE clamp = ", _max_adjacent_delta(height_img),
+		" (limit is ", SLOPE_MAX_DELTA, ")")
 	_clamp_heightmap_slopes(height_img)
+	print("[CLAMP] max adjacent delta AFTER clamp  = ", _max_adjacent_delta(height_img),
+		" (limit is ", SLOPE_MAX_DELTA, ")")
 	_height_img = height_img
 	_map_size_cached = map_size
 	height_ready = true
@@ -301,15 +305,32 @@ func _pick_tree_texture(rng: RandomNumberGenerator) -> Texture2D:
 #	return 0.0
 
 
-func _clamp_heightmap_slopes(img: Image) -> void:
+func _max_adjacent_delta(img: Image) -> float:
 	var w: int = img.get_width()
 	var h: int = img.get_height()
+	var max_d: float = 0.0
+	for y in range(h):
+		for x in range(w):
+			var v: float = img.get_pixel(x, y).r
+			if x < w - 1:
+				max_d = maxf(max_d, absf(v - img.get_pixel(x + 1, y).r))
+			if y < h - 1:
+				max_d = maxf(max_d, absf(v - img.get_pixel(x, y + 1).r))
+	return max_d
+
+
+func _clamp_heightmap_slopes(img: Image) -> void:
+	print("[CLAMP] starting, SLOPE_MAX_DELTA=", SLOPE_MAX_DELTA,
+		" MAX_PASSES=", SLOPE_CLAMP_MAX_PASSES)
+	var w: int = img.get_width()
+	var h: int = img.get_height()
+	var passes_run: int = 0
 	for _p in range(SLOPE_CLAMP_MAX_PASSES):
+		passes_run += 1
 		var converged: bool = true
+		var pass_max_change: float = 0.0
 
 		# Lower sweep: pull down any pixel that is too HIGH above a neighbor.
-		# Reads from a snapshot so all decisions are made from the same state,
-		# making the pass fully order-independent.
 		var src: Image = img.duplicate() as Image
 		for y in range(h):
 			for x in range(w):
@@ -323,12 +344,13 @@ func _clamp_heightmap_slopes(img: Image) -> void:
 					val = minf(val, src.get_pixel(x, y - 1).r + SLOPE_MAX_DELTA)
 				if y < h - 1:
 					val = minf(val, src.get_pixel(x, y + 1).r + SLOPE_MAX_DELTA)
-				if absf(val - orig) > SLOPE_CLAMP_EPSILON:
+				var change: float = absf(val - orig)
+				if change > SLOPE_CLAMP_EPSILON:
 					converged = false
+				pass_max_change = maxf(pass_max_change, change)
 				img.set_pixel(x, y, Color(val, 0.0, 0.0))
 
 		# Raise sweep: pull up any pixel that is too LOW below a neighbor.
-		# Reads from the post-lower-sweep state so both sweeps compound.
 		src = img.duplicate() as Image
 		for y in range(h):
 			for x in range(w):
@@ -342,12 +364,18 @@ func _clamp_heightmap_slopes(img: Image) -> void:
 					val = maxf(val, src.get_pixel(x, y - 1).r - SLOPE_MAX_DELTA)
 				if y < h - 1:
 					val = maxf(val, src.get_pixel(x, y + 1).r - SLOPE_MAX_DELTA)
-				if absf(val - orig) > SLOPE_CLAMP_EPSILON:
+				var change: float = absf(val - orig)
+				if change > SLOPE_CLAMP_EPSILON:
 					converged = false
+				pass_max_change = maxf(pass_max_change, change)
 				img.set_pixel(x, y, Color(val, 0.0, 0.0))
 
+		if passes_run <= 5 or passes_run % 10 == 0:
+			print("[CLAMP] pass ", passes_run, " max_change=", pass_max_change)
 		if converged:
 			break
+
+	print("[CLAMP] done after ", passes_run, " passes")
 
 
 func _box_blur_image(img: Image, passes: int) -> void:
