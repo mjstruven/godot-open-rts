@@ -42,6 +42,10 @@ func _build_mesh() -> void:
 	plane.subdivide_width = subdiv_w
 	plane.subdivide_depth = subdiv_h
 	_mesh_instance.mesh = plane
+	_mesh_instance.custom_aabb = AABB(
+		Vector3(plane.center_offset.x - mesh_w / 2.0, -1.0, plane.center_offset.z - mesh_h / 2.0),
+		Vector3(mesh_w, HEIGHTMAP_SCALE + 2.0, mesh_h)
+	)
 
 	var color_img := Image.create(256, 256, false, Image.FORMAT_RGB8)
 	for z in range(256):
