@@ -48,6 +48,13 @@ var _tvs = null
 var _visual_ui_nodes: Array[Node3D]
 var _visual_ui_base_y: Array[float]
 
+# --- TEMPORARY DIAGNOSTICS — remove after investigation ---
+static var _diag_unit_claimed: bool = false
+var _is_diag_unit: bool = false
+var _diag_frame: int = 0
+var _diag_sec: float = 0.0
+# ----------------------------------------------------------
+
 @onready var _match = find_parent("Match")
 @onready var _geometry = find_child("Geometry")
 
@@ -60,10 +67,17 @@ func _ready():
 	assert(_safety_checks())
 	_collect_visual_ui_nodes()
 	_extend_collision_for_terrain_elevation()
+	# Claim the first infantry unit for diagnostics.
+	if not Unit._diag_unit_claimed and type == "infantry":
+		_is_diag_unit = true
+		Unit._diag_unit_claimed = true
+		print("[DIAG] claimed unit: ", name, " (", type, ")")
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	_update_visual_height()
+	if _is_diag_unit:
+		_diag(delta)
 
 
 func _update_visual_height() -> void:
@@ -80,6 +94,42 @@ func _update_visual_height() -> void:
 		var node: Node3D = _visual_ui_nodes[i]
 		if is_instance_valid(node):
 			node.position.y = _visual_ui_base_y[i] + offset
+
+
+func _diag(delta: float) -> void:
+	# First 10 frames: check whether root position is stable.
+	if _diag_frame < 10:
+		_diag_frame += 1
+		print("[DIAG-FRAME] ", _diag_frame, " root=", global_position)
+		return
+	# After that: once per second — compare the three height sources.
+	_diag_sec += delta
+	if _diag_sec < 1.0:
+		return
+	_diag_sec = 0.0
+	if _tvs == null:
+		return
+	var h: float = _tvs.get_visual_height_at(global_position)
+	var geo_world_y: float = (_geometry as Node3D).global_position.y
+	var geo_local_y: float = (_geometry as Node3D).position.y
+	var ray_y: float = _diag_raycast_y()
+	print("[DIAG] root=", global_position,
+		" get_visual_h=", h,
+		" geo_local_y=", geo_local_y,
+		" geo_world_y=", geo_world_y,
+		" raycast_y=", ray_y)
+
+
+func _diag_raycast_y() -> float:
+	var space := get_world_3d().direct_space_state
+	var from := Vector3(global_position.x, 500.0, global_position.z)
+	var to := Vector3(global_position.x, -500.0, global_position.z)
+	var query := PhysicsRayQueryParameters3D.create(from, to)
+	query.collision_mask = 16  # layer 5 = TerrainSurface collider
+	var result := space.intersect_ray(query)
+	if result.is_empty():
+		return -999.0
+	return result["position"].y
 
 
 func _collect_visual_ui_nodes() -> void:
