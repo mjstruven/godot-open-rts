@@ -70,6 +70,19 @@ func _build_mesh() -> void:
 	_mesh_instance.material_override = mat
 	_material = mat
 
+	# --- SHADER-UV DIAGNOSTIC ---
+	print("[UV-DIAG] GroundMesh global_transform=", _mesh_instance.global_transform)
+	print("[UV-DIAG] map_size=", map_size, "  mesh=(", mesh_w, "x", mesh_h, ")")
+	print("[UV-DIAG] vertex world X: [", -mesh_w/2.0 + map_size.x/2.0, ", ", mesh_w/2.0 + map_size.x/2.0, "]")
+	for wx: float in [10.0, 64.0, 88.0, 118.0]:
+		var u := wx / map_size.x
+		var shader_texel := u * 256.0 - 0.5
+		var gvh_texel := u * 255.0
+		print("[UV-DIAG] worldX=", wx, " u=", u,
+			" shader_texel=", shader_texel, " gvh_texel=", gvh_texel,
+			" diff=", shader_texel - gvh_texel, " h=", get_visual_height_at(Vector3(wx, 0.0, 64.0)))
+	# ----------------------------
+
 	_build_terrain_collider()
 
 	GameLogger.info(GameLogger.Category.STARTUP, "TerrainVisualSystem generated", {
