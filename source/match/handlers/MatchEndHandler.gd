@@ -19,6 +19,7 @@ func _ready():
 	MatchSignals.setup_and_spawn_unit.connect(_on_new_unit)
 	for unit in get_tree().get_nodes_in_group("units"):
 		unit.tree_exited.connect(_on_unit_tree_exited)
+		_connect_win_condition_if_needed(unit, unit.player)
 
 
 func _handle_defeat():
@@ -43,8 +44,31 @@ func _show():
 	get_tree().paused = true
 
 
-func _on_new_unit(unit, _transform, _player):
+func _on_new_unit(unit, _transform, player):
 	unit.tree_exited.connect(_on_unit_tree_exited)
+	_connect_win_condition_if_needed(unit, player)
+
+
+func _connect_win_condition_if_needed(unit, player) -> void:
+	if "is_win_condition_building" in unit and unit.is_win_condition_building:
+		unit.tree_exited.connect(_on_win_condition_building_destroyed.bind(player))
+
+
+func _on_win_condition_building_destroyed(owner_player) -> void:
+	var match_node = find_parent("Match")
+	if match_node != null:
+		match_node.fog_of_war.reveal()
+	if visible:
+		return
+	var human_players = get_tree().get_nodes_in_group("players").filter(
+		func(p): return p is Human
+	)
+	if not human_players.is_empty() and owner_player == human_players[0]:
+		_handle_defeat()
+	elif not human_players.is_empty():
+		_handle_victory()
+	else:
+		_handle_finish()
 
 
 func _on_unit_tree_exited():

@@ -1,21 +1,27 @@
 extends CanvasLayer
 
+var _match_ended: bool = false
+
 
 func _ready():
 	hide()
+	MatchSignals.match_finished_with_victory.connect(func(): _match_ended = true)
+	MatchSignals.match_finished_with_defeat.connect(func(): _match_ended = true)
 
 
 func _unhandled_input(event):
-	if (
-		event.is_action_pressed("toggle_match_menu")
-		and ((not visible and not get_tree().paused) or (visible and get_tree().paused))
-	):
+	if not event.is_action_pressed("toggle_match_menu"):
+		return
+	if visible:
+		_toggle()
+	elif not get_tree().paused or _match_ended:
 		_toggle()
 
 
 func _toggle():
 	visible = not visible
-	get_tree().paused = visible
+	if not _match_ended:
+		get_tree().paused = visible
 
 
 func _on_resume_button_pressed():

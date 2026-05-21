@@ -140,6 +140,7 @@ script = ExtResource("1_1555u")
 [node name="Players" type="Node3D" parent="."]
 
 [node name="IsometricCamera3D" type="Camera3D" parent="."]
+process_mode = 3
 transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 49.5996, 12.4465, 65.9216)
 projection = 1
 current = true
