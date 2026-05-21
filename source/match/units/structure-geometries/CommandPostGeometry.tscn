@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cpgeoart00001"]
+[gd_scene format=3]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cpbase"]
 albedo_color = Color(0.52, 0.54, 0.58, 1)

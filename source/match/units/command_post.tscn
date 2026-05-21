@@ -1,7 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://cmdpost000001"]
+[gd_scene format=3 uid="uid://cmdpost000001"]
 
 [ext_resource type="Script" path="res://source/match/units/command_post.gd" id="1_cpgd"]
-[ext_resource type="PackedScene" uid="uid://cpgeoart00001" path="res://source/match/units/structure-geometries/CommandPostGeometry.tscn" id="2_cpgeo"]
+[ext_resource type="PackedScene" path="res://source/match/units/structure-geometries/CommandPostGeometry.tscn" id="2_cpgeo"]
 [ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="3_cphi"]
 [ext_resource type="PackedScene" uid="uid://3c1h14nqdumt" path="res://source/match/units/traits/Selection.tscn" id="4_cpse"]
 [ext_resource type="PackedScene" uid="uid://d4cwip5hpxlmo" path="res://source/match/units/traits/MovementObstacle.tscn" id="5_cpmo"]

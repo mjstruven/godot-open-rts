@@ -92,7 +92,8 @@ func _refresh():
 
 
 func _update_display(unit, count: int, type_idx: int, type_total: int):
-	var name_str = unit.type.capitalize()
+	var type_val = unit.get("type")
+	var name_str = (type_val if type_val != null else unit.name).capitalize()
 	if count > 1:
 		name_str += " x%d" % count
 	_unit_name_label.text = name_str
