@@ -26,3 +26,19 @@
 - Project compiles and runs clean, no parse errors.
 - Terrain / Path 2 chapter is complete.
 - Next: back on the main roadmap.
+
+---
+
+## Deferred: Capital-destruction win condition
+
+The Capital-destruction win condition was implemented in Wave 2 (commit `68ff0e1`) as a secondary trigger: `MatchEndHandler._connect_win_condition_if_needed` connected `_on_win_condition_building_destroyed` to each Capital's `tree_exited` signal via `.bind(player)`.
+
+**Problem:** Destroying a Capital produces no end-game response and no debugger error. The callback appears to be correctly connected (the logic and signal ordering were verified by code analysis), but the win panel never shows. Root cause was not identified — the silent failure mode is undiagnosed.
+
+**Current state:** The Capital-destruction trigger has been **DISABLED** by commenting out the connection inside `_connect_win_condition_if_needed` (MatchEndHandler.gd). The code — `_on_win_condition_building_destroyed`, `_connect_win_condition_if_needed`, `is_win_condition_building` flag — is preserved in place.
+
+**Active win condition:** Reverted to the template's original owns-nothing logic (`_on_unit_tree_exited`), which fires whenever any unit/structure exits the tree and then checks whether any player is left with zero entries in the "units" group. All structures (Capital, Command Post, mills, etc.) are in the "units" group via `_setup_unit_groups`, so destruction of all a player's buildings and units correctly triggers defeat.
+
+**Fog reveal:** Added to `_show()` so all end-game paths (owns-nothing and future Capital-destruction) reveal the full map on match end.
+
+**To re-enable Capital-destruction:** Uncomment the two commented lines in `_connect_win_condition_if_needed`. Add `GameLogger.debug` calls at the top of `_on_win_condition_building_destroyed` to confirm the callback fires. Best diagnosed once siege units exist so Capital destruction happens naturally in gameplay.

@@ -40,6 +40,9 @@ func _handle_finish():
 
 
 func _show():
+	var match_node = find_parent("Match")
+	if match_node != null:
+		match_node.fog_of_war.reveal()
 	show()
 	get_tree().paused = true
 
@@ -50,8 +53,11 @@ func _on_new_unit(unit, _transform, player):
 
 
 func _connect_win_condition_if_needed(unit, player) -> void:
-	if "is_win_condition_building" in unit and unit.is_win_condition_building:
-		unit.tree_exited.connect(_on_win_condition_building_destroyed.bind(player))
+	# Capital-destruction win condition disabled (deferred — does not fire reliably).
+	# Re-enable by uncommenting the two lines below when diagnosing.
+	#if "is_win_condition_building" in unit and unit.is_win_condition_building:
+	#	unit.tree_exited.connect(_on_win_condition_building_destroyed.bind(player))
+	pass
 
 
 func _on_win_condition_building_destroyed(owner_player) -> void:
