@@ -39,7 +39,7 @@ func _get_controlled_units_from_navigation_domain_within_topdown_polygon_2d(
 	if topdown_polygon_2d == null:
 		return Utils.Set.new()
 	var units_within_polygon = Utils.Set.new()
-	var is_terrain := navigation_domain == Constants.Match.Navigation.Domain.TERRAIN
+	var is_terrain: bool = navigation_domain == Constants.Match.Navigation.Domain.TERRAIN
 	var camera = get_viewport().get_camera_3d() if is_terrain else null
 	for unit in get_tree().get_nodes_in_group("controlled_units"):
 		if not unit.visible or unit.movement_domain != navigation_domain:
