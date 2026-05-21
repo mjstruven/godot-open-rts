@@ -12,6 +12,7 @@ class Actions:
 		"res://source/match/units/actions/CollectingResourcesSequentially.gd"
 	)
 	const AutoAttacking = preload("res://source/match/units/actions/AutoAttacking.gd")
+	const ArcherAutoAttacking = preload("res://source/match/units/actions/ArcherAutoAttacking.gd")
 	const Constructing = preload("res://source/match/units/actions/Constructing.gd")
 	const AttackMoving = preload("res://source/match/units/actions/AttackMoving.gd")
 	const StandingGround = preload("res://source/match/units/actions/StandingGround.gd")
@@ -168,7 +169,9 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		return true
 	if Actions.AutoAttacking.is_applicable(unit, target_unit):
 		var tgt = target_unit
-		_set_or_queue_action(unit, func(): unit.action = Actions.AutoAttacking.new(tgt), tgt.global_position)
+		var is_archer = unit.get_script() and unit.get_script().resource_path.get_file() == "archer.gd"
+		var action_class = Actions.ArcherAutoAttacking if is_archer else Actions.AutoAttacking
+		_set_or_queue_action(unit, func(): unit.action = action_class.new(tgt), tgt.global_position)
 		return true
 	if Actions.Constructing.is_applicable(unit, target_unit):
 		var tgt = target_unit

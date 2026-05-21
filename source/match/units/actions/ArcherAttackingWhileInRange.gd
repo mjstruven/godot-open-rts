@@ -8,11 +8,14 @@ const ARROW_LENGTH = 0.4
 const ARROW_WIDTH = 0.03
 const ARROW_COLOR = Color(0.706, 0.627, 0.471)
 const IMPACT_RADIUS = 0.5
-const DIRECT_HIT_CHANCE = 0.10
+const SCATTER_RADIUS_SMALL = 1.0
+const SCATTER_RADIUS_MEDIUM = 2.0
+const SCATTER_RADIUS_LARGE = 3.5
 
 var _target_unit = null
 var _one_shot_timer = null
 var _range_check_timer = null
+var _scatter_circle = null
 
 @onready var _unit = Utils.NodeEx.find_parent_with_group(self, "units")
 @onready var _unit_movement_trait = _unit.find_child("Movement")
@@ -37,6 +40,12 @@ func _ready():
 func _physics_process(_delta):
 	if _unit_movement_trait == null:
 		_rotate_unit_towards_target()
+
+
+func _exit_tree():
+	if is_instance_valid(_scatter_circle):
+		_scatter_circle.queue_free()
+		_scatter_circle = null
 
 
 func _setup_one_shot_timer():
@@ -86,30 +95,32 @@ func _fire_arrow():
 	var archer_pos = _unit.global_position
 	var dist = Vector2(archer_pos.x, archer_pos.z).distance_to(Vector2(target_pos.x, target_pos.z))
 
-	var is_direct_hit = randf() <= DIRECT_HIT_CHANCE
-	var landing_point: Vector3
-	var scatter_radius: float
-	if is_direct_hit:
-		landing_point = target_pos
-		scatter_radius = 0.3
-	else:
-		scatter_radius = _get_scatter_radius(dist)
-		var angle = randf() * TAU
-		var scatter_dist = sqrt(randf()) * scatter_radius
-		var offset = Vector2(cos(angle), sin(angle)) * scatter_dist
-		landing_point = target_pos + Vector3(offset.x, 0.0, offset.y)
+	var scatter_radius = _get_scatter_radius(dist)
+	var angle = randf() * TAU
+	var scatter_dist = sqrt(randf()) * scatter_radius
+	var offset = Vector2(cos(angle), sin(angle)) * scatter_dist
+	var landing_point = target_pos + Vector3(offset.x, 0.0, offset.y)
 	landing_point.y = 0.0
 
 	GameLogger.debug(GameLogger.Category.COMBAT, "Arrow fired", {
 		"archer": _unit.name,
 		"target": _target_unit.name,
 		"distance": dist,
-		"direct_hit": is_direct_hit,
 		"scatter_radius": scatter_radius,
 		"landing_point": str(landing_point)
 	})
 
 	var match_node = _unit.find_parent("Match")
+
+	if is_instance_valid(_scatter_circle):
+		_scatter_circle.queue_free()
+	var circle = Circle3D.new()
+	circle.radius = scatter_radius
+	circle.width = 5.0
+	circle.color = Color(0.6, 0.6, 0.6, 0.6)
+	match_node.add_child(circle)
+	circle.global_position = Vector3(target_pos.x, 0.01, target_pos.z)
+	_scatter_circle = circle
 
 	var arrow_root = Node3D.new()
 	var arrow_mesh = MeshInstance3D.new()
@@ -126,13 +137,6 @@ func _fire_arrow():
 	if archer_pos.distance_to(flat_target) > 0.01:
 		arrow_root.look_at(flat_target, Vector3.UP)
 
-	var circle = Circle3D.new()
-	circle.radius = 1.5
-	circle.width = 5.0
-	circle.color = Color(0.6, 0.6, 0.6, 0.6)
-	match_node.add_child(circle)
-	circle.global_position = Vector3(landing_point.x, 0.01, landing_point.z)
-
 	var tween = match_node.create_tween()
 	tween.tween_property(arrow_root, "global_position", landing_point, FLIGHT_TIME)
 
@@ -140,11 +144,9 @@ func _fire_arrow():
 	var lp = landing_point
 	var damage = _unit.attack_damage
 	var impact_r = IMPACT_RADIUS
-	# Forest cover: arrows fired from outside forest into forest deal zero damage.
 	var archer_in_forest = TerrainManager.is_forest_at(_unit.global_position)
 	tween.tween_callback(func():
 		arrow_root.queue_free()
-		circle.queue_free()
 		var closest = null
 		var closest_dist = INF
 		for u in tree.get_nodes_in_group("units"):
@@ -196,12 +198,12 @@ func _fire_arrow():
 
 
 func _get_scatter_radius(distance: float) -> float:
-	if distance <= 3.0:
-		return 1.0
-	elif distance <= 10.0:
-		return 2.0
+	if distance <= 5.0:
+		return SCATTER_RADIUS_SMALL
+	elif distance <= 8.0:
+		return SCATTER_RADIUS_MEDIUM
 	else:
-		return 3.5
+		return SCATTER_RADIUS_LARGE
 
 
 func _teardown_if_out_of_range() -> bool:
