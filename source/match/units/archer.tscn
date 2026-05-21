@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=3 uid="uid://b2oqa4xhdvtuk"]
 
 [ext_resource type="Script" path="res://source/match/units/archer.gd" id="1_archgd"]
-[ext_resource type="PackedScene" uid="uid://dismtrait0001" path="res://source/match/units/traits/Dismiss.tscn" id="7_archdism"]
+[ext_resource type="PackedScene" path="res://source/match/units/traits/Dismiss.tscn" id="7_archdism"]
 [ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="2_archhi"]
 [ext_resource type="PackedScene" uid="uid://3c1h14nqdumt" path="res://source/match/units/traits/Selection.tscn" id="3_archse"]
 [ext_resource type="PackedScene" uid="uid://ivlo0e66qocl" path="res://source/match/units/traits/Movement.tscn" id="4_archmv"]

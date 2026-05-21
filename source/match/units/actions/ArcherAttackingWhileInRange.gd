@@ -120,18 +120,18 @@ func _fire_arrow():
 	mat.albedo_color = ARROW_COLOR
 	arrow_mesh.material_override = mat
 	arrow_root.add_child(arrow_mesh)
+	match_node.add_child(arrow_root)
 	arrow_root.global_position = archer_pos
 	var flat_target = Vector3(landing_point.x, archer_pos.y, landing_point.z)
 	if archer_pos.distance_to(flat_target) > 0.01:
 		arrow_root.look_at(flat_target, Vector3.UP)
-	match_node.add_child(arrow_root)
 
 	var circle = Circle3D.new()
 	circle.radius = 1.5
 	circle.width = 5.0
 	circle.color = Color(0.6, 0.6, 0.6, 0.6)
-	circle.global_position = Vector3(landing_point.x, 0.01, landing_point.z)
 	match_node.add_child(circle)
+	circle.global_position = Vector3(landing_point.x, 0.01, landing_point.z)
 
 	var tween = match_node.create_tween()
 	tween.tween_property(arrow_root, "global_position", landing_point, FLIGHT_TIME)
