@@ -66,6 +66,7 @@ func _build_mesh() -> void:
 	mat.set_shader_parameter("color_texture", color_texture)
 	mat.set_shader_parameter("height_texture", height_texture)
 	mat.set_shader_parameter("height_scale", HEIGHTMAP_SCALE)
+	mat.set_shader_parameter("map_size", map_size)
 	_mesh_instance.material_override = mat
 	_material = mat
 
