@@ -25,9 +25,11 @@ var units: Array = []:
 		if is_node_ready():
 			_update_suppress_button()
 			_update_rally_button()
+			_update_dismiss_button()
 
 @onready var _suppress_btn = find_child("SuppressButton")
 @onready var _rally_btn = find_child("RallyButton")
+@onready var _dismiss_btn = find_child("DismissButton")
 
 var _rally_poll_timer: Timer = null
 
@@ -41,8 +43,10 @@ func _ready():
 	_rally_poll_timer = Timer.new()
 	_rally_poll_timer.wait_time = 0.5
 	_rally_poll_timer.timeout.connect(_update_rally_button)
+	_rally_poll_timer.timeout.connect(_update_dismiss_button)
 	add_child(_rally_poll_timer)
 	_rally_poll_timer.start()
+	_update_dismiss_button()
 
 
 func _unhandled_input(event):
@@ -187,6 +191,62 @@ func _get_archers() -> Array:
 func _on_suppress_state_changed(unit, _state, _auto_refresh):
 	if unit in units:
 		_update_suppress_button()
+
+
+func _get_dismissible_units() -> Array:
+	return units.filter(func(u): return is_instance_valid(u) and u.find_child("Dismiss") != null)
+
+
+func _on_dismiss_pressed():
+	var dismissible = _get_dismissible_units()
+	if dismissible.is_empty():
+		return
+	var any_dismissing = dismissible.any(func(u):
+		var d = u.find_child("Dismiss")
+		return d != null and d.is_dismissing()
+	)
+	if any_dismissing:
+		for u in dismissible:
+			var d = u.find_child("Dismiss")
+			if d != null:
+				d.cancel_dismiss()
+	else:
+		for u in dismissible:
+			var d = u.find_child("Dismiss")
+			if d != null:
+				d.start_dismiss()
+	_update_dismiss_button()
+
+
+func _update_dismiss_button():
+	if not is_instance_valid(_dismiss_btn):
+		return
+	var dismissible = _get_dismissible_units()
+	if dismissible.is_empty():
+		_dismiss_btn.disabled = true
+		_dismiss_btn.modulate = Color(0.5, 0.5, 0.5)
+		_dismiss_btn.tooltip_text = "Dismiss (no dismissible units selected)"
+		return
+	var any_dismissing = dismissible.any(func(u):
+		var d = u.find_child("Dismiss")
+		return d != null and d.is_dismissing()
+	)
+	var any_blocked = dismissible.any(func(u):
+		var d = u.find_child("Dismiss")
+		return d != null and d.has_cooldown()
+	)
+	if any_blocked and not any_dismissing:
+		_dismiss_btn.disabled = true
+		_dismiss_btn.modulate = Color(0.5, 0.5, 0.5)
+		_dismiss_btn.tooltip_text = "Dismiss on cooldown (60s from first press)"
+	elif any_dismissing:
+		_dismiss_btn.disabled = false
+		_dismiss_btn.modulate = Color(1.0, 0.5, 0.2)
+		_dismiss_btn.tooltip_text = "Dismiss in progress — press to cancel"
+	else:
+		_dismiss_btn.disabled = false
+		_dismiss_btn.modulate = Color.WHITE
+		_dismiss_btn.tooltip_text = "Dismiss unit(s) — 15s countdown, then civilians spawn"
 
 
 func _update_suppress_button():

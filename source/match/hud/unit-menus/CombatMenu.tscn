@@ -54,10 +54,11 @@ custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Pad8" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
+[node name="DismissButton" type="Button" parent="."]
 layout_mode = 2
-mouse_filter = 2
+focus_mode = 0
+text = "DIS"
+tooltip_text = "Dismiss unit(s) — 15s countdown, then civilians spawn"
 
 [node name="Pad9" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
@@ -85,4 +86,5 @@ tooltip_text = "Cancel action"
 [connection signal="pressed" from="StandGroundButton" to="." method="_on_stand_ground_pressed"]
 [connection signal="pressed" from="CaptureButton" to="." method="_on_capture_pressed"]
 [connection signal="pressed" from="RallyButton" to="." method="_handle_rally_click"]
+[connection signal="pressed" from="DismissButton" to="." method="_on_dismiss_pressed"]
 [connection signal="pressed" from="CancelButton" to="." method="_on_cancel_button_pressed"]

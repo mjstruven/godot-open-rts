@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://dismtrait0001"]
+
+[ext_resource type="Script" path="res://source/match/units/traits/Dismiss.gd" id="1_dismgd"]
+
+[sub_resource type="Gradient" id="Gradient_dism"]
+resource_local_to_scene = true
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.292969, 0.292969, 0.292969, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_dism"]
+resource_local_to_scene = true
+gradient = SubResource("Gradient_dism")
+width = 80
+height = 6
+
+[node name="Dismiss" type="Node3D"]
+script = ExtResource("1_dismgd")
+
+[node name="DismissBar" type="Sprite3D" parent="."]
+billboard = 1
+transparent = false
+no_depth_test = true
+texture_filter = 1
+render_priority = 1
+texture = SubResource("GradientTexture2D_dism")

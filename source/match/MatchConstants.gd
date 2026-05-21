@@ -229,6 +229,7 @@ class Units:
 			"attack_range": 1.2,
 			"attack_domains": [Navigation.Domain.TERRAIN],
 		},
+		"res://source/match/units/civilian.tscn": {"sight_range": 2.0, "hp": 10, "hp_max": 10},
 	}
 	const SUPPLY_TRAIN_BUILD_LIMIT = 2
 	# All upkeep values are per minute, applied once per 60-second economy tick.

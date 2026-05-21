@@ -120,6 +120,7 @@ func _try_showing_any_menu():
 		not selected_engineers.is_empty()
 		and selected_engineers.size() == selected_controlled_units.size()
 	):
+		_engineer_menu.units = selected_engineers
 		_engineer_menu.show()
 		return true
 	var combat_units = selected_controlled_units.filter(

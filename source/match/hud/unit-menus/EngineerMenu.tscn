@@ -74,10 +74,11 @@ custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Padding6" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
+[node name="DismissButton" type="Button" parent="."]
 layout_mode = 2
-mouse_filter = 2
+focus_mode = 0
+text = "DIS"
+tooltip_text = "Dismiss unit(s) — 15s countdown, then civilians spawn"
 
 [node name="Padding7" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
@@ -101,3 +102,4 @@ mouse_filter = 2
 [connection signal="pressed" from="PlaceCapitalButton" to="." method="_on_place_capital_button_pressed"]
 [connection signal="pressed" from="PlaceHouseButton" to="." method="_on_place_house_button_pressed"]
 [connection signal="pressed" from="PlaceManorButton" to="." method="_on_place_manor_button_pressed"]
+[connection signal="pressed" from="DismissButton" to="." method="_on_dismiss_pressed"]

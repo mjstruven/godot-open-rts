@@ -17,6 +17,24 @@ const CapitalUnit = preload("res://source/match/units/capital.tscn")
 @onready var _manor_btn = find_child("PlaceManorButton")
 @onready var _academy_btn = find_child("PlaceTownCenterButton")
 @onready var _capital_btn = find_child("PlaceCapitalButton")
+@onready var _dismiss_btn = find_child("DismissButton")
+
+var units: Array = []:
+	set(value):
+		units = value
+		if is_node_ready():
+			_update_dismiss_button()
+
+var _dismiss_poll_timer: Timer = null
+
+
+func _ready():
+	_update_dismiss_button()
+	_dismiss_poll_timer = Timer.new()
+	_dismiss_poll_timer.wait_time = 0.5
+	_dismiss_poll_timer.timeout.connect(_update_dismiss_button)
+	add_child(_dismiss_poll_timer)
+	_dismiss_poll_timer.start()
 
 
 func _process(_delta):
@@ -95,3 +113,59 @@ func _on_place_town_center_button_pressed():
 
 func _on_place_capital_button_pressed():
 	MatchSignals.place_structure.emit(CapitalUnit)
+
+
+func _get_dismissible_units() -> Array:
+	return units.filter(func(u): return is_instance_valid(u) and u.find_child("Dismiss") != null)
+
+
+func _on_dismiss_pressed():
+	var dismissible = _get_dismissible_units()
+	if dismissible.is_empty():
+		return
+	var any_dismissing = dismissible.any(func(u):
+		var d = u.find_child("Dismiss")
+		return d != null and d.is_dismissing()
+	)
+	if any_dismissing:
+		for u in dismissible:
+			var d = u.find_child("Dismiss")
+			if d != null:
+				d.cancel_dismiss()
+	else:
+		for u in dismissible:
+			var d = u.find_child("Dismiss")
+			if d != null:
+				d.start_dismiss()
+	_update_dismiss_button()
+
+
+func _update_dismiss_button():
+	if not is_instance_valid(_dismiss_btn):
+		return
+	var dismissible = _get_dismissible_units()
+	if dismissible.is_empty():
+		_dismiss_btn.disabled = true
+		_dismiss_btn.modulate = Color(0.5, 0.5, 0.5)
+		_dismiss_btn.tooltip_text = "Dismiss (no dismissible units selected)"
+		return
+	var any_dismissing = dismissible.any(func(u):
+		var d = u.find_child("Dismiss")
+		return d != null and d.is_dismissing()
+	)
+	var any_blocked = dismissible.any(func(u):
+		var d = u.find_child("Dismiss")
+		return d != null and d.has_cooldown()
+	)
+	if any_blocked and not any_dismissing:
+		_dismiss_btn.disabled = true
+		_dismiss_btn.modulate = Color(0.5, 0.5, 0.5)
+		_dismiss_btn.tooltip_text = "Dismiss on cooldown (60s from first press)"
+	elif any_dismissing:
+		_dismiss_btn.disabled = false
+		_dismiss_btn.modulate = Color(1.0, 0.5, 0.2)
+		_dismiss_btn.tooltip_text = "Dismiss in progress — press to cancel"
+	else:
+		_dismiss_btn.disabled = false
+		_dismiss_btn.modulate = Color.WHITE
+		_dismiss_btn.tooltip_text = "Dismiss unit(s) — 15s countdown, then civilians spawn"

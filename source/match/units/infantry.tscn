@@ -1,6 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://b4uqucgqj6fl4"]
+[gd_scene load_steps=13 format=3 uid="uid://b4uqucgqj6fl4"]
 
 [ext_resource type="Script" path="res://source/match/units/infantry.gd" id="1_infgd"]
+[ext_resource type="PackedScene" uid="uid://dismtrait0001" path="res://source/match/units/traits/Dismiss.tscn" id="7_infdism"]
 [ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="2_infhi"]
 [ext_resource type="PackedScene" uid="uid://3c1h14nqdumt" path="res://source/match/units/traits/Selection.tscn" id="3_infse"]
 [ext_resource type="PackedScene" uid="uid://ivlo0e66qocl" path="res://source/match/units/traits/Movement.tscn" id="4_infmv"]
@@ -72,3 +73,6 @@ size = Vector2(100, 10)
 [node name="Targetability" parent="." instance=ExtResource("6_infta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 radius = 0.4
+
+[node name="Dismiss" parent="." instance=ExtResource("7_infdism")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)

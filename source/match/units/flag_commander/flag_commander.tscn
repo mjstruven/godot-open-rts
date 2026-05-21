@@ -1,6 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://flagcmd00001"]
+[gd_scene load_steps=13 format=3 uid="uid://flagcmd00001"]
 
 [ext_resource type="Script" path="res://source/match/units/flag_commander/flag_commander.gd" id="1_fcgd"]
+[ext_resource type="PackedScene" uid="uid://dismtrait0001" path="res://source/match/units/traits/Dismiss.tscn" id="8_fcdism"]
 [ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="2_fchi"]
 [ext_resource type="PackedScene" uid="uid://3c1h14nqdumt" path="res://source/match/units/traits/Selection.tscn" id="3_fcse"]
 [ext_resource type="PackedScene" uid="uid://ivlo0e66qocl" path="res://source/match/units/traits/Movement.tscn" id="4_fcmv"]
@@ -73,3 +74,6 @@ radius = 0.9
 
 [node name="RallyAbility" type="Node" parent="."]
 script = ExtResource("7_rally")
+
+[node name="Dismiss" parent="." instance=ExtResource("8_fcdism")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
