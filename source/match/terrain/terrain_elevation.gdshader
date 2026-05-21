@@ -6,9 +6,11 @@ uniform float height_scale = 1.0;
 uniform vec2 map_size = vec2(128.0, 128.0);
 
 void vertex() {
-	// World XZ → [0,1] UV matching get_visual_height_at(): world 0 → texel 0, world map_size → texel max.
 	vec3 world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	// GPU texture UV.y=0 is the bottom of the image (OpenGL convention), opposite to CPU Image row 0 (top).
+	// Flip UV.y so the shader reads the same texel as get_visual_height_at() for the same world_z.
 	vec2 sample_uv = clamp(world_pos.xz / map_size, 0.0, 1.0);
+	sample_uv.y = 1.0 - sample_uv.y;
 	float h = texture(height_texture, sample_uv).r;
 	VERTEX.y += h * height_scale;
 
@@ -21,7 +23,8 @@ void vertex() {
 	float step = 1.0;
 
 	vec3 tangent = vec3(2.0 * step, (hR - hL) * height_scale, 0.0);
-	vec3 bitangent = vec3(0.0, (hU - hD) * height_scale, 2.0 * step);
+	// After Y-flip, hD is the +Z world neighbor and hU is the -Z neighbor; swap sign to keep lighting correct.
+	vec3 bitangent = vec3(0.0, (hD - hU) * height_scale, 2.0 * step);
 
 	NORMAL = normalize(cross(bitangent, tangent));
 }
