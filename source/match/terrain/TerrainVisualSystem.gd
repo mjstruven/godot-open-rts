@@ -2,6 +2,7 @@ extends Node
 
 const HEIGHTMAP_SCALE := 5.0
 const HEIGHTMAP_DIR := "res://assets/heightmaps/"
+const HEIGHTMAP_RESOLUTION := 256       # heightmaps are always loaded/resized to this square size
 const SLOPE_MAX_DELTA: float = 0.10      # max normalized height diff per adjacent texel (~0.5 WU at HEIGHTMAP_SCALE=5)
 const SLOPE_CLAMP_MAX_PASSES: int = 200  # safety cap; typical terrain converges in ~10-20 passes
 const SLOPE_CLAMP_EPSILON: float = 0.0001
@@ -33,9 +34,13 @@ func _build_mesh() -> void:
 
 	var plane := PlaneMesh.new()
 	plane.size = Vector2(mesh_w, mesh_h)
-	plane.subdivide_width = 128
-	plane.subdivide_depth = 128
 	plane.center_offset = Vector3(map_size.x / 2.0, 0.0, map_size.y / 2.0)
+	# One vertex per heightmap texel: mesh_w / subdiv <= texel_spacing (map_size / HEIGHTMAP_RESOLUTION).
+	# Rearranged: subdiv >= mesh_w * HEIGHTMAP_RESOLUTION / map_size.
+	var subdiv_w := clampi(ceili(mesh_w * HEIGHTMAP_RESOLUTION / map_size.x), 1, 512)
+	var subdiv_h := clampi(ceili(mesh_h * HEIGHTMAP_RESOLUTION / map_size.y), 1, 512)
+	plane.subdivide_width = subdiv_w
+	plane.subdivide_depth = subdiv_h
 	_mesh_instance.mesh = plane
 
 	var color_img := Image.create(256, 256, false, Image.FORMAT_RGB8)
