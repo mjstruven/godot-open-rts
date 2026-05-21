@@ -356,53 +356,50 @@ func _clamp_heightmap_slopes(img: Image) -> void:
 
 		var val_before_pass: float = img.get_pixel(trace_x, trace_y).r
 
-		# Lower sweep: pull down any pixel that is too HIGH above a neighbor.
+		# Single unified relaxation: for each pixel, compute the allowed range as the
+		# intersection of all 4 neighbor constraints. If the range is non-empty, clamp
+		# into it. If neighbors conflict (their joint constraint is unsatisfiable), go to
+		# the midpoint — this reduces the violation on both sides equally and propagates
+		# the ramp outward over successive passes without fighting itself.
 		var src: Image = img.duplicate() as Image
 		for y in range(h):
 			for x in range(w):
-				var orig: float = src.get_pixel(x, y).r
-				var val: float = orig
+				var cur: float = src.get_pixel(x, y).r
+				var min_allowed: float = -INF
+				var max_allowed: float = INF
 				if x > 0:
-					val = minf(val, src.get_pixel(x - 1, y).r + SLOPE_MAX_DELTA)
+					var n: float = src.get_pixel(x - 1, y).r
+					min_allowed = maxf(min_allowed, n - SLOPE_MAX_DELTA)
+					max_allowed = minf(max_allowed, n + SLOPE_MAX_DELTA)
 				if x < w - 1:
-					val = minf(val, src.get_pixel(x + 1, y).r + SLOPE_MAX_DELTA)
+					var n: float = src.get_pixel(x + 1, y).r
+					min_allowed = maxf(min_allowed, n - SLOPE_MAX_DELTA)
+					max_allowed = minf(max_allowed, n + SLOPE_MAX_DELTA)
 				if y > 0:
-					val = minf(val, src.get_pixel(x, y - 1).r + SLOPE_MAX_DELTA)
+					var n: float = src.get_pixel(x, y - 1).r
+					min_allowed = maxf(min_allowed, n - SLOPE_MAX_DELTA)
+					max_allowed = minf(max_allowed, n + SLOPE_MAX_DELTA)
 				if y < h - 1:
-					val = minf(val, src.get_pixel(x, y + 1).r + SLOPE_MAX_DELTA)
-				var change: float = absf(val - orig)
+					var n: float = src.get_pixel(x, y + 1).r
+					min_allowed = maxf(min_allowed, n - SLOPE_MAX_DELTA)
+					max_allowed = minf(max_allowed, n + SLOPE_MAX_DELTA)
+
+				var val: float
+				if min_allowed <= max_allowed:
+					val = clampf(cur, min_allowed, max_allowed)
+				else:
+					val = (min_allowed + max_allowed) * 0.5
+
+				var change: float = absf(val - cur)
 				if change > SLOPE_CLAMP_EPSILON:
 					converged = false
 				pass_max_change = maxf(pass_max_change, change)
 				img.set_pixel(x, y, Color(val, 0.0, 0.0))
 
-		var val_after_lower: float = img.get_pixel(trace_x, trace_y).r
-
-		# Raise sweep: pull up any pixel that is too LOW below a neighbor.
-		src = img.duplicate() as Image
-		for y in range(h):
-			for x in range(w):
-				var orig: float = src.get_pixel(x, y).r
-				var val: float = orig
-				if x > 0:
-					val = maxf(val, src.get_pixel(x - 1, y).r - SLOPE_MAX_DELTA)
-				if x < w - 1:
-					val = maxf(val, src.get_pixel(x + 1, y).r - SLOPE_MAX_DELTA)
-				if y > 0:
-					val = maxf(val, src.get_pixel(x, y - 1).r - SLOPE_MAX_DELTA)
-				if y < h - 1:
-					val = maxf(val, src.get_pixel(x, y + 1).r - SLOPE_MAX_DELTA)
-				var change: float = absf(val - orig)
-				if change > SLOPE_CLAMP_EPSILON:
-					converged = false
-				pass_max_change = maxf(pass_max_change, change)
-				img.set_pixel(x, y, Color(val, 0.0, 0.0))
-
-		var val_after_raise: float = img.get_pixel(trace_x, trace_y).r
+		var val_after_pass: float = img.get_pixel(trace_x, trace_y).r
 		if passes_run <= 3:
 			print("[CLAMP-TRACE] px(", trace_x, ",", trace_y, ") pass ", passes_run,
-				" start=", val_before_pass, " post-lower=", val_after_lower,
-				" post-raise=", val_after_raise)
+				" start=", val_before_pass, " post-pass=", val_after_pass)
 
 		if passes_run <= 5 or passes_run % 10 == 0:
 			print("[CLAMP] pass ", passes_run, " max_change=", pass_max_change)
