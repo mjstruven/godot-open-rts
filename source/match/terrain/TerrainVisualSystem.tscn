@@ -6,4 +6,3 @@
 script = ExtResource("1_tvs")
 
 [node name="GroundMesh" type="MeshInstance3D" parent="."]
-cast_shadow = 0
