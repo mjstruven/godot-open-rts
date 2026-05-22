@@ -173,6 +173,9 @@ func _set_action(action_node):
 		if action_node != null:
 			action_node.queue_free()
 		return
+	if is_in_group("suppressing") and action_node != null:
+		action_node.queue_free()
+		return
 	_action_locked = true
 	_teardown_current_action()
 	action = action_node
