@@ -124,3 +124,101 @@ A pure on/off toggle (old duration / grace / auto-renew removed).
 - Archer and Suppress are complete and stable.
 - Waves 1–2 of the building update (Capital, Command Post, win condition) are done.
 - **Next: Wave 3 — Siege Workshop and the four siege units.**
+
+---
+
+## Session: Wave 3a — Siege Workshop + Battering Ram (complete)
+
+### Units / Buildings Added
+
+**Siege Workshop** — production building, built by the Engineer.
+- Costs resources to build (standard construction flow).
+- Has a production queue; produces siege units one at a time.
+- Currently produces the Battering Ram.
+
+**Battering Ram** — anti-structure siege unit, produced by the Siege Workshop.
+- Attacks buildings, walls, and other siege units only — never regular units.
+- Melee range, edge-based attack (see Targeting below).
+- No upkeep cost.
+- Auto-acquires nearby valid targets while idle; returns to target-scanning state after any move or attack completes.
+
+### Inside-Crew System (CrewManager + CrewDots — reusable)
+
+Units (infantry / archers) board a siege unit by selecting them and right-clicking it. They walk to it and are absorbed (hidden inside).
+
+- **Capacity / minimum:** Ram capacity 12; minimum 4 crew to move or attack.
+- **Population / upkeep:** crew still count toward pop cap and pay upkeep while inside.
+- **Protection:** crew are invulnerable inside — they die only if the siege unit is destroyed (all crew hp set to 0 on death).
+- **Unman:** releases all crew at full HP beside the unit.
+
+**Ownership (neutral/claimable):**
+- Un-crewed = neutral — no owner, no player control, not visible in fog, neither player can order it.
+- Loading the first crew member claims the siege unit for that player (scene-tree reparent, group updates, colour refresh).
+- Unmanning releases it back to neutral. Either player can claim a neutral siege unit.
+- Implemented as symmetric claim/release in `CrewManager` with reparenting.
+
+**Crew Dots (CrewDots — reusable visual component):**
+- Row of dots above the unit, billboarded to the camera (always faces camera regardless of unit rotation).
+- Grey dot = empty capacity slot; white dot = filled crew slot; fills left-to-right.
+- Positioned above the unit's name label at a fixed world-space height offset.
+
+### Edge-Based Targeting
+
+A siege unit's attack reach and auto-detect range are both measured to the **edge** of the target, not its center:
+
+- `attack_range + target.MovementObstacle.radius` (for structured targets with a navmesh carve).
+- `sight_range + target.MovementObstacle.radius` (for auto-detect scan).
+- Targets without a navmesh carve (mobile siege units) contribute radius 0 — plain melee range.
+
+This allows the Ram to attack and detect buildings of any size, including the Capital (obstacle radius 2.5), without inflating the base attack_range with a magic constant. Base `attack_range = 1.2` (true melee contact).
+
+The Ram's RamAutoAttacking, RamAttackingWhileInRange, and RamWaitingForTargets all use this edge-based calculation.
+
+### Idle / Re-scan Behaviour
+
+After any action completes (move finishes, attack completes, building destroyed), the Ram's action becomes `null`. A hook on the `action_changed` signal in `battering_ram.gd` reinstates `RamWaitingForTargets` whenever action becomes null and crew ≥ 4. This means a crewed Ram continuously scans for valid targets after moving or finishing an attack.
+
+### Debug / Testing
+
+- Each player currently starts with **2 000 of every resource** — a DEBUG testing value (`DEBUG_STARTING_RESOURCES` in `Match.gd`). Set to normal values before shipping.
+
+### Deferred Design Work (specified, to build later)
+
+**Wave 3 remaining siege units:**
+- **3b — Siege Tower:** pure troop transport; 2 000 HP; capacity 24; reuses inside-crew system.
+- **3c — Ballista:** ranged siege unit operated by external crew (siege-engineer external-crew system); requires Siege Engineer unit.
+- **3d — Trebuchet:** heavy ranged siege, 15-second pack/unpack animation between move and fire states.
+- **3e — Ballista dig-in ability.**
+
+**Formation system (full design pass done — build post-siege):**
+- **Ranks:** ordered fighting line; travels as a column; deploys to rows 3 tiles from the march point. Unit type order front-to-back: cavalry → infantry → archers → siege. Faces direction of travel; does not auto-reorient when flanked.
+- **Square:** defensive box; melee on perimeter, archers inside, siege in the center; toughest type on the perimeter when no melee present. Faces direction of travel.
+- A **deployment zone** within 3 tiles gives reduced ally collision + a movement-speed boost for repositioning.
+- **Spread** is a toggle modifier on either formation: wider spacing, −5% move speed.
+- Formations are purely positional (no combat bonuses).
+- Build stages F1–F4 specified.
+
+**Command panel restructure (planned, depends on formations):**
+- Two-panel command UI: a shared "Orders" panel (movement + formation commands every selection obeys) and an "Abilities" panel (unit-unique commands for the tabbed unit type).
+
+**Phase 5 Economy (continuous simulation, when built):**
+- Simulate per-second/per-tick rather than per-minute lumps. Discrete events (supply wagon arrivals) stay discrete. HUD continues to display per-minute rates.
+
+**Combat modifier / bonus decisions (Phase 6 tuning):**
+- Cap on stacked combat bonuses (~+50% discussed), veteran per-kill bonus, terrain/high-ground bonus, additive stacking — not yet finalised; tune once combat and targeting mature.
+
+**Morale:**
+- Discussed as a behavioural system (routing, hesitation, surrender, recovery). Governs unit will, not damage; emergent; has inertia; spreads locally. Not yet designed in detail.
+
+**Smaller deferred items:**
+- Building placement revisit.
+- FormationController placement math needs a quality pass.
+- Units-before-structures targeting priority.
+- Real-time shadows (disabled — shadow AABB / bias issues with displaced terrain).
+- Cliffs / hill movement–combat penalty.
+
+### Current State
+
+- Project compiles and runs clean.
+- Wave 3a (Siege Workshop, Battering Ram, inside-crew system, neutral/claimable ownership, crew dots, edge-based targeting, idle re-scan) is **complete**.
+- **Next: Wave 3b — Siege Tower.**
