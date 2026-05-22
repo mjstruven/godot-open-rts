@@ -19,8 +19,7 @@ func _attack_or_move_closer():
 	if dist < MIN_RANGE:
 		_sub_action = MinRangeWaiter.new(_target_unit, MIN_RANGE)
 	elif dist <= _unit.attack_range and _unit.is_in_group("suppress_armed"):
-		var auto_refresh = _unit.get_meta("suppress_auto_refresh", false)
-		_sub_action = SuppressedAttacking.new(_target_unit, auto_refresh)
+		_sub_action = SuppressedAttacking.new(_target_unit)
 	elif dist <= _unit.attack_range:
 		_sub_action = ArcherAttackingWhileInRange.new(_target_unit)
 	else:

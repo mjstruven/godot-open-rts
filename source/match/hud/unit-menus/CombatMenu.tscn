@@ -36,7 +36,7 @@ tooltip_text = "Capture Structure [R] - Coming soon"
 layout_mode = 2
 focus_mode = 0
 text = "SP"
-tooltip_text = "Suppress [S]\nRoot archers. +2 range, +50% fire rate.\nCost: 1 wood per archer per period.\nDuration: 25s | Cooldown: 30s\nLeft-click: single use\nRight-click: auto-refresh"
+tooltip_text = "Suppress [S]\nRoot archers. +2 range, +50% fire rate.\nCost: 1 wood per archer. Toggle: press again to cancel.\nCooldown: 5s after deactivation."
 
 [node name="RallyButton" type="Button" parent="."]
 layout_mode = 2

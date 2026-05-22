@@ -8,9 +8,9 @@ const ARROW_LENGTH = 0.4
 const ARROW_WIDTH = 0.03
 const ARROW_COLOR = Color(0.706, 0.627, 0.471)
 const IMPACT_RADIUS = 0.5
-const SCATTER_RADIUS_SMALL = 0.75
-const SCATTER_RADIUS_MEDIUM = 1.5
-const SCATTER_RADIUS_LARGE = 2.625
+const SCATTER_RADIUS_SMALL = 0.375
+const SCATTER_RADIUS_MEDIUM = 0.75
+const SCATTER_RADIUS_LARGE = 1.3125
 
 var _target_unit = null
 var _one_shot_timer = null
@@ -34,6 +34,12 @@ func _ready():
 		_unit_movement_trait.passive_movement_finished.connect(_on_passive_movement_finished)
 	_setup_one_shot_timer()
 	_setup_range_check_timer()
+	# One-time random phase so a group of archers fires a staggered stream, not a volley.
+	if not _unit.has_meta("next_attack_availability_time"):
+		_unit.set_meta(
+			"next_attack_availability_time",
+			Time.get_ticks_msec() + int(randf() * _unit.attack_interval * 1000.0)
+		)
 	_schedule_shot()
 
 

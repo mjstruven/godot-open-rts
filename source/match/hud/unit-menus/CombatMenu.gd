@@ -5,6 +5,10 @@ const ConstructingAction = preload("res://source/match/units/actions/Constructin
 const AttackMoving = preload("res://source/match/units/actions/AttackMoving.gd")
 const StandingGround = preload("res://source/match/units/actions/StandingGround.gd")
 const Patrolling = preload("res://source/match/units/actions/Patrolling.gd")
+const SuppressedAttackingScript = preload(
+	"res://source/match/units/actions/SuppressedAttacking.gd"
+)
+const Circle3D = preload("res://source/generic-scenes-and-nodes/3d/Circle3D.gd")
 
 const RALLY_TOOLTIP = (
 	"Rally [F]\n"
@@ -15,14 +19,15 @@ const RALLY_TOOLTIP = (
 const SUPPRESS_TOOLTIP = (
 	"Suppress [S]\n"
 	+ "Root archers. +2 range, +50% fire rate.\n"
-	+ "Cost: 1 wood per archer per period. Duration: 25s\n"
-	+ "Left-click: single use | Right-click: auto-refresh"
+	+ "Cost: 1 wood per archer. Toggle: press again to cancel.\n"
+	+ "Cooldown: 5s after deactivation. Hover to preview range."
 )
 
 var units: Array = []:
 	set(value):
 		units = value
 		if is_node_ready():
+			_hide_range_preview()
 			_update_suppress_button()
 			_update_rally_button()
 			_update_dismiss_button()
@@ -32,11 +37,14 @@ var units: Array = []:
 @onready var _dismiss_btn = find_child("DismissButton")
 
 var _rally_poll_timer: Timer = null
+var _range_preview_circles: Array = []
 
 
 func _ready():
 	MatchSignals.suppress_state_changed.connect(_on_suppress_state_changed)
 	_suppress_btn.gui_input.connect(_on_suppress_gui_input)
+	_suppress_btn.mouse_entered.connect(_on_suppress_btn_mouse_entered)
+	_suppress_btn.mouse_exited.connect(_on_suppress_btn_mouse_exited)
 	_update_suppress_button()
 	_update_rally_button()
 
@@ -44,6 +52,7 @@ func _ready():
 	_rally_poll_timer.wait_time = 0.5
 	_rally_poll_timer.timeout.connect(_update_rally_button)
 	_rally_poll_timer.timeout.connect(_update_dismiss_button)
+	_rally_poll_timer.timeout.connect(_update_suppress_button)
 	add_child(_rally_poll_timer)
 	_rally_poll_timer.start()
 	_update_dismiss_button()
@@ -68,7 +77,7 @@ func _unhandled_input(event):
 			_on_capture_pressed()
 			get_viewport().set_input_as_handled()
 		KEY_S:
-			_handle_suppress_click(false)
+			_handle_suppress_click()
 			get_viewport().set_input_as_handled()
 		KEY_F:
 			_handle_rally_click()
@@ -142,14 +151,11 @@ func _on_suppress_gui_input(event: InputEvent):
 	if not (event is InputEventMouseButton and event.pressed):
 		return
 	if event.button_index == MOUSE_BUTTON_LEFT:
-		_handle_suppress_click(false)
-		_suppress_btn.get_viewport().set_input_as_handled()
-	elif event.button_index == MOUSE_BUTTON_RIGHT:
-		_handle_suppress_click(true)
+		_handle_suppress_click()
 		_suppress_btn.get_viewport().set_input_as_handled()
 
 
-func _handle_suppress_click(auto_refresh: bool):
+func _handle_suppress_click():
 	var archers = _get_archers()
 	if archers.is_empty():
 		return
@@ -161,21 +167,21 @@ func _handle_suppress_click(auto_refresh: bool):
 		_cancel_suppress(archers)
 		return
 
+	if _is_any_archer_on_cooldown(archers):
+		return
+
 	if not archers[0].player.has_resources({"wood": archers.size()}):
 		_update_suppress_button()
 		return
 
-	var mode = "toggle" if auto_refresh else "single"
 	GameLogger.info(GameLogger.Category.COMBAT, "Suppress activated", {
 		"archer_count": archers.size(),
-		"mode": mode,
 		"wood_cost": archers.size()
 	})
 
 	for archer in archers:
 		archer.add_to_group("suppress_armed")
-		archer.set_meta("suppress_auto_refresh", auto_refresh)
-		MatchSignals.suppress_state_changed.emit(archer, "armed", auto_refresh)
+		MatchSignals.suppress_state_changed.emit(archer, "armed")
 
 
 func _cancel_suppress(archers: Array):
@@ -188,7 +194,14 @@ func _get_archers() -> Array:
 	return units.filter(func(u): return is_instance_valid(u) and u.type == "archer")
 
 
-func _on_suppress_state_changed(unit, _state, _auto_refresh):
+func _is_any_archer_on_cooldown(archers: Array) -> bool:
+	var now = Time.get_ticks_msec()
+	return archers.any(func(a):
+		return a.has_meta("suppress_cooldown_until_ms") and now < a.get_meta("suppress_cooldown_until_ms")
+	)
+
+
+func _on_suppress_state_changed(unit, _state):
 	if unit in units:
 		_update_suppress_button()
 
@@ -261,17 +274,16 @@ func _update_suppress_button():
 
 	var any_suppressing = archers.any(func(a): return a.is_in_group("suppressing"))
 	var any_armed = archers.any(func(a): return a.is_in_group("suppress_armed"))
-	var auto_mode = archers.any(func(a): return a.get_meta("suppress_auto_refresh", false))
 
 	if any_suppressing or any_armed:
-		if auto_mode:
-			_suppress_btn.modulate = Color(0.3, 0.8, 1.0)
-			_suppress_btn.text = "SP~"
-			_suppress_btn.tooltip_text = "Suppress ACTIVE (auto-refresh)\nLeft-click or [S] to cancel"
-		else:
-			_suppress_btn.modulate = Color(1.0, 0.8, 0.2)
-			_suppress_btn.text = "SP!"
-			_suppress_btn.tooltip_text = "Suppress ACTIVE (single use)\nLeft-click or [S] to cancel"
+		_suppress_btn.modulate = Color(1.0, 0.8, 0.2)
+		_suppress_btn.text = "SP!"
+		_suppress_btn.tooltip_text = "Suppress ACTIVE\nLeft-click or [S] to cancel"
+	elif _is_any_archer_on_cooldown(archers):
+		_suppress_btn.disabled = true
+		_suppress_btn.modulate = Color(0.5, 0.5, 0.5)
+		_suppress_btn.text = "SP"
+		_suppress_btn.tooltip_text = "Suppress on cooldown (%ds)" % SuppressedAttackingScript.COOLDOWN_DURATION
 	elif not archers[0].player.has_resources({"wood": archers.size()}):
 		_suppress_btn.modulate = Color(1.0, 0.3, 0.3)
 		_suppress_btn.text = "SP"
@@ -280,3 +292,40 @@ func _update_suppress_button():
 		_suppress_btn.modulate = Color.WHITE
 		_suppress_btn.text = "SP"
 		_suppress_btn.tooltip_text = SUPPRESS_TOOLTIP
+
+
+# ── Hover range preview ──────────────────────────────────────────────────────
+
+func _on_suppress_btn_mouse_entered():
+	_show_range_preview()
+
+
+func _on_suppress_btn_mouse_exited():
+	_hide_range_preview()
+
+
+func _show_range_preview():
+	_hide_range_preview()
+	var archers = _get_archers()
+	if archers.is_empty():
+		return
+	var match_node = find_parent("Match")
+	if match_node == null:
+		return
+	for archer in archers:
+		if not is_instance_valid(archer):
+			continue
+		var circle = Circle3D.new()
+		circle.radius = archer.attack_range + SuppressedAttackingScript.RANGE_BONUS
+		circle.width = 4.0
+		circle.color = Color(0.6, 0.6, 0.6, 0.5)
+		match_node.add_child(circle)
+		circle.global_position = Vector3(archer.global_position.x, 0.01, archer.global_position.z)
+		_range_preview_circles.append(circle)
+
+
+func _hide_range_preview():
+	for c in _range_preview_circles:
+		if is_instance_valid(c):
+			c.queue_free()
+	_range_preview_circles.clear()
