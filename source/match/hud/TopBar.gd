@@ -10,6 +10,7 @@ const MANOR_WAGON_RATE = 92
 
 const WARNING_SECONDS_THRESHOLD = 60.0
 const UPDATE_INTERVAL = 0.5
+const SUPPRESS_WOOD_PER_MIN = 6  # 1 wood per 10s per suppressing archer
 
 var _player = null
 var _elapsed_seconds = 0.0
@@ -91,13 +92,16 @@ func _update_display():
 	var food_ex = _upkeep_per_min("food", all_units)
 	var gold_ex = _upkeep_per_min("gold", all_units)
 
+	var suppressing_count = all_units.filter(func(u): return u.is_in_group("suppressing")).size()
+	var wood_ex = suppressing_count * SUPPRESS_WOOD_PER_MIN
+
 	_set_resource_block(
 		_food_stock, _food_income, _food_expend, _food_net, _food_block,
 		int(_player.food), food_in, food_ex
 	)
 	_set_resource_block(
 		_wood_stock, _wood_income, _wood_expend, _wood_net, _wood_block,
-		int(_player.wood), wood_in, 0
+		int(_player.wood), wood_in, wood_ex
 	)
 	_set_resource_block(
 		_stone_stock, _stone_income, _stone_expend, _stone_net, _stone_block,
@@ -117,6 +121,10 @@ func _update_display():
 	_gold_income.tooltip_text = _income_tooltip("gold", [], all_units)
 	_food_expend.tooltip_text = _upkeep_breakdown_tooltip("food", all_units)
 	_gold_expend.tooltip_text = _upkeep_breakdown_tooltip("gold", all_units)
+	if suppressing_count > 0:
+		_wood_expend.tooltip_text = "-%d from Suppress ×%d" % [wood_ex, suppressing_count]
+	else:
+		_wood_expend.tooltip_text = "No upkeep"
 
 	var pop = get_tree().get_nodes_in_group("population_units").filter(
 		func(u): return u.player == _player

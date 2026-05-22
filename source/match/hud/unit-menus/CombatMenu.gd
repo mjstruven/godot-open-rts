@@ -38,6 +38,7 @@ var units: Array = []:
 
 var _rally_poll_timer: Timer = null
 var _range_preview_circles: Array = []
+var _range_preview_archer_refs: Array = []
 var _suppress_active_style: StyleBoxFlat = null
 
 
@@ -66,6 +67,14 @@ func _ready():
 	add_child(_rally_poll_timer)
 	_rally_poll_timer.start()
 	_update_dismiss_button()
+
+
+func _process(_delta):
+	for i in range(_range_preview_archer_refs.size()):
+		var archer = _range_preview_archer_refs[i]
+		var circle = _range_preview_circles[i]
+		if is_instance_valid(archer) and is_instance_valid(circle):
+			circle.global_position = Vector3(archer.global_position.x, 0.01, archer.global_position.z)
 
 
 func _unhandled_input(event):
@@ -342,6 +351,7 @@ func _show_range_preview():
 		match_node.add_child(circle)
 		circle.global_position = Vector3(archer.global_position.x, 0.01, archer.global_position.z)
 		_range_preview_circles.append(circle)
+		_range_preview_archer_refs.append(archer)
 
 
 func _hide_range_preview():
@@ -349,3 +359,4 @@ func _hide_range_preview():
 		if is_instance_valid(c):
 			c.queue_free()
 	_range_preview_circles.clear()
+	_range_preview_archer_refs.clear()
