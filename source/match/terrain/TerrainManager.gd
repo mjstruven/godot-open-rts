@@ -155,7 +155,6 @@ func _update_unit_mods(unit) -> void:
 
 	var movement = unit.find_child("Movement")
 	_unit_original_stats[unit] = {
-		"speed": movement.speed if movement != null else null,
 		"sight_range": unit.sight_range,
 		"attack_range": unit.attack_range,
 		"attack_damage": unit.attack_damage,
@@ -184,8 +183,8 @@ func _update_unit_mods(unit) -> void:
 					range_bonus += 2.0
 
 	var orig = _unit_original_stats[unit]
-	if movement != null and orig["speed"] != null:
-		movement.speed = orig["speed"] * speed_mult
+	if movement != null:
+		movement.set_speed_slow("terrain", 1.0 - speed_mult)
 	if orig["sight_range"] != null:
 		unit.sight_range = orig["sight_range"] + sight_bonus
 	if unit.attack_range != null and orig["attack_range"] != null:
@@ -204,8 +203,8 @@ func _restore_stats(unit) -> void:
 	var orig = _unit_original_stats[unit]
 	if is_instance_valid(unit) and unit.is_inside_tree():
 		var movement = unit.find_child("Movement")
-		if movement != null and orig["speed"] != null:
-			movement.speed = orig["speed"]
+		if movement != null:
+			movement.clear_speed_slow("terrain")
 		if orig["sight_range"] != null:
 			unit.sight_range = orig["sight_range"]
 		if unit.attack_range != null and orig["attack_range"] != null:

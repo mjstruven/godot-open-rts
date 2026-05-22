@@ -20,6 +20,11 @@ const PASSIVE_MOVEMENT_TRACKING_ENABLED = true
 @export var domain = Constants.Match.Navigation.Domain.TERRAIN
 @export var speed: float = 4.0
 
+const MIN_SPEED_FRACTION = 0.25
+
+var _base_speed: float = 0.0
+var _slow_contributors: Dictionary = {}
+
 var _interim_speed: float = 0.0
 
 var _stuck_prevention_window = []
@@ -51,6 +56,7 @@ func _physics_process(delta):
 
 
 func _ready():
+	_base_speed = speed
 	if _match.navigation == null:
 		await _match.ready
 	velocity_computed.connect(_on_velocity_computed)
@@ -191,3 +197,24 @@ func _on_velocity_computed(safe_velocity: Vector3):
 func _on_navigation_finished():
 	target_position = Vector3.INF
 	movement_finished.emit()
+
+
+func set_speed_slow(source: String, fraction: float) -> void:
+	_slow_contributors[source] = fraction
+	speed = _compute_effective_speed()
+
+
+func clear_speed_slow(source: String) -> void:
+	_slow_contributors.erase(source)
+	speed = _compute_effective_speed()
+
+
+# Stacking model: ADDITIVE. total_slow = sum of all contributor fractions;
+# final_speed = base × (1 - total_slow), floored at MIN_SPEED_FRACTION × base.
+# To switch to multiplicative (final = base × (1-slowA) × (1-slowB) × ...),
+# change ONLY this function — all callers remain unchanged.
+func _compute_effective_speed() -> float:
+	var total_slow := 0.0
+	for fraction in _slow_contributors.values():
+		total_slow += fraction
+	return maxf(_base_speed * (1.0 - total_slow), _base_speed * MIN_SPEED_FRACTION)
