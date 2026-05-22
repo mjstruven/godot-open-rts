@@ -248,7 +248,7 @@ class Units:
 			"hp_max": 400,
 			"attack_damage": 80,
 			"attack_interval": 3.0,
-			"attack_range": 3.0,
+			"attack_range": 1.2,
 			"attack_domains": [Navigation.Domain.TERRAIN],
 		},
 	}
