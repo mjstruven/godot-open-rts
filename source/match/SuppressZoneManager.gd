@@ -27,6 +27,8 @@ func unregister_zone(zone) -> void:
 
 
 func _clear_all_suppress_slows() -> void:
+	if not is_inside_tree():
+		return
 	for unit in get_tree().get_nodes_in_group("units"):
 		var movement = unit.find_child("Movement")
 		if is_instance_valid(movement):

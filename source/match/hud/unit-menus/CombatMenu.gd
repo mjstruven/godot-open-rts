@@ -38,9 +38,19 @@ var units: Array = []:
 
 var _rally_poll_timer: Timer = null
 var _range_preview_circles: Array = []
+var _suppress_active_style: StyleBoxFlat = null
 
 
 func _ready():
+	_suppress_active_style = StyleBoxFlat.new()
+	_suppress_active_style.border_color = Color(0.2, 0.85, 0.2)
+	_suppress_active_style.set_border_width_all(2)
+	_suppress_active_style.bg_color = Color(0.25, 0.25, 0.25, 1.0)
+	_suppress_active_style.corner_radius_top_left = 4
+	_suppress_active_style.corner_radius_top_right = 4
+	_suppress_active_style.corner_radius_bottom_left = 4
+	_suppress_active_style.corner_radius_bottom_right = 4
+
 	MatchSignals.suppress_state_changed.connect(_on_suppress_state_changed)
 	_suppress_btn.gui_input.connect(_on_suppress_gui_input)
 	_suppress_btn.mouse_entered.connect(_on_suppress_btn_mouse_entered)
@@ -180,6 +190,11 @@ func _handle_suppress_click():
 	})
 
 	for archer in archers:
+		archer.action_queue.clear()
+		archer.action = null
+		var movement = archer.find_child("Movement")
+		if movement:
+			movement.stop()
 		archer.add_to_group("suppress_armed")
 		MatchSignals.suppress_state_changed.emit(archer, "armed")
 
@@ -266,7 +281,8 @@ func _update_suppress_button():
 	var archers = _get_archers()
 	if archers.is_empty():
 		_suppress_btn.disabled = true
-		_suppress_btn.modulate = Color(0.5, 0.5, 0.5)
+		_suppress_btn.modulate = Color(0.7, 0.7, 0.7)
+		_suppress_btn.remove_theme_stylebox_override("normal")
 		_suppress_btn.tooltip_text = "Suppress (no archers selected)"
 		return
 
@@ -276,21 +292,25 @@ func _update_suppress_button():
 	var any_armed = archers.any(func(a): return a.is_in_group("suppress_armed"))
 
 	if any_suppressing or any_armed:
-		_suppress_btn.modulate = Color(1.0, 0.8, 0.2)
+		_suppress_btn.modulate = Color.WHITE
 		_suppress_btn.text = "SP!"
+		_suppress_btn.add_theme_stylebox_override("normal", _suppress_active_style)
 		_suppress_btn.tooltip_text = "Suppress ACTIVE\nLeft-click or [S] to cancel"
 	elif _is_any_archer_on_cooldown(archers):
 		_suppress_btn.disabled = true
-		_suppress_btn.modulate = Color(0.5, 0.5, 0.5)
+		_suppress_btn.modulate = Color(0.7, 0.7, 0.7)
 		_suppress_btn.text = "SP"
+		_suppress_btn.remove_theme_stylebox_override("normal")
 		_suppress_btn.tooltip_text = "Suppress on cooldown (%ds)" % SuppressedAttackingScript.COOLDOWN_DURATION
 	elif not archers[0].player.has_resources({"wood": archers.size()}):
 		_suppress_btn.modulate = Color(1.0, 0.3, 0.3)
 		_suppress_btn.text = "SP"
+		_suppress_btn.remove_theme_stylebox_override("normal")
 		_suppress_btn.tooltip_text = "Suppress — Insufficient wood (need %d)" % archers.size()
 	else:
 		_suppress_btn.modulate = Color.WHITE
 		_suppress_btn.text = "SP"
+		_suppress_btn.remove_theme_stylebox_override("normal")
 		_suppress_btn.tooltip_text = SUPPRESS_TOOLTIP
 
 

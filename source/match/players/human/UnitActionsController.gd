@@ -88,6 +88,7 @@ func _try_navigating_selected_units_towards_position(target_point):
 				and unit.movement_domain == Constants.Match.Navigation.Domain.TERRAIN
 				and Actions.Moving.is_applicable(unit)
 				and not _is_constructing(unit)
+				and not unit.is_in_group("suppressing")
 			)
 	)
 	var air_units_to_move = get_tree().get_nodes_in_group("selected_units").filter(
@@ -97,6 +98,7 @@ func _try_navigating_selected_units_towards_position(target_point):
 				and unit.movement_domain == Constants.Match.Navigation.Domain.AIR
 				and Actions.Moving.is_applicable(unit)
 				and not _is_constructing(unit)
+				and not unit.is_in_group("suppressing")
 			)
 	)
 	var new_unit_targets = Utils.Match.Unit.Movement.crowd_moved_to_new_pivot(
@@ -163,6 +165,8 @@ func _navigate_selected_units_towards_unit(target_unit):
 
 
 func _navigate_unit_towards_unit(unit, target_unit):
+	if unit.is_in_group("suppressing"):
+		return false
 	if Actions.CollectingResourcesSequentially.is_applicable(unit, target_unit):
 		unit.action_queue.clear()
 		unit.action = Actions.CollectingResourcesSequentially.new(target_unit)
@@ -247,6 +251,7 @@ func _apply_attack_move(position: Vector3):
 				and unit.movement_domain == Constants.Match.Navigation.Domain.TERRAIN
 				and Actions.AttackMoving.is_applicable(unit)
 				and not _is_constructing(unit)
+				and not unit.is_in_group("suppressing")
 			)
 	)
 	var targets = Utils.Match.Unit.Movement.crowd_moved_to_new_pivot(terrain_units, position)
@@ -264,6 +269,7 @@ func _apply_patrol(position: Vector3):
 				and unit.movement_domain == Constants.Match.Navigation.Domain.TERRAIN
 				and Actions.AttackMoving.is_applicable(unit)
 				and not _is_constructing(unit)
+				and not unit.is_in_group("suppressing")
 			)
 	)
 	var targets = Utils.Match.Unit.Movement.crowd_moved_to_new_pivot(terrain_units, position)

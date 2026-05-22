@@ -41,6 +41,10 @@ func _ready():
 	_unit.remove_from_group("suppress_armed")
 	_unit.add_to_group("suppressing")
 
+	var movement = _unit.find_child("Movement")
+	if is_instance_valid(movement):
+		movement.stop()
+
 	_attack_range_before = _unit.attack_range
 	_attack_interval_before = _unit.attack_interval
 	_unit.attack_range = _attack_range_before + RANGE_BONUS

@@ -52,7 +52,7 @@ func _on_new_unit(unit, _transform, player):
 	_connect_win_condition_if_needed(unit, player)
 
 
-func _connect_win_condition_if_needed(unit, player) -> void:
+func _connect_win_condition_if_needed(_unit, _player) -> void:
 	# Capital-destruction win condition disabled (deferred — does not fire reliably).
 	# Re-enable by uncommenting the two lines below when diagnosing.
 	#if "is_win_condition_building" in unit and unit.is_win_condition_building:
