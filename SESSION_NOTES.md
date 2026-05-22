@@ -222,3 +222,103 @@ After any action completes (move finishes, attack completes, building destroyed)
 - Project compiles and runs clean.
 - Wave 3a (Siege Workshop, Battering Ram, inside-crew system, neutral/claimable ownership, crew dots, edge-based targeting, idle re-scan) is **complete**.
 - **Next: Wave 3b — Siege Tower.**
+
+---
+
+## Session: Wave 3b — Siege Tower + Ownership Fixes (complete)
+
+### Units Added
+
+**Siege Tower** — pure troop transport, produced by the Siege Workshop (second button "TWR" [W], alongside Ram "RAM" [Q]).
+- HP: 2000, move speed: 0.5 (siege-class slow), no attack.
+- Crew capacity 24 (infantry/archers), minimum 4 to move.
+- Neutral/claimable ownership — same system as the Battering Ram (CrewManager, scene-tree reparent on claim/release).
+- Crew released at full HP on Unman. Crew killed on tower death.
+- Placeholder geometry: tall box (0.8 × 2.0 × 0.8).
+- Upkeep: 5 wood + 5 gold/min.
+- Production cost: Wood 150, Stone 100, Gold 50; 50 seconds.
+
+### CrewDots Enhancements
+
+- **Multi-row layout** — up to 12 dots per row; rows centred vertically. Ram = 1 row of 12; Tower = 2 rows of 12.
+- **`@export var crew_count_public: bool = true`** — when `false`, dots visible only to the owning player. Ram and Tower both set `crew_count_public = false`.
+- **`@export var dot_height: float = 1.15`** — configurable height offset above the unit. Tower sets `dot_height = 2.3`.
+- **Owner-visibility check** — in `_process`, when not public: neutral → dots hidden; owned → `_parent_unit.player == _get_local_player()` (lazy-cached `Human` instance lookup). Uses scene-tree parent as the authoritative owner (see ownership fix below).
+
+### Siege Ownership System — Symmetric Claim/Release
+
+`CrewManager._release_ownership()` now mirrors `_claim_ownership()` exactly:
+- On claim: reparents siege unit to the crewing player → `unit.player` = real Player.
+- On release: reparents siege unit to `$Players` (Match's Players Node3D container) → `unit.player` = `$Players`, clearly not a Player.
+
+Before this fix, release did not reparent — a neutral (unmanned) siege unit's `unit.player` still pointed at the former owner, making it unreliable. Now a neutral siege unit has consistent parentage whether it was never-crewed or unmanned.
+
+**Neutral siege unit state:** parent = `$Players`, groups = "units" + "neutral_siege", NOT in "controlled_units" or "adversary_units". `unit.player is Player` → false without any extra group check needed. Claiming always reparents (since `$Players` ≠ any player), making re-claim and cross-player capture both correct.
+
+### Crash Fix (unman crash, post-ownership-fix)
+
+After the ownership fix, `unit.player` for neutral units = `$Players` Node3D. Code that read `unit.player.color` crashed.
+
+Two fixes:
+- **`Minimap.gd._sync_unit`** — guards with `unit.is_in_group("neutral_siege")` → uses `Color.WHITE` for neutral units instead of `unit.player.color`.
+- **`Unit.gd.color` getter** — guards with `is_in_group("neutral_siege")` → returns `Color.WHITE` when neutral, preventing crashes from any future caller.
+
+`Highlight.gd`, `Selection.gd`, `Targetability.gd` were already safe — they use group-based color constants (`controlled_units` → GREEN, `adversary_units` → RED, else WHITE).
+
+### UID Fixes
+
+- `CrewDots.tscn`: removed fake `uid="uid://crewdots00001"` from `[gd_scene]` header; ext_resource uid references in `battering_ram.tscn` and `siege_tower.tscn` cleaned up to path-only resolution.
+- `UnitMenus.tscn`: updated SiegeTowerMenu ext_resource uid from stale hand-written value to the real Godot-assigned uid (`uid://dd2f1jxee2iyy`).
+- `siege_tower.tscn`, `SiegeTowerMenu.tscn`: Godot auto-corrected hand-written UIDs to real ones on first import.
+
+### Current State
+
+- Project compiles and runs clean.
+- Waves 3a and 3b complete. Siege Workshop produces Ram and Tower. Both support the full crew cycle (crew → unman → re-crew by either player) without crashes.
+- **Next: Wave 3c — Ballista (external crew / siege-engineer system).**
+
+---
+
+## SCHEDULED DESIGN WORK (not yet built)
+
+Items fully designed, to be implemented as their own tasks after the siege wave completes.
+
+### Relationship System (Ally / Enemy / Neutral)
+
+A proper tri-state relationship system. Currently every system (targeting, vision, selection, minimap, AI) does its own ad hoc check ("is this unit's player == my player?"). Neutral un-crewed siege units are a real third state that these checks handle inconsistently — causing the crash and workaround patches above.
+
+**Goal:** one canonical function that answers "what is unit X's relationship to player Y" → Ally, Enemy, or Neutral. All systems use it instead of their own ad hoc logic.
+
+**Design constraints:**
+- Must accommodate future neutral unit types (not just siege machines).
+- Must accommodate **multiplayer alliances**: in team games the answer is per-player-pair (player A is allied with B but at war with C). Do not hardcode a rigid 3-way global assumption.
+- Neutral units: uncontrollable, provide no vision, cannot be auto-attacked or targeted by normal means (only manually — see below).
+
+**Dependency:** Relationship System is a prerequisite for the Manual Attack command and for clean targeting across all units.
+
+### Manual Single-Target Attack Command
+
+A StarCraft-style explicit "Attack" command: the player deliberately orders a unit to attack a specific target, bypassing the Relationship System's auto-acquire filter. This allows intentional attacks on neutral or even friendly units — auto-acquire never does this, but a manual order can.
+
+- Universal command, belongs in the planned Orders panel of the two-panel command grid restructure.
+- **Depends on the Relationship System** (it must exist before this can bypass it correctly). Build after it.
+
+### Siege Dismissal + Salvage Crate
+
+Siege units can be dismissed, similar to regular unit dismissal:
+
+**Dismissal flow:**
+- Engaging dismiss immediately ejects all crew; they return as their original units at full HP (soldiers are NOT destroyed).
+- A 15-second countdown runs and is cancellable.
+- During the countdown the machine is un-crewed (neutral); cancelling stops the despawn.
+- On completion the empty siege machine despawns (no civilian/prop left behind).
+
+**Salvage Crate:**
+- On dismissal completion only (NOT on combat destruction), a salvage crate (simple brown box) spawns at the location.
+- Any player's engineer can collect it; collection is a 15-second action, interruptible (if interrupted, the crate remains collectible by anyone).
+- On successful collection: 50% of the siege unit's build cost is credited to the collecting player.
+- Crate despawns after 5 minutes if uncollected.
+
+### Sequencing Note
+
+Several scheduled items intersect through the planned **two-panel command grid** (Orders panel + Abilities panel): manual Attack, formation commands, and siege dismissal all surface there. The Relationship System is a dependency for manual Attack and for clean targeting. Before building any of these, do a dependency-ordering pass to sequence them correctly.
