@@ -85,3 +85,4 @@ radius = 0.8
 [node name="CrewManager" parent="." instance=ExtResource("7_ramcm")]
 
 [node name="CrewDots" parent="." instance=ExtResource("8_ramcd")]
+crew_count_public = false

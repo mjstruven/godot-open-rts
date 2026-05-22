@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cwcedr6jj7yty"]
+[gd_scene load_steps=12 format=3 uid="uid://cwcedr6jj7yty"]
 
 [ext_resource type="PackedScene" uid="uid://pawymiv0p8ab" path="res://source/match/hud/unit-menus/GenericMenu.tscn" id="1_4ci70"]
 [ext_resource type="Script" path="res://source/match/hud/UnitMenus.gd" id="1_hugbq"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://formationmenu001" path="res://source/match/hud/unit-menus/FormationMenu.tscn" id="11_fmmnu"]
 [ext_resource type="PackedScene" uid="uid://swrkmenuu0001" path="res://source/match/hud/unit-menus/SiegeWorkshopMenu.tscn" id="12_swmenu"]
 [ext_resource type="PackedScene" uid="uid://batrmenu00001" path="res://source/match/hud/unit-menus/BatteringRamMenu.tscn" id="13_rammenu"]
+[ext_resource type="PackedScene" uid="uid://stowermenu001" path="res://source/match/hud/unit-menus/SiegeTowerMenu.tscn" id="14_towermenu"]
 
 [node name="UnitMenus" type="PanelContainer"]
 script = ExtResource("1_hugbq")
@@ -119,5 +120,9 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="BatteringRamMenu" parent="MarginContainer" instance=ExtResource("13_rammenu")]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="SiegeTowerMenu" parent="MarginContainer" instance=ExtResource("14_towermenu")]
 layout_mode = 2
 mouse_filter = 2

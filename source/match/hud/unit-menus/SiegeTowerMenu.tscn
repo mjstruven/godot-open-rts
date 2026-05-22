@@ -1,22 +1,20 @@
-[gd_scene load_steps=2 format=3 uid="uid://swrkmenuu0001"]
+[gd_scene load_steps=2 format=3 uid="uid://stowermenu001"]
 
-[ext_resource type="Script" path="res://source/match/hud/unit-menus/SiegeWorkshopMenu.gd" id="1_swmenu"]
+[ext_resource type="Script" path="res://source/match/hud/unit-menus/SiegeTowerMenu.gd" id="1_towermenu"]
 
-[node name="SiegeWorkshopMenu" type="GridContainer"]
+[node name="SiegeTowerMenu" type="GridContainer"]
 columns = 4
-script = ExtResource("1_swmenu")
+script = ExtResource("1_towermenu")
 
-[node name="ProduceBatteringRamButton" type="Button" parent="."]
+[node name="UnmanButton" type="Button" parent="."]
 layout_mode = 2
 focus_mode = 0
-text = "RAM"
-tooltip_text = "Battering Ram | 40s | Wood:100, Stone:150 [Q]"
+text = "UNM"
+tooltip_text = "Unman — release all crew at full HP [Q]"
 
-[node name="ProduceSiegeTowerButton" type="Button" parent="."]
+[node name="Padding2" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-focus_mode = 0
-text = "TWR"
-tooltip_text = "Siege Tower | 50s | Wood:150, Stone:100, Gold:50 [W]"
 
 [node name="Padding3" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
@@ -62,5 +60,4 @@ layout_mode = 2
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[connection signal="pressed" from="ProduceBatteringRamButton" to="." method="_on_produce_battering_ram_pressed"]
-[connection signal="pressed" from="ProduceSiegeTowerButton" to="." method="_on_produce_siege_tower_pressed"]
+[connection signal="pressed" from="UnmanButton" to="." method="_on_unman_pressed"]

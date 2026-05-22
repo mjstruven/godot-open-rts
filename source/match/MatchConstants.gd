@@ -106,6 +106,7 @@ class Units:
 		"res://source/match/units/flag_commander/flag_commander.tscn": {"gold": 150},
 		"res://source/match/units/mercenary.tscn": {"gold": 250},
 		"res://source/match/units/battering_ram.tscn": {"wood": 100, "stone": 150},
+		"res://source/match/units/siege_tower.tscn": {"wood": 150, "stone": 100, "gold": 50},
 	}
 	const PRODUCTION_TIMES = {
 		"res://source/match/units/infantry.tscn": 6.0,
@@ -116,6 +117,7 @@ class Units:
 		"res://source/match/units/flag_commander/flag_commander.tscn": 30.0,
 		"res://source/match/units/mercenary.tscn": 10.0,
 		"res://source/match/units/battering_ram.tscn": 40.0,
+		"res://source/match/units/siege_tower.tscn": 50.0,
 	}
 	const PRODUCTION_QUEUE_LIMIT = 5
 	const STRUCTURE_BLUEPRINTS = {
@@ -251,6 +253,12 @@ class Units:
 			"attack_range": 1.2,
 			"attack_domains": [Navigation.Domain.TERRAIN],
 		},
+		"res://source/match/units/siege_tower.tscn":
+		{
+			"sight_range": 6.0,
+			"hp": 2000,
+			"hp_max": 2000,
+		},
 	}
 	const SUPPLY_TRAIN_BUILD_LIMIT = 2
 	# All upkeep values are per minute, applied once per 60-second economy tick.
@@ -261,6 +269,7 @@ class Units:
 		"res://source/match/units/supply_train.tscn": {"food": 8, "gold": 6},
 		"res://source/match/units/flag_commander/flag_commander.tscn": {"gold": 2},
 		"res://source/match/units/mercenary.tscn": {"food": 12, "gold": 8},
+		"res://source/match/units/siege_tower.tscn": {"wood": 5, "gold": 5},
 		# Future units — add entries here when the scenes exist:
 		# "res://source/match/units/battering_ram.tscn": {"gold": 4},
 		# "res://source/match/units/trebuchet.tscn": {"gold": 8},
