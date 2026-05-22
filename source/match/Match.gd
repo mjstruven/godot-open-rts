@@ -12,6 +12,8 @@ const House = preload("res://source/match/units/house.tscn")
 
 # DEBUG: set to false to disable the DELETE-key instant-kill tool
 const DEBUG_KILL_KEY_ENABLED = true
+# DEBUG: starting resources per player — change to normal values before shipping
+const DEBUG_STARTING_RESOURCES = 2000
 
 @export var settings: Resource = null
 
@@ -141,10 +143,10 @@ func _create_players_from_settings():
 		var player_scene = Constants.Match.Player.CONTROLLER_SCENES[player_settings.controller]
 		var player = player_scene.instantiate()
 		player.color = player_settings.color
-		player.food = 1000
-		player.wood = 1000
-		player.stone = 1000
-		player.gold = 1000
+		player.food = DEBUG_STARTING_RESOURCES
+		player.wood = DEBUG_STARTING_RESOURCES
+		player.stone = DEBUG_STARTING_RESOURCES
+		player.gold = DEBUG_STARTING_RESOURCES
 		if player_settings.spawn_index_offset > 0:
 			for _i in range(player_settings.spawn_index_offset):
 				_players.add_child(Node.new())

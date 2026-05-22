@@ -52,8 +52,21 @@ func unman() -> void:
 	for crew_unit in _crew.duplicate():
 		_release_crew_unit(crew_unit)
 	_crew.clear()
-	_unit.add_to_group("neutral_siege")
+	_release_ownership()
 	crew_changed.emit(0)
+
+
+func _release_ownership() -> void:
+	_unit.add_to_group("neutral_siege")
+	if _unit.is_in_group("controlled_units"):
+		_unit.remove_from_group("controlled_units")
+	if _unit.is_in_group("adversary_units"):
+		_unit.remove_from_group("adversary_units")
+	if _unit.is_in_group("selected_units"):
+		_unit.remove_from_group("selected_units")
+		MatchSignals.unit_deselected.emit(_unit)
+	if _unit.has_method("reset_player_color"):
+		_unit.reset_player_color()
 
 
 func get_all_crew() -> Array:
@@ -91,13 +104,7 @@ func _claim_ownership(new_player) -> void:
 	if not _unit.is_in_group("neutral_siege"):
 		return
 	_unit.remove_from_group("neutral_siege")
-	var current_player = _unit.player
-	if current_player == new_player:
-		if _unit.has_method("refresh_player_color"):
-			_unit.refresh_player_color()
-		return
-	# Reparent to the crewing player
-	_unit.reparent(new_player, true)
+	# Always update groups so re-claim after unman restores controlled/adversary membership
 	if _unit.is_in_group("controlled_units"):
 		_unit.remove_from_group("controlled_units")
 	if _unit.is_in_group("adversary_units"):
@@ -106,5 +113,12 @@ func _claim_ownership(new_player) -> void:
 		_unit.add_to_group("controlled_units")
 	else:
 		_unit.add_to_group("adversary_units")
+	var current_player = _unit.player
+	if current_player == new_player:
+		if _unit.has_method("refresh_player_color"):
+			_unit.refresh_player_color()
+		return
+	# Reparent to the crewing player
+	_unit.reparent(new_player, true)
 	if _unit.has_method("refresh_player_color"):
 		_unit.refresh_player_color()

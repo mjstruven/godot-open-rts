@@ -44,3 +44,11 @@ func refresh_player_color():
 	var mat = player.get_color_material() if is_instance_valid(player) else null
 	for child in geo.find_children("*", "MeshInstance3D", true, false):
 		child.material_override = mat
+
+
+func reset_player_color():
+	var geo = find_child("Geometry")
+	if geo == null:
+		return
+	for child in geo.find_children("*", "MeshInstance3D", true, false):
+		child.material_override = null
