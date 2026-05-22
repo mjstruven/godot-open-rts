@@ -33,6 +33,8 @@ var player:
 		return get_parent()
 var color:
 	get:
+		if is_in_group("neutral_siege"):
+			return Color.WHITE
 		return player.color
 var action = null:
 	set = _set_action

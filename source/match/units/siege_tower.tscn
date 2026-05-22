@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://siegetwr00001"]
+[gd_scene format=3 uid="uid://c1qx1l8rq7iyy"]
 
 [ext_resource type="Script" path="res://source/match/units/siege_tower.gd" id="1_towergd"]
 [ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="2_towerhi"]
@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://c3ssj2p6voauk" path="res://source/match/units/traits/HealthBar.tscn" id="5_towerhb"]
 [ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="6_towerta"]
 [ext_resource type="PackedScene" uid="uid://crewmgr000001" path="res://source/match/units/traits/CrewManager.tscn" id="7_towercm"]
-[ext_resource type="PackedScene" uid="uid://crewdots00001" path="res://source/match/units/traits/CrewDots.tscn" id="8_towercd"]
+[ext_resource type="PackedScene" path="res://source/match/units/traits/CrewDots.tscn" id="8_towercd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_towerbody"]
 albedo_color = Color(0.55, 0.45, 0.35, 1)

@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://formationmenu001" path="res://source/match/hud/unit-menus/FormationMenu.tscn" id="11_fmmnu"]
 [ext_resource type="PackedScene" uid="uid://swrkmenuu0001" path="res://source/match/hud/unit-menus/SiegeWorkshopMenu.tscn" id="12_swmenu"]
 [ext_resource type="PackedScene" uid="uid://batrmenu00001" path="res://source/match/hud/unit-menus/BatteringRamMenu.tscn" id="13_rammenu"]
-[ext_resource type="PackedScene" uid="uid://stowermenu001" path="res://source/match/hud/unit-menus/SiegeTowerMenu.tscn" id="14_towermenu"]
+[ext_resource type="PackedScene" uid="uid://dd2f1jxee2iyy" path="res://source/match/hud/unit-menus/SiegeTowerMenu.tscn" id="14_towermenu"]
 
 [node name="UnitMenus" type="PanelContainer"]
 script = ExtResource("1_hugbq")

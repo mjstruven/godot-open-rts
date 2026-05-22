@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://crewdots00001"]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://source/match/units/traits/CrewDots.gd" id="1_crewdots"]
 

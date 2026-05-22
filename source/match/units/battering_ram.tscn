@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://c3ssj2p6voauk" path="res://source/match/units/traits/HealthBar.tscn" id="5_ramhb"]
 [ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="6_ramta"]
 [ext_resource type="PackedScene" uid="uid://crewmgr000001" path="res://source/match/units/traits/CrewManager.tscn" id="7_ramcm"]
-[ext_resource type="PackedScene" uid="uid://crewdots00001" path="res://source/match/units/traits/CrewDots.tscn" id="8_ramcd"]
+[ext_resource type="PackedScene" path="res://source/match/units/traits/CrewDots.tscn" id="8_ramcd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rambody"]
 albedo_color = Color(0.99, 0.81, 0.48, 1)
