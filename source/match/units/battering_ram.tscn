@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://battram000001"]
+[gd_scene load_steps=15 format=3 uid="uid://battram000001"]
 
 [ext_resource type="Script" path="res://source/match/units/battering_ram.gd" id="1_ramgd"]
 [ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="2_ramhi"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://c3ssj2p6voauk" path="res://source/match/units/traits/HealthBar.tscn" id="5_ramhb"]
 [ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="6_ramta"]
 [ext_resource type="PackedScene" uid="uid://crewmgr000001" path="res://source/match/units/traits/CrewManager.tscn" id="7_ramcm"]
+[ext_resource type="PackedScene" uid="uid://crewdots00001" path="res://source/match/units/traits/CrewDots.tscn" id="8_ramcd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rambody"]
 albedo_color = Color(0.99, 0.81, 0.48, 1)
@@ -82,3 +83,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 radius = 0.8
 
 [node name="CrewManager" parent="." instance=ExtResource("7_ramcm")]
+
+[node name="CrewDots" parent="." instance=ExtResource("8_ramcd")]

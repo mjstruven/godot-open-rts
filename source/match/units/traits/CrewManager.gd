@@ -1,6 +1,6 @@
 extends Node
 
-const CAPACITY = 10
+@export var capacity: int = 12
 const CREWABLE_SCENE_PATHS = [
 	"res://source/match/units/infantry.tscn",
 	"res://source/match/units/archer.tscn",
@@ -21,11 +21,13 @@ func crew_count() -> int:
 
 
 func is_full() -> bool:
-	return _crew.size() >= CAPACITY
+	return _crew.size() >= capacity
 
 
 func can_accept_unit(unit) -> bool:
 	if is_full():
+		return false
+	if unit in _crew:
 		return false
 	if not unit.get_script():
 		return false
@@ -49,6 +51,7 @@ func load_unit(unit: Node) -> void:
 
 
 func unman() -> void:
+	_crew = _crew.filter(func(u): return is_instance_valid(u))
 	for crew_unit in _crew.duplicate():
 		_release_crew_unit(crew_unit)
 	_crew.clear()

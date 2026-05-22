@@ -28,6 +28,8 @@ func _is_disabled():
 
 
 func _recalculate_unit_visibility(unit, revealed_units = null):
+	if unit.is_in_group("in_crew"):
+		return
 	if unit.is_in_group("revealed_units") or _is_disabled():
 		_update_unit_visibility(unit, true)
 		return
