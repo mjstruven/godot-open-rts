@@ -42,3 +42,85 @@ The Capital-destruction win condition was implemented in Wave 2 (commit `68ff0e1
 **Fog reveal:** Added to `_show()` so all end-game paths (owns-nothing and future Capital-destruction) reveal the full map on match end.
 
 **To re-enable Capital-destruction:** Uncomment the two commented lines in `_connect_win_condition_if_needed`. Add `GameLogger.debug` calls at the top of `_on_win_condition_building_destroyed` to confirm the callback fires. Best diagnosed once siege units exist so Capital destruction happens naturally in gameplay.
+
+---
+
+## Session: Mercenary, Dismiss, Archer + Suppress rework, Movement modifier system
+
+### Units Added
+
+**Mercenary** — elite combat unit trained in batches of 5 from any Capital.
+- Cost: 250 gold per batch, ~10 seconds batch time, queue-able.
+- High food + gold upkeep. Intended to be strong: one mercenary beats roughly 5 infantry.
+- Production queue extended with a generic `batch_count` concept: one queue entry spawns N units simultaneously. Mercenary is the only user of batch spawning so far.
+- Note on cost enforcement: `PRODUCTION_COSTS` is enforced only for the Mercenary (charged in the Capital menu). Other units are free to train. Structures cost resources. Cost enforcement for siege units will be added with siege work.
+
+**Dismiss ability** — all mobile units gain a "DIS" command (toggle).
+- 15-second dismiss countdown with a white depleting bar; the unit stays controllable and pays upkeep during the countdown.
+- Cancelling dismiss starts a 60-second cooldown.
+- On completion the unit becomes an uncontrollable `civilian` (laborer-type prop) that wanders ~10s then despawns.
+- Respects the Tab-filter selection subset. Buildings excluded.
+
+### Archer Rework
+
+- **Attack model rewritten**: no hit/miss roll — every arrow scatters within a target-centered circle whose radius scales with range (3 tiers: ≤5, ≤8, >8 units). Nearest unit to the arrow's landing point takes damage (friendly fire on).
+- All four attack entry points (idle, right-click, attack-move, patrol) unified to use the scatter behavior.
+- Scatter radii reduced (archers were missing too much); base attack speed increased; archers in a group fire staggered (random phase offset per archer) rather than synchronized volleys.
+
+### Suppress Ability (archer) — complete
+
+A pure on/off toggle (old duration / grace / auto-renew removed).
+
+**Rooting:**
+- Toggle-on immediately roots the archer — immovable by any method (right-click, attack-move, patrol, formation, rally, minimap).
+- Enforced centrally in `Unit._set_action()`: suppressing/suppress_armed units reject all incoming actions. `suppress_armed` allows only `ArcherAutoAttacking` through (so a player-ordered in-range target correctly triggers the suppress activation chain).
+- `ArcherAutoAttacking._attack_or_move_closer()` also guards against creating `FollowingToReachDistance` while suppress is active (defense-in-depth).
+
+**Re-targeting while rooted:**
+- A suppressing archer CAN be re-targeted to any enemy already within its (boosted) range — handled via `SuppressedAttacking.retarget()`.
+- Out-of-range targets are silently rejected. Attack-move on a suppressing archer retargets the nearest in-range enemy and never moves.
+- `SuppressedAttacking` stores itself in the unit's meta (`"suppress_action"`) for O(1) lookup by controllers.
+
+**Bonuses:** +2 attack range, +50% fire rate while active.
+
+**Wood cost (recurring):**
+- 1 wood per suppressing archer charged on activation, then 1 wood per archer every 10 seconds.
+- If the player cannot pay at any tick, those archers are immediately dropped from suppress (5-second cooldown applies).
+- Shown in the resource HUD as –6 wood/min per suppressing archer (expenditure label + hover breakdown tooltip).
+
+**Suppress zone:**
+- Suppress projects a slow zone centered on the target, sized to the scatter circle radius. All units inside (friend and foe) are slowed by 1% per overlapping zone, capped at 10%. Implemented via `SuppressZoneManager` (auto-created under Match on first suppress).
+
+**Cooldown / UX:**
+- 5-second cooldown after toggling off (stored as `suppress_cooldown_until_ms` meta on the archer).
+- Hovering the Suppress button shows a grey boosted-range preview circle around each selected archer; circles track archers in real time if they move.
+
+**Design note:** Suppress is intentionally the defensive archer stance — holds ground, denies an area, high sustained DPS in place.
+
+### Movement Modifier System
+
+`Movement.gd` now owns a central effective-speed computation: base speed with all slow contributors applied additively (25% minimum speed floor). Terrain slow and suppress-zone slow both register through `set_speed_slow(source, fraction)` / `clear_speed_slow(source)`. The additive/multiplicative choice is isolated to one function (`_compute_effective_speed`) for easy future adjustment. Future systems (weather, debuffs, etc.) should feed into this same API.
+
+### Design Decisions / Deferred
+
+**Win condition:** Active condition is the template's "player owns no units or structures" logic. The Capital-destruction win condition is built but disabled (commented out in `MatchEndHandler`) — does not fire reliably; best diagnosed once siege units make Capital destruction testable in normal play.
+
+**Phase 5 Economy design decision (recorded for future):** When the full economy system is built, simulate continuously (per-second / per-tick), not in per-minute lump ticks. Income accrues and upkeep drains smoothly; discrete events (supply wagon arrivals) stay discrete. This unifies upkeep, suppress cost, and supply timing into one time base. The HUD should still display per-minute rates for readability.
+
+**Still deferred:**
+- Siege units (Battering Ram, Trebuchet, Ballista, Siege Tower) and the Siege Workshop
+- Keep, Tower, and Walls buildings
+- Units-before-structures targeting priority
+- Veteran per-kill XP / stat bonus
+- Skirmish battle-zone system
+- Morale-based surrender prompt
+- Real-time shadows (disabled — shadow AABB / bias issues with displaced terrain)
+- Cliffs (impassable terrain + navmesh exclusion)
+- Hill movement / combat penalty layer
+
+### Current State
+
+- Project compiles and runs clean.
+- Archer and Suppress are complete and stable.
+- Waves 1–2 of the building update (Capital, Command Post, win condition) are done.
+- **Next: Wave 3 — Siege Workshop and the four siege units.**
