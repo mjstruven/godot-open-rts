@@ -16,6 +16,7 @@ var _dot_meshes: Array = []
 var _mat_empty: StandardMaterial3D
 var _mat_filled: StandardMaterial3D
 var _parent_unit: Node3D
+var _local_player: Node = null
 
 
 func _ready() -> void:
@@ -60,7 +61,10 @@ func _process(_delta: float) -> void:
 	if camera != null:
 		global_transform.basis = camera.global_transform.basis
 	if not crew_count_public:
-		visible = _parent_unit.is_in_group("controlled_units")
+		if _parent_unit.is_in_group("neutral_siege"):
+			visible = false
+		else:
+			visible = _parent_unit.player == _get_local_player()
 
 
 func _on_crew_changed(new_count: int) -> void:
@@ -70,3 +74,12 @@ func _on_crew_changed(new_count: int) -> void:
 func _update_dots(filled: int) -> void:
 	for i in range(_dot_meshes.size()):
 		_dot_meshes[i].material_override = _mat_filled if i < filled else _mat_empty
+
+
+func _get_local_player() -> Node:
+	if _local_player == null or not is_instance_valid(_local_player):
+		for p in get_tree().get_nodes_in_group("players"):
+			if p is Human:
+				_local_player = p
+				break
+	return _local_player
