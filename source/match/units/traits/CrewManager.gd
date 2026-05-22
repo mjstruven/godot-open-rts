@@ -70,6 +70,13 @@ func _release_ownership() -> void:
 		MatchSignals.unit_deselected.emit(_unit)
 	if _unit.has_method("reset_player_color"):
 		_unit.reset_player_color()
+	# Reparent to the neutral container so unit.player no longer points at the former owner.
+	# Mirrors _claim_ownership's reparent-to-player step exactly in reverse.
+	var match_node = _unit.find_parent("Match")
+	if match_node != null:
+		var neutral_parent = match_node.find_child("Players", false)
+		if neutral_parent != null and _unit.get_parent() != neutral_parent:
+			_unit.reparent(neutral_parent, true)
 
 
 func get_all_crew() -> Array:
