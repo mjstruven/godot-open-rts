@@ -4,17 +4,20 @@ const DOT_SPACING := 0.18
 const DOT_RADIUS := 0.05
 const GAP_EVERY := 4
 const GAP_EXTRA := 0.06
-const DOT_HEIGHT := 1.0
+const DOT_HEIGHT := 1.15
 
 var _dot_meshes: Array = []
 var _mat_empty: StandardMaterial3D
 var _mat_filled: StandardMaterial3D
+var _parent_unit: Node3D
 
 
 func _ready() -> void:
 	var crew_mgr = get_parent().find_child("CrewManager")
 	if crew_mgr == null:
 		return
+	_parent_unit = get_parent()
+	top_level = true
 	var cap: int = crew_mgr.capacity
 	_mat_empty = StandardMaterial3D.new()
 	_mat_empty.albedo_color = Color(0.3, 0.3, 0.3)
@@ -31,11 +34,20 @@ func _ready() -> void:
 		var mi := MeshInstance3D.new()
 		mi.mesh = mesh
 		var gap_off: float = (i / GAP_EVERY) * GAP_EXTRA
-		mi.position = Vector3(i * DOT_SPACING + gap_off - total_x * 0.5, DOT_HEIGHT, 0.0)
+		mi.position = Vector3(i * DOT_SPACING + gap_off - total_x * 0.5, 0.0, 0.0)
 		add_child(mi)
 		_dot_meshes.append(mi)
 	crew_mgr.crew_changed.connect(_on_crew_changed)
 	_update_dots(crew_mgr.crew_count())
+
+
+func _process(_delta: float) -> void:
+	if _parent_unit == null or not is_instance_valid(_parent_unit):
+		return
+	global_position = _parent_unit.global_position + Vector3(0.0, DOT_HEIGHT, 0.0)
+	var camera := get_viewport().get_camera_3d()
+	if camera != null:
+		global_transform.basis = camera.global_transform.basis
 
 
 func _on_crew_changed(new_count: int) -> void:
