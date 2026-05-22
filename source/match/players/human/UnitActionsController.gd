@@ -166,7 +166,18 @@ func _navigate_selected_units_towards_unit(target_unit):
 
 func _navigate_unit_towards_unit(unit, target_unit):
 	if unit.is_in_group("suppressing"):
+		var dist = unit.global_position_yless.distance_to(target_unit.global_position_yless)
+		if dist <= unit.attack_range and Actions.AutoAttacking.is_applicable(unit, target_unit):
+			var suppress_action = unit.get_meta("suppress_action", null)
+			if is_instance_valid(suppress_action):
+				suppress_action.retarget(target_unit)
+				return true
 		return false
+	if unit.is_in_group("suppress_armed"):
+		var dist = unit.global_position_yless.distance_to(target_unit.global_position_yless)
+		if dist > unit.attack_range or not Actions.AutoAttacking.is_applicable(unit, target_unit):
+			return false
+		# In range: fall through — ArcherAutoAttacking will activate SuppressedAttacking
 	if Actions.CollectingResourcesSequentially.is_applicable(unit, target_unit):
 		unit.action_queue.clear()
 		unit.action = Actions.CollectingResourcesSequentially.new(target_unit)
@@ -243,7 +254,34 @@ func _on_terrain_targeted(position):
 	_try_setting_rally_points(position)
 
 
+func _retarget_suppressing_to_nearest_in_range(unit) -> void:
+	var suppress_action = unit.get_meta("suppress_action", null)
+	if not is_instance_valid(suppress_action):
+		return
+	var candidates = get_tree().get_nodes_in_group("adversary_units").filter(
+		func(candidate):
+			return (
+				Actions.AutoAttacking.is_applicable(unit, candidate)
+				and unit.global_position_yless.distance_to(candidate.global_position_yless)
+					<= unit.attack_range
+			)
+	)
+	if candidates.is_empty():
+		return
+	var nearest = candidates[0]
+	var nearest_dist = unit.global_position_yless.distance_to(nearest.global_position_yless)
+	for candidate in candidates:
+		var d = unit.global_position_yless.distance_to(candidate.global_position_yless)
+		if d < nearest_dist:
+			nearest_dist = d
+			nearest = candidate
+	suppress_action.retarget(nearest)
+
+
 func _apply_attack_move(position: Vector3):
+	for unit in get_tree().get_nodes_in_group("selected_units"):
+		if unit.is_in_group("controlled_units") and unit.is_in_group("suppressing"):
+			_retarget_suppressing_to_nearest_in_range(unit)
 	var terrain_units = get_tree().get_nodes_in_group("selected_units").filter(
 		func(unit):
 			return (

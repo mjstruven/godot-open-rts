@@ -8,6 +8,9 @@ signal action_updated
 
 const MATERIAL_ALBEDO_TO_REPLACE = Color(0.99, 0.81, 0.48)
 const MATERIAL_ALBEDO_TO_REPLACE_EPSILON = 0.05
+const _ArcherAutoAttackingScript = preload(
+	"res://source/match/units/actions/ArcherAutoAttacking.gd"
+)
 
 var hp = null:
 	set = _set_hp
@@ -173,7 +176,10 @@ func _set_action(action_node):
 		if action_node != null:
 			action_node.queue_free()
 		return
-	if (is_in_group("suppressing") or is_in_group("suppress_armed")) and action_node != null:
+	if is_in_group("suppressing") and action_node != null:
+		action_node.queue_free()
+		return
+	if is_in_group("suppress_armed") and action_node != null and not (action_node is _ArcherAutoAttackingScript):
 		action_node.queue_free()
 		return
 	_action_locked = true

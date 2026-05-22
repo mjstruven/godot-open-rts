@@ -9,6 +9,7 @@ const RANGE_BONUS = 2.0
 const INTERVAL_MULTIPLIER = 2.0 / 3.0
 const MIN_RANGE = 1.0
 const COOLDOWN_DURATION = 5.0
+const WOOD_COST_INTERVAL = 10.0
 
 var _target_unit = null
 var _attack_range_before: float = 0.0
@@ -16,6 +17,7 @@ var _attack_interval_before: float = 0.0
 var _stats_boosted: bool = false
 var _suppress_started: bool = false
 var _is_attacking: bool = false
+var _attack_sub_action = null
 
 @onready var _unit = Utils.NodeEx.find_parent_with_group(self, "units")
 
@@ -40,6 +42,7 @@ func _ready():
 
 	_unit.remove_from_group("suppress_armed")
 	_unit.add_to_group("suppressing")
+	_unit.set_meta("suppress_action", self)
 
 	var movement = _unit.find_child("Movement")
 	if is_instance_valid(movement):
@@ -63,6 +66,12 @@ func _ready():
 	add_child(range_check)
 	range_check.start(1.0 / 60.0 * 10.0)
 
+	var wood_timer = Timer.new()
+	wood_timer.wait_time = WOOD_COST_INTERVAL
+	wood_timer.timeout.connect(_on_wood_tick)
+	add_child(wood_timer)
+	wood_timer.start()
+
 	_try_start_attacking()
 	MatchSignals.suppress_state_changed.emit(_unit, "suppressing")
 
@@ -78,11 +87,39 @@ func _try_start_attacking():
 	_is_attacking = true
 	var atk = ArcherAttackingWhileInRange.new(_target_unit)
 	atk.tree_exited.connect(_on_attack_finished)
+	_attack_sub_action = atk
 	add_child(atk)
 
 
 func _on_attack_finished():
 	_is_attacking = false
+	_attack_sub_action = null
+
+
+func retarget(new_target: Node) -> void:
+	if not is_instance_valid(new_target) or new_target == _target_unit:
+		return
+	if is_instance_valid(_target_unit) and _target_unit.tree_exited.is_connected(_on_target_removed):
+		_target_unit.tree_exited.disconnect(_on_target_removed)
+	_target_unit = new_target
+	_target_unit.tree_exited.connect(_on_target_removed)
+	var old_attack = _attack_sub_action
+	if old_attack != null and is_instance_valid(old_attack):
+		remove_child(old_attack)  # fires tree_exited → _on_attack_finished → clears _attack_sub_action
+		old_attack.queue_free()
+	_try_start_attacking()
+
+
+func _on_wood_tick():
+	var player = _unit.player
+	if not player.has_resources({"wood": 1}):
+		GameLogger.info(GameLogger.Category.ECONOMY, "Suppress ended", {"reason": "no_wood"})
+		queue_free()
+		return
+	player.subtract_resources({"wood": 1})
+	GameLogger.info(GameLogger.Category.ECONOMY, "Suppress wood tick", {
+		"wood_deducted": 1, "wood_remaining": player.wood
+	})
 
 
 func _restore_stats():
@@ -130,6 +167,8 @@ func _exit_tree():
 	_restore_stats()
 	if _suppress_started and is_instance_valid(_unit):
 		_unit.remove_from_group("suppressing")
+		if _unit.has_meta("suppress_action") and _unit.get_meta("suppress_action") == self:
+			_unit.remove_meta("suppress_action")
 		var match_node = _unit.find_parent("Match")
 		if match_node != null:
 			var zone_mgr = match_node.get_node_or_null("SuppressZoneManager")

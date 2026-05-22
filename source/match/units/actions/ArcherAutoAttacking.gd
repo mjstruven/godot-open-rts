@@ -23,6 +23,9 @@ func _attack_or_move_closer():
 	elif dist <= _unit.attack_range:
 		_sub_action = ArcherAttackingWhileInRange.new(_target_unit)
 	else:
+		if _unit.is_in_group("suppress_armed") or _unit.is_in_group("suppressing"):
+			queue_free()
+			return
 		_sub_action = FollowingToReachDistanceLocal.new(_target_unit, _unit.attack_range)
 	_sub_action.tree_exited.connect(_on_sub_action_finished)
 	add_child(_sub_action)
