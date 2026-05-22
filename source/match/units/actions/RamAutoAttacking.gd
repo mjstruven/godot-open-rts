@@ -4,9 +4,6 @@ const Structure = preload("res://source/match/units/Structure.gd")
 const RamAttackingWhileInRange = preload(
 	"res://source/match/units/actions/RamAttackingWhileInRange.gd"
 )
-const FollowingToReachDistance = preload(
-	"res://source/match/units/actions/FollowingToReachDistance.gd"
-)
 
 
 static func is_applicable(source_unit, target_unit):
@@ -38,11 +35,11 @@ func _target_in_range():
 
 
 func _attack_or_move_closer():
-	var range = _effective_attack_range()
+	var effective_range = _effective_attack_range()
 	_sub_action = (
-		RamAttackingWhileInRange.new(_target_unit, range)
+		RamAttackingWhileInRange.new(_target_unit, effective_range)
 		if _target_in_range()
-		else FollowingToReachDistance.new(_target_unit, range)
+		else FollowingToReachDistance.new(_target_unit, effective_range)
 	)
 	_sub_action.tree_exited.connect(_on_sub_action_finished)
 	add_child(_sub_action)
