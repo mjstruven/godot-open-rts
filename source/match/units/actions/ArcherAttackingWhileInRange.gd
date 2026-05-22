@@ -8,9 +8,9 @@ const ARROW_LENGTH = 0.4
 const ARROW_WIDTH = 0.03
 const ARROW_COLOR = Color(0.706, 0.627, 0.471)
 const IMPACT_RADIUS = 0.5
-const SCATTER_RADIUS_SMALL = 1.0
-const SCATTER_RADIUS_MEDIUM = 2.0
-const SCATTER_RADIUS_LARGE = 3.5
+const SCATTER_RADIUS_SMALL = 0.75
+const SCATTER_RADIUS_MEDIUM = 1.5
+const SCATTER_RADIUS_LARGE = 2.625
 
 var _target_unit = null
 var _one_shot_timer = null

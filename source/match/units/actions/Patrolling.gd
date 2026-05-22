@@ -1,6 +1,7 @@
 extends "res://source/match/units/actions/Action.gd"
 
 const AutoAttacking = preload("res://source/match/units/actions/AutoAttacking.gd")
+const ArcherAutoAttacking = preload("res://source/match/units/actions/ArcherAutoAttacking.gd")
 
 const SCAN_INTERVAL = 1.0 / 60.0 * 10.0
 const WAYPOINT_RADIUS = 1.2
@@ -50,7 +51,9 @@ func _on_scan_timer_timeout():
 	if targets.is_empty():
 		return
 	_movement.stop()
-	_sub_action = AutoAttacking.new(_pick_closest(targets))
+	var is_archer = _unit.get_script() and _unit.get_script().resource_path.get_file() == "archer.gd"
+	var action_class = ArcherAutoAttacking if is_archer else AutoAttacking
+	_sub_action = action_class.new(_pick_closest(targets))
 	_sub_action.tree_exited.connect(_on_sub_action_finished)
 	add_child(_sub_action)
 	_unit.action_updated.emit()
