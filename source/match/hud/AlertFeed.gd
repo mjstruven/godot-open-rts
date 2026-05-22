@@ -25,6 +25,7 @@ func _ready():
 	MatchSignals.unit_damaged.connect(_on_unit_damaged)
 	MatchSignals.unit_construction_finished.connect(_on_construction_finished)
 	MatchSignals.unit_production_finished.connect(_on_production_finished)
+	MatchSignals.alert_message.connect(_on_alert_message)
 
 
 func _process(delta):
@@ -78,6 +79,12 @@ func _push(text: String):
 	var alert = Alert.new()
 	alert.label = lbl
 	_alerts.append(alert)
+
+
+func _on_alert_message(msg_player, text: String):
+	if msg_player != _player:
+		return
+	_push(text)
 
 
 func _unit_name(unit) -> String:

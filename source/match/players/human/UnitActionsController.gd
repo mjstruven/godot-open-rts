@@ -13,6 +13,8 @@ class Actions:
 	)
 	const AutoAttacking = preload("res://source/match/units/actions/AutoAttacking.gd")
 	const ArcherAutoAttacking = preload("res://source/match/units/actions/ArcherAutoAttacking.gd")
+	const RamAutoAttacking = preload("res://source/match/units/actions/RamAutoAttacking.gd")
+	const LoadingIntoCrew = preload("res://source/match/units/actions/LoadingIntoCrew.gd")
 	const Constructing = preload("res://source/match/units/actions/Constructing.gd")
 	const AttackMoving = preload("res://source/match/units/actions/AttackMoving.gd")
 	const StandingGround = preload("res://source/match/units/actions/StandingGround.gd")
@@ -165,6 +167,8 @@ func _navigate_selected_units_towards_unit(target_unit):
 
 
 func _navigate_unit_towards_unit(unit, target_unit):
+	if unit.is_in_group("in_crew"):
+		return false
 	if unit.is_in_group("suppressing"):
 		var dist = unit.global_position_yless.distance_to(target_unit.global_position_yless)
 		if dist <= unit.attack_range and Actions.AutoAttacking.is_applicable(unit, target_unit):
@@ -178,16 +182,42 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		if dist > unit.attack_range or not Actions.AutoAttacking.is_applicable(unit, target_unit):
 			return false
 		# In range: fall through — ArcherAutoAttacking will activate SuppressedAttacking
+	# Crew loading: infantry/archer right-clicking a neutral or same-player siege unit
+	var crew_manager = target_unit.find_child("CrewManager")
+	if crew_manager != null:
+		var can_crew = (
+			target_unit.is_in_group("neutral_siege") or target_unit.player == unit.player
+		)
+		if can_crew and crew_manager.can_accept_unit(unit):
+			var tgt = target_unit
+			_set_or_queue_action(
+				unit, func(): unit.action = Actions.LoadingIntoCrew.new(tgt), tgt.global_position
+			)
+			return true
 	if Actions.CollectingResourcesSequentially.is_applicable(unit, target_unit):
 		unit.action_queue.clear()
 		unit.action = Actions.CollectingResourcesSequentially.new(target_unit)
 		return true
 	if Actions.AutoAttacking.is_applicable(unit, target_unit):
 		var tgt = target_unit
-		var is_archer = unit.get_script() and unit.get_script().resource_path.get_file() == "archer.gd"
-		var action_class = Actions.ArcherAutoAttacking if is_archer else Actions.AutoAttacking
-		_set_or_queue_action(unit, func(): unit.action = action_class.new(tgt), tgt.global_position)
-		return true
+		var unit_script_file = (
+			unit.get_script().resource_path.get_file() if unit.get_script() else ""
+		)
+		var is_archer = unit_script_file == "archer.gd"
+		var is_ram = unit_script_file == "battering_ram.gd"
+		if is_ram:
+			if Actions.RamAutoAttacking.is_applicable(unit, tgt):
+				_set_or_queue_action(
+					unit,
+					func(): unit.action = Actions.RamAutoAttacking.new(tgt),
+					tgt.global_position
+				)
+				return true
+			# Ram cannot attack this target type — fall through to follow/move
+		else:
+			var action_class = Actions.ArcherAutoAttacking if is_archer else Actions.AutoAttacking
+			_set_or_queue_action(unit, func(): unit.action = action_class.new(tgt), tgt.global_position)
+			return true
 	if Actions.Constructing.is_applicable(unit, target_unit):
 		var tgt = target_unit
 		_set_or_queue_action(unit, func(): unit.action = Actions.Constructing.new(tgt), tgt.global_position)

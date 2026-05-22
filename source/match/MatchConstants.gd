@@ -105,6 +105,7 @@ class Units:
 		"res://source/match/units/supply_train.tscn": {"food": 80, "gold": 40},
 		"res://source/match/units/flag_commander/flag_commander.tscn": {"gold": 150},
 		"res://source/match/units/mercenary.tscn": {"gold": 250},
+		"res://source/match/units/battering_ram.tscn": {"wood": 100, "stone": 150},
 	}
 	const PRODUCTION_TIMES = {
 		"res://source/match/units/infantry.tscn": 6.0,
@@ -114,6 +115,7 @@ class Units:
 		"res://source/match/units/supply_train.tscn": 45.0,
 		"res://source/match/units/flag_commander/flag_commander.tscn": 30.0,
 		"res://source/match/units/mercenary.tscn": 10.0,
+		"res://source/match/units/battering_ram.tscn": 40.0,
 	}
 	const PRODUCTION_QUEUE_LIMIT = 5
 	const STRUCTURE_BLUEPRINTS = {
@@ -133,6 +135,8 @@ class Units:
 		"res://source/match/units/structure-geometries/CapitalGeometry.tscn",
 		"res://source/match/units/command_post.tscn":
 		"res://source/match/units/structure-geometries/CommandPostGeometry.tscn",
+		"res://source/match/units/siege_workshop.tscn":
+		"res://source/match/units/structure-geometries/SiegeWorkshopGeometry.tscn",
 	}
 	const CONSTRUCTION_COSTS = {
 		"res://source/match/units/grain_mill.tscn": {"wood": 50, "stone": 20},
@@ -143,6 +147,7 @@ class Units:
 		"res://source/match/units/academy.tscn": {"wood": 300, "stone": 200},
 		"res://source/match/units/capital.tscn": {"wood": 600, "stone": 400},
 		"res://source/match/units/command_post.tscn": {"wood": 600, "stone": 400},
+		"res://source/match/units/siege_workshop.tscn": {"wood": 400, "stone": 300},
 	}
 	const DEFAULT_PROPERTIES = {
 		"res://source/match/units/infantry.tscn":
@@ -234,6 +239,18 @@ class Units:
 			"attack_domains": [Navigation.Domain.TERRAIN],
 		},
 		"res://source/match/units/civilian.tscn": {"sight_range": 2.0, "hp": 10, "hp_max": 10},
+		"res://source/match/units/siege_workshop.tscn":
+		{"sight_range": 8.0, "hp": 3000, "hp_max": 3000},
+		"res://source/match/units/battering_ram.tscn":
+		{
+			"sight_range": 6.0,
+			"hp": 400,
+			"hp_max": 400,
+			"attack_damage": 80,
+			"attack_interval": 3.0,
+			"attack_range": 1.2,
+			"attack_domains": [Navigation.Domain.TERRAIN],
+		},
 	}
 	const SUPPLY_TRAIN_BUILD_LIMIT = 2
 	# All upkeep values are per minute, applied once per 60-second economy tick.

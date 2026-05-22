@@ -4,6 +4,8 @@ const Engineer = preload("res://source/match/units/engineer.gd")
 const Academy = preload("res://source/match/units/academy.gd")
 const Capital = preload("res://source/match/units/capital.gd")
 const Structure = preload("res://source/match/units/Structure.gd")
+const SiegeWorkshop = preload("res://source/match/units/siege_workshop.gd")
+const BatteringRam = preload("res://source/match/units/battering_ram.gd")
 
 @onready var _generic_menu = find_child("GenericMenu")
 @onready var _engineer_menu = find_child("EngineerMenu")
@@ -12,6 +14,8 @@ const Structure = preload("res://source/match/units/Structure.gd")
 @onready var _structure_menu = find_child("StructureMenu")
 @onready var _combat_menu = find_child("CombatMenu")
 @onready var _formation_menu = find_child("FormationMenu")
+@onready var _siege_workshop_menu = find_child("SiegeWorkshopMenu")
+@onready var _battering_ram_menu = find_child("BatteringRamMenu")
 
 var _focused_units: Array = []
 var _full_focused_units: Array = []
@@ -87,6 +91,8 @@ func _hide_all_menus():
 	_structure_menu.hide()
 	_combat_menu.hide()
 	_formation_menu.hide()
+	_siege_workshop_menu.hide()
+	_battering_ram_menu.hide()
 
 
 func _try_showing_any_menu():
@@ -106,6 +112,22 @@ func _try_showing_any_menu():
 	):
 		_capital_menu.units = selected_capitals
 		_capital_menu.show()
+		return true
+	var selected_workshops = selected_controlled_units.filter(func(u): return u is SiegeWorkshop)
+	if (
+		not selected_workshops.is_empty()
+		and selected_workshops.size() == selected_controlled_units.size()
+	):
+		_siege_workshop_menu.units = selected_workshops
+		_siege_workshop_menu.show()
+		return true
+	var selected_rams = selected_controlled_units.filter(func(u): return u is BatteringRam)
+	if (
+		not selected_rams.is_empty()
+		and selected_rams.size() == selected_controlled_units.size()
+	):
+		_battering_ram_menu.units = selected_rams
+		_battering_ram_menu.show()
 		return true
 	if (
 		selected_controlled_units.size() == 1

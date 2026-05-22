@@ -37,6 +37,12 @@ focus_mode = 0
 text = "CP"
 tooltip_text = "Command Post - Wood:600, Stone:400 [A]"
 
+[node name="PlaceSiegeWorkshopButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "SW"
+tooltip_text = "Siege Workshop - Wood:400, Stone:300 [F]"
+
 [node name="PlaceHouseButton" type="Button" parent="."]
 layout_mode = 2
 focus_mode = 0
@@ -100,6 +106,7 @@ mouse_filter = 2
 [connection signal="pressed" from="PlaceStoneMillButton" to="." method="_on_place_stone_mill_button_pressed"]
 [connection signal="pressed" from="PlaceTownCenterButton" to="." method="_on_place_town_center_button_pressed"]
 [connection signal="pressed" from="PlaceCommandPostButton" to="." method="_on_place_command_post_button_pressed"]
+[connection signal="pressed" from="PlaceSiegeWorkshopButton" to="." method="_on_place_siege_workshop_button_pressed"]
 [connection signal="pressed" from="PlaceHouseButton" to="." method="_on_place_house_button_pressed"]
 [connection signal="pressed" from="PlaceManorButton" to="." method="_on_place_manor_button_pressed"]
 [connection signal="pressed" from="DismissButton" to="." method="_on_dismiss_pressed"]
