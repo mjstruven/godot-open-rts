@@ -16,6 +16,7 @@ func _get_units_to_attack():
 				and u.movement_domain in _unit.attack_domains
 				and (
 					_unit.global_position_yless.distance_to(u.global_position_yless)
+					- _obstacle_radius_of(u)
 					<= _unit.sight_range
 				)
 				and (u is Structure or u.is_in_group("siege_units"))
@@ -29,3 +30,10 @@ func _attack_unit(unit):
 	_sub_action.tree_exited.connect(_on_attack_finished)
 	add_child(_sub_action)
 	_unit.action_updated.emit()
+
+
+func _obstacle_radius_of(unit) -> float:
+	var obstacle = unit.find_child("MovementObstacle")
+	if obstacle != null and obstacle.affect_navigation_mesh:
+		return obstacle.radius
+	return 0.0
