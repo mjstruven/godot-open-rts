@@ -14,6 +14,17 @@ func _ready():
 	var crew_mgr = find_child("CrewManager")
 	if crew_mgr != null:
 		crew_mgr.crew_changed.connect(_on_crew_changed)
+	action_changed.connect(_on_action_changed)
+
+
+func _on_action_changed(new_action) -> void:
+	if new_action != null:
+		return
+	if not is_inside_tree():
+		return
+	var crew_mgr = find_child("CrewManager")
+	if crew_mgr != null and crew_mgr.crew_count() >= MIN_CREW_TO_FUNCTION:
+		action = RamWaitingForTargets.new()
 
 
 func _on_crew_changed(new_count: int) -> void:
