@@ -463,3 +463,45 @@ Design is settled; code is not written. Recorded here so it survives session bou
 ## SCHEDULED DESIGN WORK (updated)
 
 Siege anti-mass cap: **10 trebuchets per player** (trebuchet-specific for now); implemented as a unit cap, not a damage mechanic. Recorded earlier; restated for completeness.
+
+---
+
+## Session: Wave 3d Stage 3 — Trebuchet attack (complete)
+
+### Completed
+
+The Trebuchet's full attack system is built and verified working.
+
+- **Crew and pack requirement.** Attacks while crewed (minimum 2 engineers) and fully unpacked only. Range: min 7, max 30. Attacks anything (buildings, siege, units).
+- **Sight-range vs attack-range.** Sight range is intentionally LOWER than max attack range — a max-range Trebuchet shot may need another unit to provide vision of the target. This is a deliberate mechanic (siege needs a spotter at long range), not a bug.
+- **Scatter.** The impact point is a random point in a circle centred on the target. The scatter circle radius grows with distance, in four tiers (placeholder values, tunable):
+  - 7–13  → 1.0  (very accurate)
+  - 14–19 → 1.75 (pretty accurate)
+  - 20–25 → 2.75 (some misses)
+  - 26–30 → 3.75 (wildly variable)
+- **AOE.** A fixed circular blast (radius 1.5, placeholder/tunable) at the impact point — full flat damage to all units and buildings in it. Does NOT scale with range. Friendly fire is active.
+- **No line damage.** Unlike the Ballista, the Trebuchet deals NO flight-path/line damage — impact AOE only.
+- **Projectile.** A visible arcing grey rock with real travel time; damage applies on impact.
+- **Impact indicator (telegraph), visible to all players.** Grey while reloading, turns red at 5 s remaining, stays red through flight, disappears ~1 s after impact. First shot after unpacking is 5 s red-only (no grey). Manual reassign when ready = instant red + launch. Reassign while reloading = grey moves, reload continues. Target leaving during the red phase = the shot still commits to that spot (this makes dodging meaningful).
+- **Reload 10 s.** Auto-fires every cycle; on target loss, reacquires in-range targets only, priority: enemy siege → enemy unit-producing buildings → other enemy buildings → enemy units, nearest within tier; idles if nothing in range (does not hunt).
+- **Attack command.** In range → attack; too far → pack, move to max range, unpack, attack; too close → pack, move to min range, unpack, attack. Attack-ground ([E]) is continuous.
+- **Range circles.** When a Trebuchet is selected, 5 red range circles show at radii 7, 13, 19, 25, 30 (min, the three scatter-tier boundaries, and max).
+- **Placeholder stats (tunable):** `attack_damage 80`, `attack_interval 10 s`.
+
+---
+
+## BALLISTA / SIEGE INDICATOR NOTE
+
+- Siege range indicator circles are red (Trebuchet and Ballista). Archer indicators stay grey.
+
+---
+
+## TUNING LEVERS (Trebuchet)
+
+For later balancing: the four scatter tier radii (1.0 / 1.75 / 2.75 / 3.75), the AOE radius (1.5), `attack_damage` (80), `attack_interval` (10 s), and the tier distance bands themselves.
+
+---
+
+## GDD IS STALE ON THE TREBUCHET
+
+The GDD v0.3 Trebuchet (30 s pack, range 10–25, damage 32, buildings-only, "Flying Fire") is now fully superseded by the built Trebuchet. The GDD needs a reconciliation pass; until then, SESSION_NOTES is the source of truth for the Trebuchet.
