@@ -51,4 +51,15 @@ func _load_into_target():
 
 
 func _on_target_removed():
-	queue_free()
+	_check_target_still_alive.call_deferred()
+
+
+func _check_target_still_alive():
+	if not is_inside_tree():
+		return
+	if (
+		not is_instance_valid(_target)
+		or not _target.is_inside_tree()
+		or _target.is_queued_for_deletion()
+	):
+		queue_free()
