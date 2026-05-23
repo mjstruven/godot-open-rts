@@ -100,6 +100,13 @@ func _is_constructing(unit) -> bool:
 	return unit.action != null and unit.action is Actions.Constructing
 
 
+func _emit_needs_crew_if_uncrewed_siege_selected() -> void:
+	for unit in get_tree().get_nodes_in_group("selected_units"):
+		if unit.is_in_group("neutral_siege") and unit.is_in_group("siege_units"):
+			MatchSignals.alert_message.emit(get_parent(), "Needs a crew to operate")
+			return
+
+
 func _ready():
 	MatchSignals.terrain_targeted.connect(_on_terrain_targeted)
 	MatchSignals.unit_targeted.connect(_on_unit_targeted)
@@ -139,6 +146,7 @@ func _try_navigating_selected_units_towards_position(target_point):
 		var unit = tuple[0]
 		var new_target = tuple[1]
 		_set_or_queue_action(unit, func(): unit.action = Actions.Moving.new(new_target), new_target)
+	_emit_needs_crew_if_uncrewed_siege_selected()
 
 
 func _try_setting_rally_points(target_point: Vector3):
@@ -182,8 +190,12 @@ func _try_queuing_selected_workers_to_construct_structure(potential_structure):
 
 func _navigate_selected_units_towards_unit(target_unit):
 	var at_least_one_unit_navigated = false
+	var emitted_needs_crew := false
 	for unit in get_tree().get_nodes_in_group("selected_units"):
 		if not unit.is_in_group("controlled_units"):
+			if not emitted_needs_crew and unit.is_in_group("neutral_siege"):
+				MatchSignals.alert_message.emit(get_parent(), "Needs a crew to operate")
+				emitted_needs_crew = true
 			continue
 		if _is_constructing(unit) and not Actions.Constructing.is_applicable(unit, target_unit):
 			continue
