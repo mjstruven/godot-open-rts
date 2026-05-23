@@ -347,3 +347,44 @@ The abandon teardown itself was also reworked (`6dc875c`) to a three-phase deter
 - Project compiles and runs clean.
 - Wave 3c (Ballista, external-crew / siege-engineer system, neutral/claimable ownership, `ExternalCrewManager`, `CrewDots` with public count, abandon teardown) is **complete**.
 - **Next: Wave 3d — Trebuchet.**
+
+---
+
+## Session: Wave 3c — Ballista external-crew system HARDENED (complete)
+
+The Ballista external-crew system is complete, hardened, and verified. All four fixes summarised below.
+
+**Friendly-fire on own crew (`94b2c7f`):** The `Unit.gd` `player` getter (`get_parent()`) returned the Ballista for a crewed engineer, since engineers are reparented to the Ballista — so target scans (`player != player`) read friendly engineers as enemies and auto-attacked them. Fixed at source: the `player` getter resolves a crewed engineer (one with `crew_siege_unit` meta) to its siege unit's owner.
+
+**Crew-list corruption / abandon crash (`3db7bb9`, the real root-cause fix; `bc7412d` and `6dc875c` were earlier partial attempts):** `load_unit` connected the engineer `tree_exited` signal and appended to `_crew` *before* calling `_claim_ownership`. `_claim_ownership` reparents the neutral Ballista; reparenting fires `tree_exited` on all children including the just-attached engineer, triggering `_on_engineer_died` mid-claim and dropping that engineer from `_crew`. Result: a "ghost" engineer — physically present, has meta, in `"units"` group, **not** in `_crew` — causing the "4 crew loaded but 3 dots" desync, slot-index collisions, and the abandon crash. Fix: `_claim_ownership` now runs *before* connecting `tree_exited` and appending to `_crew`.
+
+**Abandon teardown reworked (`6dc875c`):** `abandon()` now runs in explicit phases — detach engineers (disconnect signals, strip meta, remove from `"units"`) **before** releasing Ballista ownership, then free + respawn. This guarantees `_sync_unit` cannot see a live engineer with a stale meta pointing to a now-neutral Ballista.
+
+**Reparent invalid-state guards (`524ed02`):** `_claim_ownership` and `_release_ownership` now guard their `reparent` calls with `is_inside_tree()`, so a reparent is never attempted while the node is mid-reparent. Cleared the line-201 debugger errors (`!is_inside_tree()` / parent busy / already has parent). Group/ownership bookkeeping (groups, color, avoidance) still runs unconditionally even when the physical reparent is skipped.
+
+### Key Engine Lessons
+
+- **Reparenting a node in Godot fires `tree_exited` on ALL its children recursively.** Connecting lifecycle signals to a child before a parent reparent, or calling reparent re-entrantly, causes spurious handler firing. Order signal connections around reparenting carefully, and guard reparent calls with `is_inside_tree()`.
+- **Diagnose upstream.** The abandon crash was patched three times at the teardown site before the real cause was found in the loading path. A seemingly minor symptom — crew dot count off by one — was the clue that located the root cause.
+
+---
+
+## Session: Selection and highlight circle sizing (complete)
+
+Selection circles and hover-highlight circles were per-unit hand-typed radii not derived from unit size; cavalry was badly oversized. Standardised to consistent per-category values (`f364bd7`):
+
+- **Foot units:** Selection radius `0.4`
+- **Cavalry:** Selection radius `0.5`
+- **Large / siege / buildings:** radius ≈ collision radius (set individually)
+
+These radii do **not** auto-derive from unit size — when real models replace placeholder geometry they will need re-tuning. The per-category values keep that re-tuning to a few numbers rather than per-unit.
+
+---
+
+## SIEGE DESIGN DECISIONS (design only — not yet built)
+
+**Anti-mass cap on siege quantity:** Massed siege must not trivialize targets (no "10 trebs instantly delete a castle", no "50 cannons kill cavalry"). The chosen solution is a **cap on the quantity of siege a player can field** — not a damage-over-time or damage-stacking mechanic. A unit cap is visible, honest, and simple; a damage cap makes excess siege silently useless. Open question: hard cap vs. escalating-cost soft cap — undecided.
+
+**Long, drawn-out siege feel:** Achieved by tuning, not a new mechanic — high building HP, slow siege fire rate, and fragile/exposed siege units. This also creates counterplay for free (time to flank the siege, repair the structure, or counter-siege).
+
+**DoT (damage-over-time) for siege was considered and dropped** as a balance mechanic. Fire-rate tuning achieves the same drawn-out feel more simply. DoT may optionally be kept later as pure visual flavour (crumbling structures) but not as a balance lever.
