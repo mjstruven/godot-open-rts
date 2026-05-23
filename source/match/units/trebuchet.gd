@@ -150,8 +150,11 @@ func reset_player_color():
 
 func _show_range_circles():
 	if _range_circles.is_empty():
-		_range_circles.append(_make_siege_range_circle(ATTACK_MIN_RANGE))
-		_range_circles.append(_make_siege_range_circle(attack_range if attack_range != null else 25.0))
+		_range_circles.append(_make_siege_range_circle(7.0))
+		_range_circles.append(_make_siege_range_circle(13.0))
+		_range_circles.append(_make_siege_range_circle(19.0))
+		_range_circles.append(_make_siege_range_circle(25.0))
+		_range_circles.append(_make_siege_range_circle(attack_range if attack_range != null else 30.0))
 	for c in _range_circles:
 		if is_instance_valid(c):
 			c.show()

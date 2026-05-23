@@ -1,9 +1,9 @@
 extends "res://source/match/units/actions/Action.gd"
 
-const SCATTER_RADIUS_CLOSE := 1.0
-const SCATTER_RADIUS_MID := 1.75
-const SCATTER_RADIUS_FAR := 2.5
-const SCATTER_RADIUS_MAX := 3.25
+const SCATTER_RADIUS_CLOSE := 1.0    # 7–13 (tunable)
+const SCATTER_RADIUS_MID := 1.75    # 14–19 (tunable)
+const SCATTER_RADIUS_FAR := 2.75    # 20–25 (tunable)
+const SCATTER_RADIUS_MAX := 3.75    # 26–30 (tunable)
 const AOE_RADIUS := 1.5
 const FLIGHT_TIME := 1.5
 const ARC_PEAK := 5.0
@@ -55,11 +55,11 @@ func _pick_scatter_pos():
 
 
 func _get_scatter_radius(dist: float) -> float:
-	if dist <= 10.0:
+	if dist <= 13.0:
 		return SCATTER_RADIUS_CLOSE
-	elif dist <= 15.0:
+	elif dist <= 19.0:
 		return SCATTER_RADIUS_MID
-	elif dist <= 20.0:
+	elif dist <= 25.0:
 		return SCATTER_RADIUS_FAR
 	else:
 		return SCATTER_RADIUS_MAX
