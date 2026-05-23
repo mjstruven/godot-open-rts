@@ -1,10 +1,13 @@
 extends "res://source/match/units/actions/Action.gd"
 
-const SCATTER_RADIUS := 2.0
-const AOE_HALF := 1.0
+const SCATTER_RADIUS_CLOSE := 1.0
+const SCATTER_RADIUS_MID := 1.75
+const SCATTER_RADIUS_FAR := 2.5
+const SCATTER_RADIUS_MAX := 3.25
+const AOE_RADIUS := 1.5
 const FLIGHT_TIME := 1.5
 const ARC_PEAK := 5.0
-const MIN_RANGE := 5.0
+const MIN_RANGE := 7.0
 const INDICATOR_GREY := Color(0.5, 0.5, 0.5, 0.50)
 const INDICATOR_RED := Color(0.85, 0.10, 0.10, 0.65)
 const RED_PRE_FIRE_DURATION := 1.0
@@ -42,11 +45,24 @@ func _begin_shot_cycle():
 
 
 func _pick_scatter_pos():
-	var angle = randf() * TAU
-	var dist = sqrt(randf()) * SCATTER_RADIUS
-	var offset = Vector2(cos(angle), sin(angle)) * dist
 	var base = _target_unit.global_position
+	var dist = _unit.global_position_yless.distance_to(_target_unit.global_position_yless)
+	var scatter_radius = _get_scatter_radius(dist)
+	var angle = randf() * TAU
+	var scatter_dist = sqrt(randf()) * scatter_radius
+	var offset = Vector2(cos(angle), sin(angle)) * scatter_dist
 	_scatter_pos = Vector3(base.x + offset.x, 0.0, base.z + offset.y)
+
+
+func _get_scatter_radius(dist: float) -> float:
+	if dist <= 10.0:
+		return SCATTER_RADIUS_CLOSE
+	elif dist <= 15.0:
+		return SCATTER_RADIUS_MID
+	elif dist <= 20.0:
+		return SCATTER_RADIUS_FAR
+	else:
+		return SCATTER_RADIUS_MAX
 
 
 func _create_indicator(color: Color):
@@ -54,9 +70,12 @@ func _create_indicator(color: Color):
 	if match_node == null:
 		return
 	var mesh = MeshInstance3D.new()
-	var plane = PlaneMesh.new()
-	plane.size = Vector2(AOE_HALF * 2.0, AOE_HALF * 2.0)
-	mesh.mesh = plane
+	var cylinder = CylinderMesh.new()
+	cylinder.top_radius = AOE_RADIUS
+	cylinder.bottom_radius = AOE_RADIUS
+	cylinder.height = 0.01
+	cylinder.radial_segments = 16
+	mesh.mesh = cylinder
 	var mat = StandardMaterial3D.new()
 	mat.albedo_color = color
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -64,8 +83,8 @@ func _create_indicator(color: Color):
 	mat.render_priority = 1
 	mat.no_depth_test = true
 	mesh.material_override = mat
-	mesh.global_position = Vector3(_scatter_pos.x, 0.02, _scatter_pos.z)
 	match_node.add_child(mesh)
+	mesh.global_position = Vector3(_scatter_pos.x, 0.005, _scatter_pos.z)
 	_indicator = mesh
 
 
@@ -106,6 +125,9 @@ func _on_reload_done():
 
 func _fire_shot():
 	if not is_inside_tree():
+		return
+	if _unit.get_pack_state() != "UNPACKED":
+		queue_free()
 		return
 	if _teardown_if_out_of_range():
 		return
@@ -204,6 +226,8 @@ static func _apply_aoe_damage(
 	impact_pos: Vector3,
 	damage: int
 ) -> void:
+	if not is_instance_valid(src_unit):
+		return
 	var ip = Vector2(impact_pos.x, impact_pos.z)
 	for u in tree.get_nodes_in_group("units"):
 		if not is_instance_valid(u):
@@ -213,5 +237,5 @@ static func _apply_aoe_damage(
 		if u.has_meta("crew_siege_unit") and u.get_meta("crew_siege_unit") == src_unit:
 			continue
 		var up = Vector2(u.global_position.x, u.global_position.z)
-		if abs(up.x - ip.x) <= AOE_HALF and abs(up.y - ip.y) <= AOE_HALF:
+		if up.distance_to(ip) <= AOE_RADIUS:
 			u.hp -= damage

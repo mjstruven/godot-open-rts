@@ -7,7 +7,7 @@ const FollowingToReachDistance = preload(
 	"res://source/match/units/actions/FollowingToReachDistance.gd"
 )
 
-const TREB_MIN_RANGE = 5.0
+const TREB_MIN_RANGE = 7.0
 const POLL_INTERVAL = 0.15
 
 var _target_unit = null

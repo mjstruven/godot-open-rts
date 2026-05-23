@@ -4,8 +4,11 @@ const TrebuchetAttackingWhileInRange = preload(
 	"res://source/match/units/actions/TrebuchetAttackingWhileInRange.gd"
 )
 
-const SCATTER_RADIUS = 2.0
-const AOE_HALF = 1.0
+const SCATTER_RADIUS_CLOSE = 1.0
+const SCATTER_RADIUS_MID = 1.75
+const SCATTER_RADIUS_FAR = 2.5
+const SCATTER_RADIUS_MAX = 3.25
+const AOE_RADIUS = 1.5
 const FLIGHT_TIME = 1.5
 const ARC_PEAK = 5.0
 const INDICATOR_GREY = Color(0.5, 0.5, 0.5, 0.50)
@@ -25,6 +28,9 @@ func _init(target_pos: Vector3):
 
 
 func _ready():
+	if _unit.get_pack_state() != "UNPACKED":
+		queue_free()
+		return
 	var ecm = _unit.find_child("ExternalCrewManager")
 	if ecm == null or ecm.crew_count() < 2:
 		queue_free()
@@ -43,10 +49,24 @@ func _begin_shot_cycle():
 
 
 func _pick_scatter_pos():
+	var unit_pos = _unit.global_position
+	var dist = Vector2(unit_pos.x, unit_pos.z).distance_to(Vector2(_target_pos.x, _target_pos.z))
+	var scatter_radius = _get_scatter_radius(dist)
 	var angle = randf() * TAU
-	var dist = sqrt(randf()) * SCATTER_RADIUS
-	var offset = Vector2(cos(angle), sin(angle)) * dist
+	var scatter_dist = sqrt(randf()) * scatter_radius
+	var offset = Vector2(cos(angle), sin(angle)) * scatter_dist
 	_scatter_pos = Vector3(_target_pos.x + offset.x, 0.0, _target_pos.z + offset.y)
+
+
+func _get_scatter_radius(dist: float) -> float:
+	if dist <= 10.0:
+		return SCATTER_RADIUS_CLOSE
+	elif dist <= 15.0:
+		return SCATTER_RADIUS_MID
+	elif dist <= 20.0:
+		return SCATTER_RADIUS_FAR
+	else:
+		return SCATTER_RADIUS_MAX
 
 
 func _create_indicator(color: Color):
@@ -54,9 +74,12 @@ func _create_indicator(color: Color):
 	if match_node == null:
 		return
 	var mesh = MeshInstance3D.new()
-	var plane = PlaneMesh.new()
-	plane.size = Vector2(AOE_HALF * 2.0, AOE_HALF * 2.0)
-	mesh.mesh = plane
+	var cylinder = CylinderMesh.new()
+	cylinder.top_radius = AOE_RADIUS
+	cylinder.bottom_radius = AOE_RADIUS
+	cylinder.height = 0.01
+	cylinder.radial_segments = 16
+	mesh.mesh = cylinder
 	var mat = StandardMaterial3D.new()
 	mat.albedo_color = color
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -64,8 +87,8 @@ func _create_indicator(color: Color):
 	mat.render_priority = 1
 	mat.no_depth_test = true
 	mesh.material_override = mat
-	mesh.global_position = Vector3(_scatter_pos.x, 0.02, _scatter_pos.z)
 	match_node.add_child(mesh)
+	mesh.global_position = Vector3(_scatter_pos.x, 0.005, _scatter_pos.z)
 	_indicator = mesh
 
 
@@ -106,6 +129,9 @@ func _on_reload_done():
 
 func _fire_shot():
 	if not is_inside_tree():
+		return
+	if _unit.get_pack_state() != "UNPACKED":
+		queue_free()
 		return
 	var ecm = _unit.find_child("ExternalCrewManager")
 	if ecm == null or ecm.crew_count() < 2:

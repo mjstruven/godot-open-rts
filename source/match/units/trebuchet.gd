@@ -2,7 +2,7 @@ extends "res://source/match/units/Unit.gd"
 
 const PACK_RATE: float = 1.0 / 15.0
 const MIN_CREW_TO_FUNCTION: int = 2
-const ATTACK_MIN_RANGE: float = 5.0
+const ATTACK_MIN_RANGE: float = 7.0
 
 const MovingAction = preload("res://source/match/units/actions/Moving.gd")
 const AttackMovingAction = preload("res://source/match/units/actions/AttackMoving.gd")
@@ -151,7 +151,7 @@ func reset_player_color():
 func _show_range_circles():
 	if _range_circles.is_empty():
 		_range_circles.append(_make_siege_range_circle(ATTACK_MIN_RANGE))
-		_range_circles.append(_make_siege_range_circle(attack_range if attack_range != null else 20.0))
+		_range_circles.append(_make_siege_range_circle(attack_range if attack_range != null else 25.0))
 	for c in _range_circles:
 		if is_instance_valid(c):
 			c.show()

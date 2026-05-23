@@ -5,7 +5,7 @@ const TrebuchetAutoAttacking = preload(
 )
 const Structure = preload("res://source/match/units/Structure.gd")
 
-const TREB_MIN_RANGE = 5.0
+const TREB_MIN_RANGE = 7.0
 
 
 func _get_units_to_attack():
