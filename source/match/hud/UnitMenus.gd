@@ -24,9 +24,6 @@ const Trebuchet = preload("res://source/match/units/trebuchet.gd")
 @onready var _trebuchet_menu = find_child("TrebuchetMenu")
 
 var _focused_units: Array = []
-var _full_focused_units: Array = []
-var _tab_index: int = 0
-var _is_tab_emitting: bool = false
 
 
 func _ready():
@@ -35,50 +32,9 @@ func _ready():
 	MatchSignals.formation_changed.connect(func(): _reset_menus())
 
 
-func _unhandled_input(event):
-	if not (event is InputEventKey and event.pressed and not event.echo):
-		return
-	if event.keycode == KEY_TAB:
-		_cycle_tab_subselection()
-		get_viewport().set_input_as_handled()
-
-
 func _on_unit_focus_changed(focused_controlled_units: Array):
-	if not _is_tab_emitting:
-		_full_focused_units = focused_controlled_units
-		_tab_index = 0
 	_focused_units = focused_controlled_units
 	_reset_menus()
-
-
-func _cycle_tab_subselection():
-	var valid = _full_focused_units.filter(
-		func(u): return is_instance_valid(u) and u.is_in_group("controlled_units")
-	)
-	if valid.is_empty():
-		return
-
-	var types: Array = []
-	for u in valid:
-		if u.type not in types:
-			types.append(u.type)
-
-	if types.size() <= 1:
-		return  # nothing to cycle
-
-	var cycle_size = 1 + types.size()  # [all, type0, type1, ...]
-	_tab_index = (_tab_index + 1) % cycle_size
-
-	var subset: Array
-	if _tab_index == 0:
-		subset = valid
-	else:
-		var t = types[_tab_index - 1]
-		subset = valid.filter(func(u): return u.type == t)
-
-	_is_tab_emitting = true
-	MatchSignals.unit_focus_changed.emit(subset)
-	_is_tab_emitting = false
 
 
 func _reset_menus():

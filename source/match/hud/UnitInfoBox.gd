@@ -1,8 +1,5 @@
 extends PanelContainer
 
-var _selected_units: Array = []
-var _tab_index: int = 0
-
 @onready var _unit_name_label = find_child("UnitNameLabel")
 @onready var _tab_hint_label = find_child("TabHintLabel")
 @onready var _hp_label = find_child("HpLabel")
@@ -23,86 +20,26 @@ var _tab_index: int = 0
 
 
 func _ready():
-	MatchSignals.unit_selected.connect(_on_unit_selected)
-	MatchSignals.unit_deselected.connect(_on_unit_deselected)
-	MatchSignals.unit_died.connect(_on_unit_died)
+	MatchSignals.unit_focus_changed.connect(_on_unit_focus_changed)
 	hide()
 
 
-func _unhandled_input(event):
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_TAB:
-		if _unique_types().size() > 1:
-			_tab_index = (_tab_index + 1) % _unique_types().size()
-			_refresh()
-			get_viewport().set_input_as_handled()
-
-
-func _on_unit_selected(unit):
-	if unit not in _selected_units:
-		_selected_units.append(unit)
-	_tab_index = 0
-	_refresh()
-
-
-func _on_unit_deselected(unit):
-	_selected_units.erase(unit)
-	_tab_index = mini(_tab_index, max(0, _unique_types().size() - 1))
-	_refresh()
-
-
-func _on_unit_died(unit):
-	_selected_units.erase(unit)
-	_tab_index = mini(_tab_index, max(0, _unique_types().size() - 1))
-	_refresh()
-
-
-func _unique_types() -> Array:
-	var seen = {}
-	var result = []
-	for unit in _selected_units:
-		if not is_instance_valid(unit):
-			continue
-		var t = unit.get_script().resource_path
-		if t not in seen:
-			seen[t] = true
-			result.append(t)
-	return result
-
-
-func _refresh():
-	_selected_units = _selected_units.filter(func(u): return is_instance_valid(u))
-	var types = _unique_types()
-	if types.is_empty():
+func _on_unit_focus_changed(focused_units: Array):
+	var valid = focused_units.filter(func(u): return is_instance_valid(u))
+	if valid.is_empty():
 		hide()
-		MatchSignals.unit_focus_changed.emit([])
-		return
-	_tab_index = clampi(_tab_index, 0, types.size() - 1)
-	var current_type = types[_tab_index]
-	var units_of_type = _selected_units.filter(
-		func(u): return u.get_script().resource_path == current_type
-	)
-	if units_of_type.is_empty():
-		hide()
-		MatchSignals.unit_focus_changed.emit([])
 		return
 	show()
-	_update_display(units_of_type[0], units_of_type.size(), _tab_index + 1, types.size())
-	var focused_controlled = units_of_type.filter(func(u): return u.is_in_group("controlled_units"))
-	MatchSignals.unit_focus_changed.emit(focused_controlled)
+	_update_display(valid[0], valid.size())
 
 
-func _update_display(unit, count: int, type_idx: int, type_total: int):
+func _update_display(unit, count: int):
 	var type_val = unit.get("type")
 	var name_str = (type_val if type_val != null else unit.name).capitalize()
 	if count > 1:
 		name_str += " x%d" % count
 	_unit_name_label.text = name_str
-
-	if type_total > 1:
-		_tab_hint_label.text = "%d/%d Tab" % [type_idx, type_total]
-		_tab_hint_label.show()
-	else:
-		_tab_hint_label.hide()
+	_tab_hint_label.hide()
 
 	if unit.hp != null and unit.hp_max != null:
 		_hp_label.text = "HP: %d / %d" % [int(unit.hp), int(unit.hp_max)]
