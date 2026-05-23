@@ -111,6 +111,7 @@ capacity = 4
 [node name="CrewDots" parent="." instance=ExtResource("8_trebcd")]
 crew_count_public = true
 dot_height = 1.4
+min_crew_required = 2
 
 [node name="ChargeBar" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)

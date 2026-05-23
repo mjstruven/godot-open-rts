@@ -11,10 +11,12 @@ const ROW_SPACING := 0.16
 
 @export var crew_count_public: bool = true
 @export var dot_height: float = 1.15
+@export var min_crew_required: int = 0
 
 var _dot_meshes: Array = []
 var _mat_empty: StandardMaterial3D
 var _mat_filled: StandardMaterial3D
+var _mat_required_empty: StandardMaterial3D
 var _parent_unit: Node3D
 var _local_player: Node = null
 
@@ -32,6 +34,8 @@ func _ready() -> void:
 	_mat_empty.albedo_color = Color(0.3, 0.3, 0.3)
 	_mat_filled = StandardMaterial3D.new()
 	_mat_filled.albedo_color = Color(1.0, 1.0, 1.0)
+	_mat_required_empty = StandardMaterial3D.new()
+	_mat_required_empty.albedo_color = Color(0.8, 0.1, 0.1)
 	var mesh := SphereMesh.new()
 	mesh.radius = DOT_RADIUS
 	mesh.height = DOT_RADIUS * 2.0
@@ -75,7 +79,12 @@ func _on_crew_changed(new_count: int) -> void:
 
 func _update_dots(filled: int) -> void:
 	for i in range(_dot_meshes.size()):
-		_dot_meshes[i].material_override = _mat_filled if i < filled else _mat_empty
+		if i < filled:
+			_dot_meshes[i].material_override = _mat_filled
+		elif i < min_crew_required:
+			_dot_meshes[i].material_override = _mat_required_empty
+		else:
+			_dot_meshes[i].material_override = _mat_empty
 
 
 func _get_local_player() -> Node:

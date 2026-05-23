@@ -68,3 +68,4 @@ capacity = 24
 [node name="CrewDots" parent="." instance=ExtResource("8_towercd")]
 crew_count_public = false
 dot_height = 2.3
+min_crew_required = 4

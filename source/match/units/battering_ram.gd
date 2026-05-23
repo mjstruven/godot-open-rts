@@ -41,8 +41,6 @@ func _set_action(action_node):
 		var crew_mgr = find_child("CrewManager")
 		if crew_mgr != null and crew_mgr.crew_count() < MIN_CREW_TO_FUNCTION:
 			action_node.queue_free()
-			if is_in_group("controlled_units"):
-				MatchSignals.alert_message.emit(player, "Must be crewed by at least 4")
 			return
 	super(action_node)
 

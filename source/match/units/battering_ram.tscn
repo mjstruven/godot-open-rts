@@ -86,3 +86,4 @@ radius = 0.8
 
 [node name="CrewDots" parent="." instance=ExtResource("8_ramcd")]
 crew_count_public = false
+min_crew_required = 4
