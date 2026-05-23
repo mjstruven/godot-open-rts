@@ -15,7 +15,7 @@ material = SubResource("StandardMaterial3D_siengmt")
 size = Vector3(0.4, 0.4, 0.4)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_siengcol"]
-height = 0.8
+height = 0.3
 radius = 0.25
 
 [node name="SiegeEngineer" type="Area3D"]
@@ -31,7 +31,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 mesh = SubResource("BoxMesh_siengbody")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
 shape = SubResource("CylinderShape3D_siengcol")
 
 [node name="Movement" parent="." instance=ExtResource("2_siengmv")]
