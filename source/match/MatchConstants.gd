@@ -108,6 +108,7 @@ class Units:
 		"res://source/match/units/battering_ram.tscn": {"wood": 100, "stone": 150},
 		"res://source/match/units/siege_tower.tscn": {"wood": 150, "stone": 100, "gold": 50},
 		"res://source/match/units/ballista.tscn": {"wood": 120, "stone": 80, "gold": 30},
+		"res://source/match/units/trebuchet.tscn": {"wood": 150, "stone": 100, "gold": 50},
 	}
 	const PRODUCTION_TIMES = {
 		"res://source/match/units/infantry.tscn": 6.0,
@@ -120,6 +121,7 @@ class Units:
 		"res://source/match/units/battering_ram.tscn": 40.0,
 		"res://source/match/units/siege_tower.tscn": 50.0,
 		"res://source/match/units/ballista.tscn": 45.0,
+		"res://source/match/units/trebuchet.tscn": 60.0,
 	}
 	const PRODUCTION_QUEUE_LIMIT = 5
 	const STRUCTURE_BLUEPRINTS = {
@@ -277,6 +279,12 @@ class Units:
 			"hp": 400,
 			"hp_max": 400,
 		},
+		"res://source/match/units/trebuchet.tscn":
+		{
+			"sight_range": 12.0,
+			"hp": 700,
+			"hp_max": 700,
+		},
 	}
 	const SUPPLY_TRAIN_BUILD_LIMIT = 2
 	# All upkeep values are per minute, applied once per 60-second economy tick.
@@ -292,7 +300,7 @@ class Units:
 		"res://source/match/units/siege_engineer.tscn": {"food": 4},
 		# Future units — add entries here when the scenes exist:
 		# "res://source/match/units/battering_ram.tscn": {"gold": 4},
-		# "res://source/match/units/trebuchet.tscn": {"gold": 8},
+		"res://source/match/units/trebuchet.tscn": {"wood": 4, "gold": 6},
 	}
 	# Income from constructed buildings, per minute, applied each 60-second tick.
 	# Mill food/wood/stone income is handled separately via supply wagons (60/min each).

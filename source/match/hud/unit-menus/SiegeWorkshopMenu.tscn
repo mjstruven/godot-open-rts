@@ -24,9 +24,11 @@ focus_mode = 0
 text = "BAL"
 tooltip_text = "Ballista | 45s | Wood:120, Stone:80, Gold:30 [E]"
 
-[node name="Padding3" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
+[node name="ProduceTrebuchetButton" type="Button" parent="."]
 layout_mode = 2
+focus_mode = 0
+text = "TRB"
+tooltip_text = "Trebuchet | 60s | Wood:150, Stone:100, Gold:50 [R]"
 
 [node name="Padding4" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
@@ -71,3 +73,4 @@ layout_mode = 2
 [connection signal="pressed" from="ProduceBatteringRamButton" to="." method="_on_produce_battering_ram_pressed"]
 [connection signal="pressed" from="ProduceSiegeTowerButton" to="." method="_on_produce_siege_tower_pressed"]
 [connection signal="pressed" from="ProduceBallistaButton" to="." method="_on_produce_ballista_pressed"]
+[connection signal="pressed" from="ProduceTrebuchetButton" to="." method="_on_produce_trebuchet_pressed"]
