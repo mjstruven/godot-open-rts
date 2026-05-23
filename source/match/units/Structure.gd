@@ -19,6 +19,10 @@ var has_builder: bool:
 		pass
 
 
+func _is_structure() -> bool:
+	return true
+
+
 func is_revealing():
 	return super() and is_constructed()
 

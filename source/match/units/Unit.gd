@@ -8,6 +8,12 @@ signal action_updated
 
 const MATERIAL_ALBEDO_TO_REPLACE = Color(0.99, 0.81, 0.48)
 const MATERIAL_ALBEDO_TO_REPLACE_EPSILON = 0.05
+const DEATH_MARKER_FULL_DURATION = 5.0    # seconds at full opacity (tunable)
+const DEATH_MARKER_FADE_DURATION = 5.0    # seconds to fade out (tunable)
+const DEATH_MARKER_FULL_ALPHA = 0.75      # opacity while full (tunable)
+const DEATH_MARKER_FADED_ALPHA = 0.0      # opacity at end of fade (tunable)
+const DEATH_MARKER_COLOR_UNIT = Color(0.85, 0.0, 0.0)    # red — regular units
+const DEATH_MARKER_COLOR_HEAVY = Color(0.0, 0.0, 0.0)    # black — siege and structures
 const _ArcherAutoAttackingScript = preload(
 	"res://source/match/units/actions/ArcherAutoAttacking.gd"
 )
@@ -222,9 +228,53 @@ func _safety_checks():
 	return true
 
 
+func _is_structure() -> bool:
+	return false
+
+
 func _handle_unit_death():
+	_spawn_death_marker()
 	tree_exited.connect(func(): MatchSignals.unit_died.emit(self))
 	queue_free()
+
+
+func _spawn_death_marker():
+	if _match == null or not is_instance_valid(_match):
+		return
+	var r = radius
+	if r == null or r <= 0.0:
+		return
+	var base_color: Color
+	if is_in_group("siege_units") or _is_structure():
+		base_color = DEATH_MARKER_COLOR_HEAVY
+	else:
+		base_color = DEATH_MARKER_COLOR_UNIT
+	var full_color = Color(base_color.r, base_color.g, base_color.b, DEATH_MARKER_FULL_ALPHA)
+	var faded_color = Color(base_color.r, base_color.g, base_color.b, DEATH_MARKER_FADED_ALPHA)
+	var marker = MeshInstance3D.new()
+	var cylinder = CylinderMesh.new()
+	cylinder.top_radius = r
+	cylinder.bottom_radius = r
+	cylinder.height = 0.01
+	cylinder.radial_segments = 24
+	marker.mesh = cylinder
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = full_color
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.no_depth_test = false
+	marker.material_override = mat
+	_match.add_child(marker)
+	if _tvs == null:
+		_tvs = get_tree().get_first_node_in_group("terrain_visual_system")
+	var ground_y = 0.0
+	if _tvs != null and _tvs.height_ready:
+		ground_y = _tvs.get_visual_height_at(global_position)
+	marker.global_position = Vector3(global_position.x, ground_y + 0.005, global_position.z)
+	var tween = _match.create_tween()
+	tween.tween_interval(DEATH_MARKER_FULL_DURATION)
+	tween.tween_property(mat, "albedo_color", faded_color, DEATH_MARKER_FADE_DURATION)
+	tween.tween_callback(func(): if is_instance_valid(marker): marker.queue_free())
 
 
 func _setup_default_properties_from_constants():
