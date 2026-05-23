@@ -42,22 +42,22 @@ func _begin_shot_cycle():
 
 
 func _pick_scatter_pos():
-	var angle := randf() * TAU
-	var dist := sqrt(randf()) * SCATTER_RADIUS
-	var offset := Vector2(cos(angle), sin(angle)) * dist
-	var base := _target_unit.global_position
+	var angle = randf() * TAU
+	var dist = sqrt(randf()) * SCATTER_RADIUS
+	var offset = Vector2(cos(angle), sin(angle)) * dist
+	var base = _target_unit.global_position
 	_scatter_pos = Vector3(base.x + offset.x, 0.0, base.z + offset.y)
 
 
 func _create_indicator(color: Color):
-	var match_node := _unit.find_parent("Match")
+	var match_node = _unit.find_parent("Match")
 	if match_node == null:
 		return
-	var mesh := MeshInstance3D.new()
-	var plane := PlaneMesh.new()
+	var mesh = MeshInstance3D.new()
+	var plane = PlaneMesh.new()
 	plane.size = Vector2(AOE_HALF * 2.0, AOE_HALF * 2.0)
 	mesh.mesh = plane
-	var mat := StandardMaterial3D.new()
+	var mat = StandardMaterial3D.new()
 	mat.albedo_color = color
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -81,19 +81,19 @@ func _cleanup_indicator():
 
 
 func _schedule_shot():
-	var now := Time.get_ticks_msec()
-	var is_first := _unit.get_meta("treb_first_shot", false)
+	var now = Time.get_ticks_msec()
+	var is_first = _unit.get_meta("treb_first_shot", false)
 	if is_first:
 		_unit.remove_meta("treb_first_shot")
 		_set_indicator_color(INDICATOR_RED)
 		_start_timer(5.0, _fire_shot)
 		return
-	var next := _unit.get_meta("next_attack_availability_time", now)
+	var next = _unit.get_meta("next_attack_availability_time", now)
 	if next <= now:
 		_set_indicator_color(INDICATOR_RED)
 		_start_timer(RED_PRE_FIRE_DURATION, _fire_shot)
 	else:
-		var remaining := (next - now) / 1000.0
+		var remaining = (next - now) / 1000.0
 		_start_timer(remaining, _on_reload_done)
 
 
@@ -113,46 +113,46 @@ func _fire_shot():
 		"next_attack_availability_time",
 		Time.get_ticks_msec() + int(_unit.attack_interval * 1000.0)
 	)
-	var from_pos := _unit.global_position
-	var to_pos := _scatter_pos
-	var indicator_to_fire := _indicator
+	var from_pos: Vector3 = _unit.global_position
+	var to_pos: Vector3 = _scatter_pos
+	var indicator_to_fire = _indicator
 	_indicator = null
 	_launch_rock(from_pos, to_pos, indicator_to_fire)
 
 
 func _launch_rock(from_pos: Vector3, to_pos: Vector3, indicator_to_remove: MeshInstance3D):
-	var match_node := _unit.find_parent("Match")
+	var match_node = _unit.find_parent("Match")
 	if match_node == null:
 		if is_instance_valid(indicator_to_remove):
 			indicator_to_remove.queue_free()
 		return
-	var rock := MeshInstance3D.new()
-	var sphere := SphereMesh.new()
+	var rock = MeshInstance3D.new()
+	var sphere = SphereMesh.new()
 	sphere.radius = 0.15
 	sphere.height = 0.3
 	rock.mesh = sphere
-	var mat := StandardMaterial3D.new()
+	var mat = StandardMaterial3D.new()
 	mat.albedo_color = ROCK_COLOR
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	rock.material_override = mat
 	match_node.add_child(rock)
 	rock.global_position = from_pos
 
-	var tree := get_tree()
-	var src := _unit
-	var impact := to_pos
+	var tree = get_tree()
+	var src = _unit
+	var impact: Vector3 = to_pos
 	var dmg: int = _unit.attack_damage
-	var action_ref := self
+	var action_ref = self
 
-	var arc_move := func(t: float) -> void:
+	var arc_move = func(t: float) -> void:
 		if not is_instance_valid(rock):
 			return
-		var xz_x := lerpf(from_pos.x, to_pos.x, t)
-		var xz_z := lerpf(from_pos.z, to_pos.z, t)
-		var arc_y := 4.0 * ARC_PEAK * t * (1.0 - t)
+		var xz_x = lerpf(from_pos.x, to_pos.x, t)
+		var xz_z = lerpf(from_pos.z, to_pos.z, t)
+		var arc_y = 4.0 * ARC_PEAK * t * (1.0 - t)
 		rock.global_position = Vector3(xz_x, from_pos.y + arc_y, xz_z)
 
-	var tween := match_node.create_tween()
+	var tween = match_node.create_tween()
 	tween.tween_method(arc_move, 0.0, 1.0, FLIGHT_TIME)
 	tween.tween_callback(func():
 		if is_instance_valid(rock):
@@ -175,7 +175,7 @@ func _teardown_if_out_of_range() -> bool:
 	if not is_instance_valid(_target_unit) or not _target_unit.is_inside_tree():
 		queue_free()
 		return true
-	var dist := _unit.global_position_yless.distance_to(_target_unit.global_position_yless)
+	var dist = _unit.global_position_yless.distance_to(_target_unit.global_position_yless)
 	if dist < MIN_RANGE or dist > _unit.attack_range:
 		queue_free()
 		return true
@@ -187,7 +187,7 @@ func _on_target_removed():
 
 
 func _start_timer(wait_time: float, callback: Callable):
-	var t := Timer.new()
+	var t = Timer.new()
 	t.wait_time = wait_time
 	t.one_shot = true
 	add_child(t)
@@ -204,7 +204,7 @@ static func _apply_aoe_damage(
 	impact_pos: Vector3,
 	damage: int
 ) -> void:
-	var ip := Vector2(impact_pos.x, impact_pos.z)
+	var ip = Vector2(impact_pos.x, impact_pos.z)
 	for u in tree.get_nodes_in_group("units"):
 		if not is_instance_valid(u):
 			continue
@@ -212,6 +212,6 @@ static func _apply_aoe_damage(
 			continue
 		if u.has_meta("crew_siege_unit") and u.get_meta("crew_siege_unit") == src_unit:
 			continue
-		var up := Vector2(u.global_position.x, u.global_position.z)
+		var up = Vector2(u.global_position.x, u.global_position.z)
 		if abs(up.x - ip.x) <= AOE_HALF and abs(up.y - ip.y) <= AOE_HALF:
 			u.hp -= damage

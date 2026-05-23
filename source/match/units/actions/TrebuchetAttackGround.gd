@@ -4,14 +4,14 @@ const TrebuchetAttackingWhileInRange = preload(
 	"res://source/match/units/actions/TrebuchetAttackingWhileInRange.gd"
 )
 
-const SCATTER_RADIUS := TrebuchetAttackingWhileInRange.SCATTER_RADIUS
-const AOE_HALF := TrebuchetAttackingWhileInRange.AOE_HALF
-const FLIGHT_TIME := TrebuchetAttackingWhileInRange.FLIGHT_TIME
-const ARC_PEAK := TrebuchetAttackingWhileInRange.ARC_PEAK
-const INDICATOR_GREY := TrebuchetAttackingWhileInRange.INDICATOR_GREY
-const INDICATOR_RED := TrebuchetAttackingWhileInRange.INDICATOR_RED
-const RED_PRE_FIRE_DURATION := TrebuchetAttackingWhileInRange.RED_PRE_FIRE_DURATION
-const ROCK_COLOR := TrebuchetAttackingWhileInRange.ROCK_COLOR
+const SCATTER_RADIUS = 2.0
+const AOE_HALF = 1.0
+const FLIGHT_TIME = 1.5
+const ARC_PEAK = 5.0
+const INDICATOR_GREY = Color(0.5, 0.5, 0.5, 0.50)
+const INDICATOR_RED = Color(0.85, 0.10, 0.10, 0.65)
+const RED_PRE_FIRE_DURATION = 1.0
+const ROCK_COLOR = Color(0.5, 0.5, 0.55)
 
 var _target_pos: Vector3
 var _scatter_pos: Vector3
@@ -25,7 +25,7 @@ func _init(target_pos: Vector3):
 
 
 func _ready():
-	var ecm := _unit.find_child("ExternalCrewManager")
+	var ecm = _unit.find_child("ExternalCrewManager")
 	if ecm == null or ecm.crew_count() < 2:
 		queue_free()
 		return
@@ -43,21 +43,21 @@ func _begin_shot_cycle():
 
 
 func _pick_scatter_pos():
-	var angle := randf() * TAU
-	var dist := sqrt(randf()) * SCATTER_RADIUS
-	var offset := Vector2(cos(angle), sin(angle)) * dist
+	var angle = randf() * TAU
+	var dist = sqrt(randf()) * SCATTER_RADIUS
+	var offset = Vector2(cos(angle), sin(angle)) * dist
 	_scatter_pos = Vector3(_target_pos.x + offset.x, 0.0, _target_pos.z + offset.y)
 
 
 func _create_indicator(color: Color):
-	var match_node := _unit.find_parent("Match")
+	var match_node = _unit.find_parent("Match")
 	if match_node == null:
 		return
-	var mesh := MeshInstance3D.new()
-	var plane := PlaneMesh.new()
+	var mesh = MeshInstance3D.new()
+	var plane = PlaneMesh.new()
 	plane.size = Vector2(AOE_HALF * 2.0, AOE_HALF * 2.0)
 	mesh.mesh = plane
-	var mat := StandardMaterial3D.new()
+	var mat = StandardMaterial3D.new()
 	mat.albedo_color = color
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -81,19 +81,19 @@ func _cleanup_indicator():
 
 
 func _schedule_shot():
-	var now := Time.get_ticks_msec()
-	var is_first := _unit.get_meta("treb_first_shot", false)
+	var now = Time.get_ticks_msec()
+	var is_first = _unit.get_meta("treb_first_shot", false)
 	if is_first:
 		_unit.remove_meta("treb_first_shot")
 		_set_indicator_color(INDICATOR_RED)
 		_start_timer(5.0, _fire_shot)
 		return
-	var next := _unit.get_meta("next_attack_availability_time", now)
+	var next = _unit.get_meta("next_attack_availability_time", now)
 	if next <= now:
 		_set_indicator_color(INDICATOR_RED)
 		_start_timer(RED_PRE_FIRE_DURATION, _fire_shot)
 	else:
-		var remaining := (next - now) / 1000.0
+		var remaining = (next - now) / 1000.0
 		_start_timer(remaining, _on_reload_done)
 
 
@@ -107,7 +107,7 @@ func _on_reload_done():
 func _fire_shot():
 	if not is_inside_tree():
 		return
-	var ecm := _unit.find_child("ExternalCrewManager")
+	var ecm = _unit.find_child("ExternalCrewManager")
 	if ecm == null or ecm.crew_count() < 2:
 		queue_free()
 		return
@@ -115,46 +115,46 @@ func _fire_shot():
 		"next_attack_availability_time",
 		Time.get_ticks_msec() + int(_unit.attack_interval * 1000.0)
 	)
-	var from_pos := _unit.global_position
-	var to_pos := _scatter_pos
-	var indicator_to_fire := _indicator
+	var from_pos: Vector3 = _unit.global_position
+	var to_pos: Vector3 = _scatter_pos
+	var indicator_to_fire = _indicator
 	_indicator = null
 	_launch_rock(from_pos, to_pos, indicator_to_fire)
 
 
 func _launch_rock(from_pos: Vector3, to_pos: Vector3, indicator_to_remove: MeshInstance3D):
-	var match_node := _unit.find_parent("Match")
+	var match_node = _unit.find_parent("Match")
 	if match_node == null:
 		if is_instance_valid(indicator_to_remove):
 			indicator_to_remove.queue_free()
 		return
-	var rock := MeshInstance3D.new()
-	var sphere := SphereMesh.new()
+	var rock = MeshInstance3D.new()
+	var sphere = SphereMesh.new()
 	sphere.radius = 0.15
 	sphere.height = 0.3
 	rock.mesh = sphere
-	var mat := StandardMaterial3D.new()
+	var mat = StandardMaterial3D.new()
 	mat.albedo_color = ROCK_COLOR
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	rock.material_override = mat
 	match_node.add_child(rock)
 	rock.global_position = from_pos
 
-	var tree := get_tree()
-	var src := _unit
-	var impact := to_pos
+	var tree = get_tree()
+	var src = _unit
+	var impact: Vector3 = to_pos
 	var dmg: int = _unit.attack_damage
-	var action_ref := self
+	var action_ref = self
 
-	var arc_move := func(t: float) -> void:
+	var arc_move = func(t: float) -> void:
 		if not is_instance_valid(rock):
 			return
-		var xz_x := lerpf(from_pos.x, to_pos.x, t)
-		var xz_z := lerpf(from_pos.z, to_pos.z, t)
-		var arc_y := 4.0 * ARC_PEAK * t * (1.0 - t)
+		var xz_x = lerpf(from_pos.x, to_pos.x, t)
+		var xz_z = lerpf(from_pos.z, to_pos.z, t)
+		var arc_y = 4.0 * ARC_PEAK * t * (1.0 - t)
 		rock.global_position = Vector3(xz_x, from_pos.y + arc_y, xz_z)
 
-	var tween := match_node.create_tween()
+	var tween = match_node.create_tween()
 	tween.tween_method(arc_move, 0.0, 1.0, FLIGHT_TIME)
 	tween.tween_callback(func():
 		if is_instance_valid(rock):
@@ -174,7 +174,7 @@ func _on_rock_landed():
 
 
 func _start_timer(wait_time: float, callback: Callable):
-	var t := Timer.new()
+	var t = Timer.new()
 	t.wait_time = wait_time
 	t.one_shot = true
 	add_child(t)
