@@ -150,6 +150,8 @@ static func _apply_damage(
 	for u in tree.get_nodes_in_group("units"):
 		if not is_instance_valid(u) or u == src_unit:
 			continue
+		if u.get_meta("crew_siege_unit", null) == src_unit:
+			continue
 		# Line pierce
 		var px2 = Vector2(u.global_position.x, u.global_position.z)
 		var ld: float
@@ -164,6 +166,8 @@ static func _apply_damage(
 
 	for u in tree.get_nodes_in_group("units"):
 		if not is_instance_valid(u) or u == src_unit:
+			continue
+		if u.get_meta("crew_siege_unit", null) == src_unit:
 			continue
 		var d2d = Vector2(u.global_position.x, u.global_position.z).distance_to(bx2)
 		if d2d <= a_radius:

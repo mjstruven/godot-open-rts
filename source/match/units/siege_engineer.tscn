@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://ivlo0e66qocl" path="res://source/match/units/traits/Movement.tscn" id="2_siengmv"]
 [ext_resource type="PackedScene" uid="uid://c3ssj2p6voauk" path="res://source/match/units/traits/HealthBar.tscn" id="3_sienghb"]
 [ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="4_siengta"]
+[ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="5_sienghi"]
+[ext_resource type="PackedScene" uid="uid://3c1h14nqdumt" path="res://source/match/units/traits/Selection.tscn" id="6_siengse"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_siengmt"]
 albedo_color = Color(0.55, 0.38, 0.22, 1)
@@ -47,6 +49,14 @@ speed = 0.7
 [node name="HealthBar" parent="." instance=ExtResource("3_sienghb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
 size = Vector2(60, 4)
+
+[node name="Highlight" parent="." instance=ExtResource("5_sienghi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.25
+
+[node name="Selection" parent="." instance=ExtResource("6_siengse")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.25
 
 [node name="Targetability" parent="." instance=ExtResource("4_siengta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)

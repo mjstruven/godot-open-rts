@@ -5,11 +5,13 @@ const WANDER_WAIT: float = 2.5
 
 var _wait_timer: Timer = null
 var _movement = null
+var _last_wander_origin: Vector3 = Vector3.ZERO
 
 
 func _ready():
 	await super()
 	add_to_group("population_units")
+	remove_from_group("controlled_units")
 	_wait_timer = Timer.new()
 	_wait_timer.one_shot = true
 	_wait_timer.wait_time = WANDER_WAIT
@@ -21,6 +23,18 @@ func _ready():
 	_pick_wander_destination()
 
 
+func _process(delta: float) -> void:
+	super(delta)
+	if _movement == null:
+		return
+	var siege_unit = get_meta("crew_siege_unit", null)
+	if not is_instance_valid(siege_unit):
+		return
+	if siege_unit.global_position.distance_to(_last_wander_origin) > WANDER_RADIUS:
+		_wait_timer.stop()
+		_pick_wander_destination()
+
+
 func _pick_wander_destination():
 	if _movement == null:
 		return
@@ -30,6 +44,7 @@ func _pick_wander_destination():
 		origin = siege_unit.global_position
 	else:
 		origin = global_position
+	_last_wander_origin = origin
 	var angle: float = randf() * TAU
 	var dist: float = randf_range(0.2, WANDER_RADIUS)
 	_movement.move(origin + Vector3(cos(angle) * dist, 0.0, sin(angle) * dist))

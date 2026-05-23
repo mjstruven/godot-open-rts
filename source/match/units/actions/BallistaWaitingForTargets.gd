@@ -17,6 +17,8 @@ func _get_units_to_attack():
 				return false
 			if u.is_in_group("neutral_siege"):
 				return false
+			if u.get_meta("crew_siege_unit", null) == _unit:
+				return false
 			if u.movement_domain not in _unit.attack_domains:
 				return false
 			var dist = _unit.global_position_yless.distance_to(u.global_position_yless)
