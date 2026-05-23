@@ -174,7 +174,7 @@ func _claim_ownership(new_player: Node) -> void:
 	var mv = _unit.find_child("Movement")
 	if mv != null:
 		mv.avoidance_enabled = true
-	if _unit.player != new_player:
+	if _unit.player != new_player and _unit.is_inside_tree():
 		_unit.reparent(new_player, true)
 	if _unit.has_method("refresh_player_color"):
 		_unit.refresh_player_color()
@@ -197,5 +197,5 @@ func _release_ownership() -> void:
 	var match_node = _unit.find_parent("Match")
 	if match_node != null:
 		var neutral_parent = match_node.find_child("Players", false)
-		if neutral_parent != null and _unit.get_parent() != neutral_parent:
+		if neutral_parent != null and _unit.get_parent() != neutral_parent and _unit.is_inside_tree():
 			_unit.reparent(neutral_parent, true)
