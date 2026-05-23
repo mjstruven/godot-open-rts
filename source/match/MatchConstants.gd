@@ -107,6 +107,7 @@ class Units:
 		"res://source/match/units/mercenary.tscn": {"gold": 250},
 		"res://source/match/units/battering_ram.tscn": {"wood": 100, "stone": 150},
 		"res://source/match/units/siege_tower.tscn": {"wood": 150, "stone": 100, "gold": 50},
+		"res://source/match/units/ballista.tscn": {"wood": 120, "stone": 80, "gold": 30},
 	}
 	const PRODUCTION_TIMES = {
 		"res://source/match/units/infantry.tscn": 6.0,
@@ -118,6 +119,7 @@ class Units:
 		"res://source/match/units/mercenary.tscn": 10.0,
 		"res://source/match/units/battering_ram.tscn": 40.0,
 		"res://source/match/units/siege_tower.tscn": 50.0,
+		"res://source/match/units/ballista.tscn": 45.0,
 	}
 	const PRODUCTION_QUEUE_LIMIT = 5
 	const STRUCTURE_BLUEPRINTS = {
@@ -259,6 +261,22 @@ class Units:
 			"hp": 2000,
 			"hp_max": 2000,
 		},
+		"res://source/match/units/ballista.tscn":
+		{
+			"sight_range": 12.0,
+			"hp": 600,
+			"hp_max": 600,
+			"attack_damage": 35,
+			"attack_interval": 5.0,
+			"attack_range": 10.0,
+			"attack_domains": [Navigation.Domain.TERRAIN],
+		},
+		"res://source/match/units/siege_engineer.tscn":
+		{
+			"sight_range": 4.0,
+			"hp": 400,
+			"hp_max": 400,
+		},
 	}
 	const SUPPLY_TRAIN_BUILD_LIMIT = 2
 	# All upkeep values are per minute, applied once per 60-second economy tick.
@@ -270,6 +288,8 @@ class Units:
 		"res://source/match/units/flag_commander/flag_commander.tscn": {"gold": 2},
 		"res://source/match/units/mercenary.tscn": {"food": 12, "gold": 8},
 		"res://source/match/units/siege_tower.tscn": {"wood": 5, "gold": 5},
+		"res://source/match/units/ballista.tscn": {"wood": 3, "gold": 4},
+		"res://source/match/units/siege_engineer.tscn": {"food": 4},
 		# Future units — add entries here when the scenes exist:
 		# "res://source/match/units/battering_ram.tscn": {"gold": 4},
 		# "res://source/match/units/trebuchet.tscn": {"gold": 8},

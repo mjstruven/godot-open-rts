@@ -15,6 +15,15 @@ class Actions:
 	const ArcherAutoAttacking = preload("res://source/match/units/actions/ArcherAutoAttacking.gd")
 	const RamAutoAttacking = preload("res://source/match/units/actions/RamAutoAttacking.gd")
 	const LoadingIntoCrew = preload("res://source/match/units/actions/LoadingIntoCrew.gd")
+	const ApproachingExternalCrew = preload(
+		"res://source/match/units/actions/ApproachingExternalCrew.gd"
+	)
+	const BallistaAutoAttacking = preload(
+		"res://source/match/units/actions/BallistaAutoAttacking.gd"
+	)
+	const BallistaAttackGround = preload(
+		"res://source/match/units/actions/BallistaAttackGround.gd"
+	)
 	const Constructing = preload("res://source/match/units/actions/Constructing.gd")
 	const AttackMoving = preload("res://source/match/units/actions/AttackMoving.gd")
 	const StandingGround = preload("res://source/match/units/actions/StandingGround.gd")
@@ -44,6 +53,8 @@ func _input(event):
 					_apply_attack_move(pos)
 				"patrol":
 					_apply_patrol(pos)
+				"attack_ground":
+					_apply_attack_ground(pos)
 		get_viewport().set_input_as_handled()
 	elif event.button_index == MOUSE_BUTTON_RIGHT:
 		_exit_targeting_mode()
@@ -182,6 +193,20 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		if dist > unit.attack_range or not Actions.AutoAttacking.is_applicable(unit, target_unit):
 			return false
 		# In range: fall through — ArcherAutoAttacking will activate SuppressedAttacking
+	# External crew loading (Ballista, Trebuchet, etc.)
+	var external_crew_mgr = target_unit.find_child("ExternalCrewManager")
+	if external_crew_mgr != null:
+		var can_crew = (
+			target_unit.is_in_group("neutral_siege") or target_unit.player == unit.player
+		)
+		if can_crew and external_crew_mgr.can_accept_unit(unit):
+			var tgt = target_unit
+			_set_or_queue_action(
+				unit,
+				func(): unit.action = Actions.ApproachingExternalCrew.new(tgt),
+				tgt.global_position
+			)
+			return true
 	# Crew loading: infantry/archer right-clicking a neutral or same-player siege unit
 	var crew_manager = target_unit.find_child("CrewManager")
 	if crew_manager != null:
@@ -205,6 +230,7 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		)
 		var is_archer = unit_script_file == "archer.gd"
 		var is_ram = unit_script_file == "battering_ram.gd"
+		var is_ballista = unit.find_child("ExternalCrewManager") != null
 		if is_ram:
 			if Actions.RamAutoAttacking.is_applicable(unit, tgt):
 				_set_or_queue_action(
@@ -214,6 +240,14 @@ func _navigate_unit_towards_unit(unit, target_unit):
 				)
 				return true
 			# Ram cannot attack this target type — fall through to follow/move
+		elif is_ballista:
+			if Actions.BallistaAutoAttacking.is_applicable(unit, tgt):
+				_set_or_queue_action(
+					unit,
+					func(): unit.action = Actions.BallistaAutoAttacking.new(tgt),
+					tgt.global_position
+				)
+				return true
 		else:
 			var action_class = Actions.ArcherAutoAttacking if is_archer else Actions.AutoAttacking
 			_set_or_queue_action(unit, func(): unit.action = action_class.new(tgt), tgt.global_position)
@@ -258,6 +292,8 @@ func _on_combat_command_requested(command: String):
 			_apply_stand_ground()
 		"attack_move", "patrol":
 			_enter_targeting_mode(command)
+		"attack_ground":
+			_enter_targeting_mode(command)
 
 
 func _apply_stand_ground():
@@ -279,6 +315,10 @@ func _on_terrain_targeted(position):
 	if _pending_command == "patrol":
 		_exit_targeting_mode()
 		_apply_patrol(position)
+		return
+	if _pending_command == "attack_ground":
+		_exit_targeting_mode()
+		_apply_attack_ground(position)
 		return
 	_try_navigating_selected_units_towards_position(position)
 	_try_setting_rally_points(position)
@@ -345,6 +385,25 @@ func _apply_patrol(position: Vector3):
 		var unit = tuple[0]
 		var dest = tuple[1]
 		_set_or_queue_action(unit, func(): unit.action = Actions.Patrolling.new(unit.global_position, dest), dest)
+
+
+func _apply_attack_ground(position: Vector3):
+	for unit in get_tree().get_nodes_in_group("selected_units"):
+		if not unit.is_in_group("controlled_units"):
+			continue
+		var ecm = unit.find_child("ExternalCrewManager")
+		if ecm == null or ecm.crew_count() < 2:
+			continue
+		if unit.attack_range == null:
+			continue
+		var min_range: float = unit.get_meta("attack_min_range", 0.0)
+		var dist = unit.global_position_yless.distance_to(Vector3(position.x, 0.0, position.z))
+		if dist < min_range or dist > unit.attack_range:
+			continue
+		var tgt_pos = position
+		_set_or_queue_action(
+			unit, func(): unit.action = Actions.BallistaAttackGround.new(tgt_pos), tgt_pos
+		)
 
 
 func _on_unit_targeted(unit):

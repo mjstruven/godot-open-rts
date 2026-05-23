@@ -22,6 +22,8 @@ var _local_player: Node = null
 func _ready() -> void:
 	var crew_mgr = get_parent().find_child("CrewManager")
 	if crew_mgr == null:
+		crew_mgr = get_parent().find_child("ExternalCrewManager")
+	if crew_mgr == null:
 		return
 	_parent_unit = get_parent()
 	top_level = true

@@ -1,0 +1,90 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://source/match/units/ballista.gd" id="1_balgd"]
+[ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="2_balhi"]
+[ext_resource type="PackedScene" uid="uid://3c1h14nqdumt" path="res://source/match/units/traits/Selection.tscn" id="3_bals"]
+[ext_resource type="PackedScene" uid="uid://ivlo0e66qocl" path="res://source/match/units/traits/Movement.tscn" id="4_balmv"]
+[ext_resource type="PackedScene" uid="uid://c3ssj2p6voauk" path="res://source/match/units/traits/HealthBar.tscn" id="5_balhb"]
+[ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="6_balta"]
+[ext_resource type="PackedScene" path="res://source/match/units/traits/ExternalCrewManager.tscn" id="7_balecm"]
+[ext_resource type="PackedScene" path="res://source/match/units/traits/CrewDots.tscn" id="8_balcd"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_balframe"]
+albedo_color = Color(0.99, 0.81, 0.48, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_baldark"]
+albedo_color = Color(0.32, 0.28, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_balbase"]
+material = SubResource("StandardMaterial3D_balframe")
+size = Vector3(1.0, 0.25, 0.65)
+
+[sub_resource type="BoxMesh" id="BoxMesh_balarm"]
+material = SubResource("StandardMaterial3D_baldark")
+size = Vector3(0.85, 0.12, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_balbolt"]
+material = SubResource("StandardMaterial3D_baldark")
+size = Vector3(0.12, 0.12, 0.8)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_balcol"]
+height = 0.8
+radius = 0.65
+
+[node name="Ballista" type="Area3D"]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_balgd")
+
+[node name="Geometry" type="Node3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+
+[node name="Base" type="MeshInstance3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("BoxMesh_balbase")
+
+[node name="Arm" type="MeshInstance3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+mesh = SubResource("BoxMesh_balarm")
+
+[node name="Bolt" type="MeshInstance3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.42, 0)
+mesh = SubResource("BoxMesh_balbolt")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+shape = SubResource("CylinderShape3D_balcol")
+
+[node name="Highlight" parent="." instance=ExtResource("2_balhi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.65
+
+[node name="Selection" parent="." instance=ExtResource("3_bals")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.65
+
+[node name="Movement" parent="." instance=ExtResource("4_balmv")]
+path_desired_distance = 0.4
+target_desired_distance = 0.4
+path_height_offset = 0.55
+path_max_distance = 0.45
+radius = 0.65
+neighbor_distance = 8.0
+max_neighbors = 40
+time_horizon_agents = 3.0
+speed = 0.8
+
+[node name="HealthBar" parent="." instance=ExtResource("5_balhb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+size = Vector2(160, 8)
+
+[node name="Targetability" parent="." instance=ExtResource("6_balta")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 0.65
+
+[node name="ExternalCrewManager" parent="." instance=ExtResource("7_balecm")]
+capacity = 4
+
+[node name="CrewDots" parent="." instance=ExtResource("8_balcd")]
+crew_count_public = true
+dot_height = 1.1

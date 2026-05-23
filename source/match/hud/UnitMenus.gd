@@ -7,6 +7,7 @@ const Structure = preload("res://source/match/units/Structure.gd")
 const SiegeWorkshop = preload("res://source/match/units/siege_workshop.gd")
 const BatteringRam = preload("res://source/match/units/battering_ram.gd")
 const SiegeTower = preload("res://source/match/units/siege_tower.gd")
+const Ballista = preload("res://source/match/units/ballista.gd")
 
 @onready var _generic_menu = find_child("GenericMenu")
 @onready var _engineer_menu = find_child("EngineerMenu")
@@ -18,6 +19,7 @@ const SiegeTower = preload("res://source/match/units/siege_tower.gd")
 @onready var _siege_workshop_menu = find_child("SiegeWorkshopMenu")
 @onready var _battering_ram_menu = find_child("BatteringRamMenu")
 @onready var _siege_tower_menu = find_child("SiegeTowerMenu")
+@onready var _ballista_menu = find_child("BallistaMenu")
 
 var _focused_units: Array = []
 var _full_focused_units: Array = []
@@ -96,6 +98,7 @@ func _hide_all_menus():
 	_siege_workshop_menu.hide()
 	_battering_ram_menu.hide()
 	_siege_tower_menu.hide()
+	_ballista_menu.hide()
 
 
 func _try_showing_any_menu():
@@ -139,6 +142,14 @@ func _try_showing_any_menu():
 	):
 		_siege_tower_menu.units = selected_towers
 		_siege_tower_menu.show()
+		return true
+	var selected_ballistae = selected_controlled_units.filter(func(u): return u is Ballista)
+	if (
+		not selected_ballistae.is_empty()
+		and selected_ballistae.size() == selected_controlled_units.size()
+	):
+		_ballista_menu.units = selected_ballistae
+		_ballista_menu.show()
 		return true
 	if (
 		selected_controlled_units.size() == 1
