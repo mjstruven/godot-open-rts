@@ -4,7 +4,7 @@ const BallistaAttackingWhileInRange = preload(
 	"res://source/match/units/actions/BallistaAttackingWhileInRange.gd"
 )
 
-const BALLISTA_MIN_RANGE = 5.0
+const BALLISTA_MIN_RANGE = 3.0
 
 
 static func is_applicable(source_unit, target_unit) -> bool:

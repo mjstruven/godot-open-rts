@@ -1,6 +1,6 @@
 extends "res://source/match/units/Unit.gd"
 
-const ATTACK_MIN_RANGE: float = 5.0
+const ATTACK_MIN_RANGE: float = 3.0
 const ATTACK_AOE_DAMAGE: int = 25
 const MIN_CREW_TO_FUNCTION: int = 2
 
@@ -55,7 +55,7 @@ func _on_crew_changed(new_count: int) -> void:
 func _show_range_circles():
 	if _range_circles.is_empty():
 		_range_circles.append(_make_siege_range_circle(ATTACK_MIN_RANGE))
-		_range_circles.append(_make_siege_range_circle(attack_range if attack_range != null else 10.0))
+		_range_circles.append(_make_siege_range_circle(attack_range if attack_range != null else 15.0))
 	for c in _range_circles:
 		if is_instance_valid(c):
 			c.show()

@@ -6,7 +6,7 @@ const BOLT_SIZE = Vector3(0.12, 0.12, 0.5)
 const BOLT_COLOR = Color(0.25, 0.22, 0.18)
 const AOE_RADIUS = 4.0
 const LINE_WIDTH = 0.5
-const MIN_RANGE = 5.0
+const MIN_RANGE = 3.0
 
 var _target_unit = null
 var _one_shot_timer = null

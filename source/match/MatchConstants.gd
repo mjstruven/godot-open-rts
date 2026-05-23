@@ -168,12 +168,12 @@ class Units:
 		},
 		"res://source/match/units/archer.tscn":
 		{
-			"sight_range": 12.0,
+			"sight_range": 20.0,
 			"hp": 40,
 			"hp_max": 40,
 			"attack_damage": 6,
 			"attack_interval": 4.0,
-			"attack_range": 15.0,
+			"attack_range": 20.0,
 			"attack_domains": [Navigation.Domain.TERRAIN],
 		},
 		"res://source/match/units/cavalry.tscn":
@@ -265,12 +265,12 @@ class Units:
 		},
 		"res://source/match/units/ballista.tscn":
 		{
-			"sight_range": 12.0,
+			"sight_range": 15.0,
 			"hp": 600,
 			"hp_max": 600,
 			"attack_damage": 35,
 			"attack_interval": 5.0,
-			"attack_range": 10.0,
+			"attack_range": 15.0,
 			"attack_domains": [Navigation.Domain.TERRAIN],
 		},
 		"res://source/match/units/siege_engineer.tscn":
@@ -281,7 +281,7 @@ class Units:
 		},
 		"res://source/match/units/trebuchet.tscn":
 		{
-			"sight_range": 22.0,
+			"sight_range": 25.0,
 			"hp": 700,
 			"hp_max": 700,
 			"attack_damage": 80,

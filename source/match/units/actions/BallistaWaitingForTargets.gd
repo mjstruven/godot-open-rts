@@ -4,7 +4,7 @@ const BallistaAutoAttacking = preload(
 	"res://source/match/units/actions/BallistaAutoAttacking.gd"
 )
 
-const MIN_RANGE = 5.0
+const MIN_RANGE = 3.0
 
 
 func _get_units_to_attack():
