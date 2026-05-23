@@ -423,42 +423,56 @@ grow_vertical = 0
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MarginContainer3"]
+[node name="OuterVBox" type="VBoxContainer" parent="HUD/MarginContainer3"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ProductionQueue" parent="HUD/MarginContainer3/OuterVBox" instance=ExtResource("13_qv3xn")]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MarginContainer3/OuterVBox"]
 layout_mode = 2
 alignment = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 4
 
-[node name="GroupSummaryPanel" parent="HUD/MarginContainer3/HBoxContainer" instance=ExtResource("40_grpsum")]
+[node name="GroupSummaryPanel" parent="HUD/MarginContainer3/OuterVBox/HBoxContainer" instance=ExtResource("40_grpsum")]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
 
-[node name="UnitInfoBox" parent="HUD/MarginContainer3/HBoxContainer" instance=ExtResource("37_unitinfo")]
+[node name="UnitInfoBox" parent="HUD/MarginContainer3/OuterVBox/HBoxContainer" instance=ExtResource("37_unitinfo")]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
 
-[node name="AbilityPlaceholder" type="PanelContainer" parent="HUD/MarginContainer3/HBoxContainer"]
-layout_mode = 2
-visible = false
-custom_minimum_size = Vector2(100, 60)
-
-[node name="FormationPlaceholder" type="PanelContainer" parent="HUD/MarginContainer3/HBoxContainer"]
-layout_mode = 2
-visible = false
-custom_minimum_size = Vector2(100, 60)
-
-[node name="VBoxContainer" type="VBoxContainer" parent="HUD/MarginContainer3/HBoxContainer"]
+[node name="AbilityPlaceholder" type="PanelContainer" parent="HUD/MarginContainer3/OuterVBox/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_constants/separation = 5
+size_flags_vertical = 8
+custom_minimum_size = Vector2(100, 60)
 
-[node name="ProductionQueue" parent="HUD/MarginContainer3/HBoxContainer/VBoxContainer" instance=ExtResource("13_qv3xn")]
+[node name="HeaderLabel" type="Label" parent="HUD/MarginContainer3/OuterVBox/HBoxContainer/AbilityPlaceholder"]
 layout_mode = 2
+text = "Abilities"
+modulate = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 10
 
-[node name="UnitMenus" parent="HUD/MarginContainer3/HBoxContainer/VBoxContainer" instance=ExtResource("13_6cypl")]
+[node name="FormationPlaceholder" type="PanelContainer" parent="HUD/MarginContainer3/OuterVBox/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 8
+size_flags_horizontal = 4
+size_flags_vertical = 8
+custom_minimum_size = Vector2(100, 60)
+
+[node name="HeaderLabel" type="Label" parent="HUD/MarginContainer3/OuterVBox/HBoxContainer/FormationPlaceholder"]
+layout_mode = 2
+text = "Orders"
+modulate = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 10
+
+[node name="UnitMenus" parent="HUD/MarginContainer3/OuterVBox/HBoxContainer" instance=ExtResource("13_6cypl")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
 
 [node name="TopBarContainer" type="MarginContainer" parent="HUD"]
 anchors_preset = 10

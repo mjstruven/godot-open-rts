@@ -26,6 +26,8 @@ func _unhandled_input(event):
 	if event.keycode == KEY_TAB:
 		if event.ctrl_pressed:
 			_narrow_selection_to_focused_type()
+		elif event.shift_pressed:
+			_cycle_focused_type_backward()
 		else:
 			_cycle_focused_type()
 		get_viewport().set_input_as_handled()
@@ -133,6 +135,14 @@ func _cycle_focused_type():
 	if _type_list.size() <= 1:
 		return
 	_focused_index = (_focused_index + 1) % _type_list.size()
+	_rebuild_buttons()
+	_emit_focus()
+
+
+func _cycle_focused_type_backward():
+	if _type_list.size() <= 1:
+		return
+	_focused_index = (_focused_index - 1 + _type_list.size()) % _type_list.size()
 	_rebuild_buttons()
 	_emit_focus()
 

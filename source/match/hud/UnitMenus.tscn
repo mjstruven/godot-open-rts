@@ -17,122 +17,132 @@
 [node name="UnitMenus" type="PanelContainer"]
 script = ExtResource("1_hugbq")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="CommandsLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Commands"
+modulate = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 10
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="BackgroundGrid" type="GridContainer" parent="MarginContainer"]
+[node name="BackgroundGrid" type="GridContainer" parent="VBoxContainer/MarginContainer"]
 layout_mode = 2
 columns = 4
 
-[node name="Panel" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel2" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel2" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel3" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel3" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel4" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel4" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel5" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel5" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel6" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel6" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel7" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel7" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel8" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel8" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel9" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel9" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel10" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel10" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel11" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel11" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel12" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel12" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel13" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel13" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel14" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel14" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel15" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel15" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="Panel16" type="Panel" parent="MarginContainer/BackgroundGrid"]
+[node name="Panel16" type="Panel" parent="VBoxContainer/MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 
-[node name="GenericMenu" parent="MarginContainer" instance=ExtResource("1_4ci70")]
+[node name="GenericMenu" parent="VBoxContainer/MarginContainer" instance=ExtResource("1_4ci70")]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="EngineerMenu" parent="MarginContainer" instance=ExtResource("6_engmu")]
+[node name="EngineerMenu" parent="VBoxContainer/MarginContainer" instance=ExtResource("6_engmu")]
 layout_mode = 2
 
-[node name="AcademyMenu" parent="MarginContainer" instance=ExtResource("7_acmenu")]
-layout_mode = 2
-mouse_filter = 2
-
-[node name="CapitalMenu" parent="MarginContainer" instance=ExtResource("8_capmenu")]
+[node name="AcademyMenu" parent="VBoxContainer/MarginContainer" instance=ExtResource("7_acmenu")]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="StructureMenu" parent="MarginContainer" instance=ExtResource("9_strmenu")]
+[node name="CapitalMenu" parent="VBoxContainer/MarginContainer" instance=ExtResource("8_capmenu")]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="CombatMenu" parent="MarginContainer" instance=ExtResource("10_cmbmnu")]
-layout_mode = 2
-
-[node name="FormationMenu" parent="MarginContainer" instance=ExtResource("11_fmmnu")]
-layout_mode = 2
-
-[node name="SiegeWorkshopMenu" parent="MarginContainer" instance=ExtResource("12_swmenu")]
+[node name="StructureMenu" parent="VBoxContainer/MarginContainer" instance=ExtResource("9_strmenu")]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="BatteringRamMenu" parent="MarginContainer" instance=ExtResource("13_rammenu")]
+[node name="CombatMenu" parent="VBoxContainer/MarginContainer" instance=ExtResource("10_cmbmnu")]
+layout_mode = 2
+
+[node name="FormationMenu" parent="VBoxContainer/MarginContainer" instance=ExtResource("11_fmmnu")]
+layout_mode = 2
+
+[node name="SiegeWorkshopMenu" parent="VBoxContainer/MarginContainer" instance=ExtResource("12_swmenu")]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="SiegeTowerMenu" parent="MarginContainer" instance=ExtResource("14_towermenu")]
+[node name="BatteringRamMenu" parent="VBoxContainer/MarginContainer" instance=ExtResource("13_rammenu")]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="BallistaMenu" parent="MarginContainer" instance=ExtResource("15_balmenu")]
+[node name="SiegeTowerMenu" parent="VBoxContainer/MarginContainer" instance=ExtResource("14_towermenu")]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="TrebuchetMenu" parent="MarginContainer" instance=ExtResource("16_trebmenu")]
+[node name="BallistaMenu" parent="VBoxContainer/MarginContainer" instance=ExtResource("15_balmenu")]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TrebuchetMenu" parent="VBoxContainer/MarginContainer" instance=ExtResource("16_trebmenu")]
 layout_mode = 2
 mouse_filter = 2
