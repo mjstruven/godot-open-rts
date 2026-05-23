@@ -61,7 +61,7 @@ radius = 0.45
 
 [node name="Selection" parent="." instance=ExtResource("3_mercse")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
-radius = 0.45
+radius = 0.4
 
 [node name="Movement" parent="." instance=ExtResource("4_mercmv")]
 path_desired_distance = 0.14

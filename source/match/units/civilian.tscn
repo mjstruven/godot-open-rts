@@ -38,7 +38,7 @@ radius = 0.35
 
 [node name="Selection" parent="." instance=ExtResource("3_civse")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
-radius = 0.35
+radius = 0.4
 
 [node name="Movement" parent="." instance=ExtResource("4_civmv")]
 path_desired_distance = 0.2

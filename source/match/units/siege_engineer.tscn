@@ -56,7 +56,7 @@ radius = 0.25
 
 [node name="Selection" parent="." instance=ExtResource("6_siengse")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
-radius = 0.25
+radius = 0.4
 
 [node name="Targetability" parent="." instance=ExtResource("4_siengta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
