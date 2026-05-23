@@ -388,3 +388,78 @@ These radii do **not** auto-derive from unit size — when real models replace p
 **Long, drawn-out siege feel:** Achieved by tuning, not a new mechanic — high building HP, slow siege fire rate, and fragile/exposed siege units. This also creates counterplay for free (time to flank the siege, repair the structure, or counter-siege).
 
 **DoT (damage-over-time) for siege was considered and dropped** as a balance mechanic. Fire-rate tuning achieves the same drawn-out feel more simply. DoT may optionally be kept later as pure visual flavour (crumbling structures) but not as a balance lever.
+
+---
+
+## Session: Wave 3d — Trebuchet foundation (Stages 1–2 + cleanup, complete)
+
+### Completed
+
+The Trebuchet's full pre-combat foundation is built and verified. **NOT yet built:** the attack itself (Stage 3).
+
+**Trebuchet unit** — built at the Siege Workshop, placeholder geometry, reuses the external-crew system (ExternalCrewManager, siege engineer crew). Minimum 2 engineers to operate.
+
+**Multi-unit crewing fix (`d096808`):** Crew-approach actions (`ApproachingExternalCrew`, `LoadingIntoCrew`) connected `target.tree_exited → queue_free`, which fired spuriously when the first boarding crew triggered `_claim_ownership` → `reparent()`. Reparenting fires `tree_exited` on the siege unit, cancelling every other queued crew member's approach action. Fixed by deferring the `tree_exited` validity check one frame with `call_deferred` to distinguish a transient reparent from an actual unit death.
+
+**Pack/unpack state machine:** Two states — packed (can move, cannot fire) and unpacked (can fire, cannot move). Transitions take ~15 seconds at a constant rate. A context-sensitive command-menu button shows "Unpack" or "Pack" depending on current state. A white charge bar tracks progress (full = unpacked, empty = packed).
+
+**Cancel/reversal:** Cancelling a pack or unpack reverses progress from its current point at the same rate — no snap to either extreme. The cancel is itself cancellable (re-issues the original direction).
+
+**Movement gating:** An unpacked or transitioning Trebuchet cannot move by any command path. `Moving`, `MovingToUnit`, `AttackMoving`, and `Following` actions are all gated in `_set_action`.
+
+**Packed/unpacked geometry swap:** Packed state shows only the base box. Unpacked state reveals the full model (Mast, Arm, Counterweight meshes).
+
+**Trebuchet command menu** with Abandon button.
+
+---
+
+## Session: Siege needs-crew message (resolved after 4 attempts)
+
+**Root cause:** An abandoned/uncrewed siege unit is removed from the `controlled_units` group. The command pipeline in `UnitActionsController` skips any selected unit not in `controlled_units`, so the command never reaches the unit and `_set_action` never runs. Every prior fix patched the message emit inside `_set_action` — which is unreachable code for these units.
+
+**Fix (`04eacfd`):** The "Needs a crew to operate" message is now emitted from `UnitActionsController` at the exact point the command loop silently skips an uncrewed siege unit (detected by `neutral_siege` group membership). Emits at most once per command regardless of how many uncrewed siege units are in the selection.
+
+**Cleanup (`80b16a7`):** The old per-unit crew messages (`"Must be crewed by at least 4"`, `"Needs at least 2 engineers to operate"`) were removed from all four siege scripts. The crew-gating logic (action `queue_free` + `return` when undercrewed) was kept intact — undercrewed siege units still cannot act.
+
+---
+
+## Session: Siege crew-dot QOL
+
+**Red required-slot dots:** An unfilled slot within the minimum-required crew count shows RED; filled slots show white; optional unfilled slots show grey. Implemented as a `@export var min_crew_required: int = 0` on `CrewDots.gd`, set per-scene: Ram/Tower → 4, Ballista/Trebuchet → 2. Three-state color logic in `_update_dots()`. Lets the player see at a glance which siege units are below functional minimum.
+
+**Consistent dot visibility:** All four siege types now show crew dots at all times (when in the player's view). Previously Ram and Tower hid dots when uncrewed. Changed by setting `crew_count_public = true` (the default) on their `CrewDots` instances — matching the existing Ballista/Trebuchet behaviour. **Design note:** As a consequence, enemy siege crew counts are visible to both players when the unit is in vision range. This is a deliberate, accepted rule — it supports crew-sniping as a readable tactic.
+
+---
+
+## KEY ENGINE LESSON (reinforced across Wave 3c–3d)
+
+**Reparenting fires `tree_exited` on the node and all its children.** This has now caused multiple bugs (ghost engineer, abandon crash, multi-crew member drop). Any code reacting to a siege unit's `tree_exited` must distinguish a transient reparent from an actual death — defer the check one frame with `call_deferred` and re-test `is_inside_tree()` / `is_instance_valid()`.
+
+---
+
+## TREBUCHET ATTACK SPEC (Wave 3e — not yet built)
+
+Design is settled; code is not written. Recorded here so it survives session boundaries.
+
+- **Range:** 5–20 units (minimum + maximum; too-close handling required).
+- **Targets:** buildings and siege units only (not regular units).
+- **Scatter:** shot lands at a random point within a circle 4× the size of the archer scatter circle, centred on the target.
+- **AOE:** 2×2 area expanding outward from where the shot actually lands. Friendly fire on.
+- **Attack-ground:** continuous/auto-repeating (not one-shot per order).
+- **Auto-unpack-on-attack:** a packed Trebuchet ordered to attack moves to max range, then unpacks; if already in range, it just unpacks; if too close, it moves to minimum range first, then unpacks.
+
+**This spec supersedes the GDD's Trebuchet entry** (GDD v0.3 listed 30 s pack time, range 10–25, etc.). The GDD is now out of date on the Trebuchet.
+
+---
+
+## CORE DESIGN PRINCIPLE (articulated this session)
+
+**Micro is intentionally relocated from economy to battlefield — not reduced.** Economy is "build the asset, it self-maintains" (no AoE-style villager reassignment). The freed attention goes to battlefield control: raiding, siege, positioning.
+
+**But battlefield micro must be engaging, not rote.** Engaging micro = decisions, reactions, tactical variation. Rote micro = repetitive zero-decision busywork. Test each mechanic: is this micro the player is glad to be doing, or upkeep they resent? Rote battlefield micro is the villager treadmill in a new costume.
+
+---
+
+## SCHEDULED DESIGN WORK (updated)
+
+Siege anti-mass cap: **10 trebuchets per player** (trebuchet-specific for now); implemented as a unit cap, not a damage mechanic. Recorded earlier; restated for completeness.
