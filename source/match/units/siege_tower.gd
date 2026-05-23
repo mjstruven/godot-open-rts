@@ -7,6 +7,9 @@ func _ready():
 	await super()
 	add_to_group("siege_units")
 	add_to_group("neutral_siege")
+	var mv = find_child("Movement")
+	if mv != null:
+		mv.avoidance_enabled = false
 	var crew_mgr = find_child("CrewManager")
 	if crew_mgr != null:
 		crew_mgr.crew_changed.connect(_on_crew_changed)

@@ -7,12 +7,21 @@ const MIN_CREW_TO_FUNCTION: int = 2
 const BallistaWaitingForTargets = preload(
 	"res://source/match/units/actions/BallistaWaitingForTargets.gd"
 )
+const BallistaAutoAttacking = preload(
+	"res://source/match/units/actions/BallistaAutoAttacking.gd"
+)
+const BallistaAttackGround = preload(
+	"res://source/match/units/actions/BallistaAttackGround.gd"
+)
 
 
 func _ready():
 	await super()
 	add_to_group("siege_units")
 	add_to_group("neutral_siege")
+	var mv = find_child("Movement")
+	if mv != null:
+		mv.avoidance_enabled = false
 	set_meta("attack_min_range", ATTACK_MIN_RANGE)
 	set_meta("attack_aoe_damage", ATTACK_AOE_DAMAGE)
 	action = BallistaWaitingForTargets.new()
@@ -45,6 +54,23 @@ func _set_action(action_node):
 			action_node.queue_free()
 			if is_instance_valid(player):
 				MatchSignals.alert_message.emit(player, "Needs at least 2 engineers to operate")
+			return
+	if action_node is BallistaAutoAttacking:
+		var target = action_node._target_unit
+		if is_instance_valid(target):
+			var dist = global_position_yless.distance_to(target.global_position_yless)
+			if dist < ATTACK_MIN_RANGE:
+				action_node.queue_free()
+				if is_instance_valid(player):
+					MatchSignals.alert_message.emit(player, "The target is too close")
+				return
+	elif action_node is BallistaAttackGround:
+		var tp = action_node._target_pos
+		var dist = global_position_yless.distance_to(Vector3(tp.x, 0.0, tp.z))
+		if dist < ATTACK_MIN_RANGE:
+			action_node.queue_free()
+			if is_instance_valid(player):
+				MatchSignals.alert_message.emit(player, "The target is too close")
 			return
 	super(action_node)
 

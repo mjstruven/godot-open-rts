@@ -3,6 +3,7 @@ extends Node
 signal crew_changed(new_count)
 
 @export var capacity: int = 4
+@export var slot_radius: float = 0.8
 
 const CREWABLE_SCENE_PATHS = [
 	"res://source/match/units/infantry.tscn",
@@ -50,6 +51,11 @@ func load_unit(unit: Node) -> void:
 	engineer.set_meta("crew_siege_unit", _unit)
 	MatchSignals.setup_and_spawn_unit.emit(engineer, Transform3D(Basis.IDENTITY, spawn_pos), original_player)
 
+	# Rigidly attach: reparent engineer to siege unit so it moves with it automatically.
+	var slot_index = _crew.size()
+	engineer.reparent(_unit, false)
+	engineer.position = _get_slot_offset(slot_index)
+
 	_crew.append({
 		"engineer": engineer,
 		"original_scene": original_scene,
@@ -72,6 +78,11 @@ func abandon() -> void:
 
 func get_all_engineers() -> Array:
 	return _crew.map(func(e): return e.get("engineer")).filter(func(e): return is_instance_valid(e))
+
+
+func _get_slot_offset(slot_index: int) -> Vector3:
+	var angle = (TAU / capacity) * slot_index
+	return Vector3(cos(angle) * slot_radius, 0.0, sin(angle) * slot_radius)
 
 
 func _restore_crew_unit(entry: Dictionary) -> void:
@@ -118,6 +129,9 @@ func _claim_ownership(new_player: Node) -> void:
 		_unit.add_to_group("controlled_units")
 	else:
 		_unit.add_to_group("adversary_units")
+	var mv = _unit.find_child("Movement")
+	if mv != null:
+		mv.avoidance_enabled = true
 	if _unit.player != new_player:
 		_unit.reparent(new_player, true)
 	if _unit.has_method("refresh_player_color"):
@@ -135,6 +149,9 @@ func _release_ownership() -> void:
 		MatchSignals.unit_deselected.emit(_unit)
 	if _unit.has_method("reset_player_color"):
 		_unit.reset_player_color()
+	var mv = _unit.find_child("Movement")
+	if mv != null:
+		mv.avoidance_enabled = false
 	var match_node = _unit.find_parent("Match")
 	if match_node != null:
 		var neutral_parent = match_node.find_child("Players", false)

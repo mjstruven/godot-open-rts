@@ -10,6 +10,9 @@ func _ready():
 	await super()
 	add_to_group("siege_units")
 	add_to_group("neutral_siege")
+	var mv = find_child("Movement")
+	if mv != null:
+		mv.avoidance_enabled = false
 	action = RamWaitingForTargets.new()
 	var crew_mgr = find_child("CrewManager")
 	if crew_mgr != null:

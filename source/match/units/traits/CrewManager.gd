@@ -70,6 +70,9 @@ func _release_ownership() -> void:
 		MatchSignals.unit_deselected.emit(_unit)
 	if _unit.has_method("reset_player_color"):
 		_unit.reset_player_color()
+	var mv = _unit.find_child("Movement")
+	if mv != null:
+		mv.avoidance_enabled = false
 	# Reparent to the neutral container so unit.player no longer points at the former owner.
 	# Mirrors _claim_ownership's reparent-to-player step exactly in reverse.
 	var match_node = _unit.find_parent("Match")
@@ -123,6 +126,9 @@ func _claim_ownership(new_player) -> void:
 		_unit.add_to_group("controlled_units")
 	else:
 		_unit.add_to_group("adversary_units")
+	var mv = _unit.find_child("Movement")
+	if mv != null:
+		mv.avoidance_enabled = true
 	var current_player = _unit.player
 	if current_player == new_player:
 		if _unit.has_method("refresh_player_color"):
