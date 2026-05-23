@@ -178,6 +178,9 @@ func _claim_ownership(new_player: Node) -> void:
 		_unit.reparent(new_player, true)
 	if _unit.has_method("refresh_player_color"):
 		_unit.refresh_player_color()
+	var match_node = _unit.find_parent("Match")
+	if match_node != null and new_player in match_node.visible_players:
+		_unit.add_to_group("revealed_units")
 
 
 func _release_ownership() -> void:

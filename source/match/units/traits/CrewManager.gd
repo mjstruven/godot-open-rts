@@ -135,8 +135,11 @@ func _claim_ownership(new_player) -> void:
 	if current_player == new_player:
 		if _unit.has_method("refresh_player_color"):
 			_unit.refresh_player_color()
-		return
-	# Reparent to the crewing player
-	_unit.reparent(new_player, true)
-	if _unit.has_method("refresh_player_color"):
-		_unit.refresh_player_color()
+	else:
+		# Reparent to the crewing player
+		_unit.reparent(new_player, true)
+		if _unit.has_method("refresh_player_color"):
+			_unit.refresh_player_color()
+	var match_node = _unit.find_parent("Match")
+	if match_node != null and new_player in match_node.visible_players:
+		_unit.add_to_group("revealed_units")
