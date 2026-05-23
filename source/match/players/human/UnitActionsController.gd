@@ -54,7 +54,22 @@ func _input(event):
 				"patrol":
 					_apply_patrol(pos)
 				"attack_ground":
-					_apply_attack_ground(pos)
+					var space_state = get_viewport().get_world_3d().direct_space_state
+					var ray_from = camera.project_ray_origin(event.position)
+					var ray_query = PhysicsRayQueryParameters3D.create(
+						ray_from, ray_from + camera.project_ray_normal(event.position) * 1000.0, 2
+					)
+					ray_query.collide_with_areas = true
+					ray_query.collide_with_bodies = false
+					var ray_result = space_state.intersect_ray(ray_query)
+					var hit_unit = ray_result.get("collider") if not ray_result.is_empty() else null
+					if hit_unit != null and hit_unit.is_in_group("units"):
+						if _navigate_selected_units_towards_unit(hit_unit):
+							var targetability = hit_unit.find_child("Targetability")
+							if targetability != null:
+								targetability.animate()
+					else:
+						_apply_attack_ground(pos)
 		get_viewport().set_input_as_handled()
 	elif event.button_index == MOUSE_BUTTON_RIGHT:
 		_exit_targeting_mode()
@@ -279,6 +294,8 @@ func _try_setting_rally_point_to_unit(unit, target_unit):
 		# it's not allowed to set rally point to enemy at the moment as with current implementation
 		# the position of enemy unit hidden in the fog of war could be hinted
 		return false
+	if target_unit.is_in_group("siege_units"):
+		return false
 	var rally_point = unit.find_child("RallyPoint")
 	if rally_point == null:
 		return false
@@ -398,7 +415,11 @@ func _apply_attack_ground(position: Vector3):
 			continue
 		var min_range: float = unit.get_meta("attack_min_range", 0.0)
 		var dist = unit.global_position_yless.distance_to(Vector3(position.x, 0.0, position.z))
-		if dist < min_range or dist > unit.attack_range:
+		if dist < min_range:
+			if is_instance_valid(unit.player):
+				MatchSignals.alert_message.emit(unit.player, "The target is too close")
+			continue
+		if dist > unit.attack_range:
 			continue
 		var tgt_pos = position
 		_set_or_queue_action(

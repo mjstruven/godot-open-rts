@@ -81,7 +81,9 @@ func get_all_engineers() -> Array:
 
 
 func _get_slot_offset(slot_index: int) -> Vector3:
-	var angle = (TAU / capacity) * slot_index
+	# Rear/side arc (45°–135°): all positive Z, clear of the forward firing line
+	var angles = [PI / 4.0, PI * 5.0 / 12.0, PI * 7.0 / 12.0, PI * 3.0 / 4.0]
+	var angle = angles[slot_index % angles.size()]
 	return Vector3(cos(angle) * slot_radius, 0.0, sin(angle) * slot_radius)
 
 
