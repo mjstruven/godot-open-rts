@@ -281,9 +281,13 @@ class Units:
 		},
 		"res://source/match/units/trebuchet.tscn":
 		{
-			"sight_range": 12.0,
+			"sight_range": 22.0,
 			"hp": 700,
 			"hp_max": 700,
+			"attack_damage": 80,
+			"attack_interval": 10.0,
+			"attack_range": 20.0,
+			"attack_domains": [Navigation.Domain.TERRAIN],
 		},
 	}
 	const SUPPLY_TRAIN_BUILD_LIMIT = 2

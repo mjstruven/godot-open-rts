@@ -13,6 +13,9 @@ const BallistaAutoAttacking = preload(
 const BallistaAttackGround = preload(
 	"res://source/match/units/actions/BallistaAttackGround.gd"
 )
+const Circle3D = preload("res://source/generic-scenes-and-nodes/3d/Circle3D.gd")
+
+var _range_circles: Array = []
 
 
 func _ready():
@@ -29,6 +32,8 @@ func _ready():
 	if ecm != null:
 		ecm.crew_changed.connect(_on_crew_changed)
 	action_changed.connect(_on_action_changed)
+	selected.connect(_show_range_circles)
+	deselected.connect(_hide_range_circles)
 
 
 func _on_action_changed(new_action) -> void:
@@ -45,6 +50,32 @@ func _on_crew_changed(new_count: int) -> void:
 	if new_count < MIN_CREW_TO_FUNCTION:
 		action_queue.clear()
 		action = BallistaWaitingForTargets.new()
+
+
+func _show_range_circles():
+	if _range_circles.is_empty():
+		_range_circles.append(_make_siege_range_circle(ATTACK_MIN_RANGE))
+		_range_circles.append(_make_siege_range_circle(attack_range if attack_range != null else 10.0))
+	for c in _range_circles:
+		if is_instance_valid(c):
+			c.show()
+
+
+func _hide_range_circles():
+	for c in _range_circles:
+		if is_instance_valid(c):
+			c.hide()
+
+
+func _make_siege_range_circle(r: float) -> Node3D:
+	var circle = Circle3D.new()
+	circle.radius = r
+	circle.width = 3.0
+	circle.color = Color.RED
+	circle.render_priority = 1
+	add_child(circle)
+	circle.hide()
+	return circle
 
 
 func _set_action(action_node):

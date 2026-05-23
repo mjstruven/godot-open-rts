@@ -24,6 +24,12 @@ class Actions:
 	const BallistaAttackGround = preload(
 		"res://source/match/units/actions/BallistaAttackGround.gd"
 	)
+	const TrebuchetAutoAttacking = preload(
+		"res://source/match/units/actions/TrebuchetAutoAttacking.gd"
+	)
+	const TrebuchetAttackGround = preload(
+		"res://source/match/units/actions/TrebuchetAttackGround.gd"
+	)
 	const Constructing = preload("res://source/match/units/actions/Constructing.gd")
 	const AttackMoving = preload("res://source/match/units/actions/AttackMoving.gd")
 	const StandingGround = preload("res://source/match/units/actions/StandingGround.gd")
@@ -257,7 +263,8 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		)
 		var is_archer = unit_script_file == "archer.gd"
 		var is_ram = unit_script_file == "battering_ram.gd"
-		var is_ballista = unit.find_child("ExternalCrewManager") != null
+		var is_trebuchet = unit_script_file == "trebuchet.gd"
+		var is_ballista = unit.find_child("ExternalCrewManager") != null and not is_trebuchet
 		if is_ram:
 			if Actions.RamAutoAttacking.is_applicable(unit, tgt):
 				_set_or_queue_action(
@@ -267,6 +274,15 @@ func _navigate_unit_towards_unit(unit, target_unit):
 				)
 				return true
 			# Ram cannot attack this target type — fall through to follow/move
+		elif is_trebuchet:
+			if Actions.TrebuchetAutoAttacking.is_applicable(unit, tgt):
+				_set_or_queue_action(
+					unit,
+					func(): unit.action = Actions.TrebuchetAutoAttacking.new(tgt),
+					tgt.global_position
+				)
+				return true
+			# Trebuchet undercrewed — fall through to follow/move
 		elif is_ballista:
 			if Actions.BallistaAutoAttacking.is_applicable(unit, tgt):
 				_set_or_queue_action(
@@ -383,10 +399,12 @@ func _apply_attack_move(position: Vector3):
 			_retarget_suppressing_to_nearest_in_range(unit)
 	var terrain_units = get_tree().get_nodes_in_group("selected_units").filter(
 		func(unit):
+			var sf = unit.get_script().resource_path.get_file() if unit.get_script() else ""
 			return (
 				unit.is_in_group("controlled_units")
 				and unit.movement_domain == Constants.Match.Navigation.Domain.TERRAIN
 				and Actions.AttackMoving.is_applicable(unit)
+				and sf != "trebuchet.gd"
 				and not _is_constructing(unit)
 				and not unit.is_in_group("suppressing")
 			)
@@ -401,10 +419,12 @@ func _apply_attack_move(position: Vector3):
 func _apply_patrol(position: Vector3):
 	var terrain_units = get_tree().get_nodes_in_group("selected_units").filter(
 		func(unit):
+			var sf = unit.get_script().resource_path.get_file() if unit.get_script() else ""
 			return (
 				unit.is_in_group("controlled_units")
 				and unit.movement_domain == Constants.Match.Navigation.Domain.TERRAIN
 				and Actions.AttackMoving.is_applicable(unit)
+				and sf != "trebuchet.gd"
 				and not _is_constructing(unit)
 				and not unit.is_in_group("suppressing")
 			)
@@ -434,9 +454,19 @@ func _apply_attack_ground(position: Vector3):
 		if dist > unit.attack_range:
 			continue
 		var tgt_pos = position
-		_set_or_queue_action(
-			unit, func(): unit.action = Actions.BallistaAttackGround.new(tgt_pos), tgt_pos
-		)
+		var unit_script_file = unit.get_script().resource_path.get_file() if unit.get_script() else ""
+		if unit_script_file == "trebuchet.gd":
+			if unit.get_pack_state() != "UNPACKED":
+				if is_instance_valid(unit.player):
+					MatchSignals.alert_message.emit(unit.player, "Unpack trebuchet before firing")
+				continue
+			_set_or_queue_action(
+				unit, func(): unit.action = Actions.TrebuchetAttackGround.new(tgt_pos), tgt_pos
+			)
+		else:
+			_set_or_queue_action(
+				unit, func(): unit.action = Actions.BallistaAttackGround.new(tgt_pos), tgt_pos
+			)
 
 
 func _on_unit_targeted(unit):

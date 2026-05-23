@@ -49,6 +49,9 @@ func _unhandled_input(event):
 	elif event.keycode == KEY_W:
 		_on_pack_state_pressed()
 		get_viewport().set_input_as_handled()
+	elif event.keycode == KEY_E:
+		_on_attack_ground_pressed()
+		get_viewport().set_input_as_handled()
 
 
 func _on_abandon_pressed():
@@ -65,3 +68,7 @@ func _on_pack_state_pressed():
 		if not is_instance_valid(u):
 			continue
 		u.set_pack_target(1.0 - u.get_pack_target())
+
+
+func _on_attack_ground_pressed():
+	MatchSignals.combat_command_requested.emit("attack_ground")
