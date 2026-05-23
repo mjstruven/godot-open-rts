@@ -105,6 +105,7 @@ func _get_slot_offset(slot_index: int) -> Vector3:
 func _restore_crew_unit(entry: Dictionary) -> void:
 	var engineer = entry.get("engineer")
 	if is_instance_valid(engineer):
+		engineer.remove_meta("crew_siege_unit")
 		engineer.queue_free()
 	var original_scene_path: String = entry.get("original_scene", "")
 	var original_player = entry.get("original_player")

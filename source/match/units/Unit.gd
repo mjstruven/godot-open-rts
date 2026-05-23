@@ -37,7 +37,10 @@ var color:
 	get:
 		if is_in_group("neutral_siege"):
 			return Color.WHITE
-		return player.color
+		var p = player
+		if not p.has_method("get_color_material"):
+			return Color.WHITE
+		return p.color
 var action = null:
 	set = _set_action
 var global_position_yless:
