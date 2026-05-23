@@ -322,3 +322,28 @@ Siege units can be dismissed, similar to regular unit dismissal:
 ### Sequencing Note
 
 Several scheduled items intersect through the planned **two-panel command grid** (Orders panel + Abilities panel): manual Attack, formation commands, and siege dismissal all surface there. The Relationship System is a dependency for manual Attack and for clean targeting. Before building any of these, do a dependency-ordering pass to sequence them correctly.
+
+---
+
+## Session: Wave 3c — Ballista external-crew system (complete)
+
+### Completed
+
+The Ballista external-crew system is complete and verified. Key fixes from this work:
+
+**Friendly-fire-on-own-crew bug (commit `94b2c7f`):** The `Unit.gd` `player` getter (just `get_parent()`) returned the Ballista for a crewed engineer, because `ExternalCrewManager` reparents engineers to the Ballista. Target scans use `player != player` to identify enemies, so friendly engineers read as enemies and were auto-attacked. Fixed at source: the `player` getter now resolves a crewed engineer (one with `crew_siege_unit` meta) to its siege unit's owner.
+
+**Abandon crash + crew-list corruption (commits `bc7412d`, `6dc875c`, `3db7bb9`):** Root cause found in `3db7bb9`: `load_unit` connected the engineer `tree_exited` death-signal and appended to `_crew` *before* calling `_claim_ownership`. `_claim_ownership` reparents the neutral Ballista to the player, and reparenting fires `tree_exited` on **all children** — including the just-attached engineer — which triggered `_on_engineer_died` mid-claim, dropping that engineer from `_crew`. Result: a "ghost" engineer — physically present in the Ballista subtree, has `crew_siege_unit` meta, in the `"units"` group, but **not** in `_crew`. This caused the "4 crew loaded but only 3 dots" desync, a slot-index collision (two engineers at slot 0), and the abandon crash (the ghost was skipped by teardown, kept its meta, and crashed `_sync_unit` once the Ballista went neutral). Fix: `_claim_ownership` now runs *before* connecting `tree_exited` and appending to `_crew`, so the reparent's `tree_exited` fires harmlessly with no connection established.
+
+The abandon teardown itself was also reworked (`6dc875c`) to a three-phase deterministic order: (1) strip meta, disconnect signal, remove from `"units"` group for all tracked engineers; (2) release Ballista ownership; (3) spawn fresh infantry replacements and `queue_free` engineer nodes. This ordering guarantees `_sync_unit` cannot see a live engineer with a stale meta pointing to a now-neutral Ballista.
+
+### Key Lessons
+
+- **Reparenting a node in Godot fires `tree_exited` on all its children.** Connecting lifecycle signals to a child *before* a parent reparent can trigger those handlers spuriously. Order signal connections carefully around any reparenting operation.
+- **Diagnose upstream.** The abandon crash was patched three times at the teardown site before the real cause was found in the *loading* path. A seemingly minor symptom — crew dot count being off by one — was the clue that located the root cause upstream.
+
+### Current State
+
+- Project compiles and runs clean.
+- Wave 3c (Ballista, external-crew / siege-engineer system, neutral/claimable ownership, `ExternalCrewManager`, `CrewDots` with public count, abandon teardown) is **complete**.
+- **Next: Wave 3d — Trebuchet.**
