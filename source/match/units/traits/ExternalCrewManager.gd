@@ -11,7 +11,7 @@ const CREWABLE_SCENE_PATHS = [
 ]
 const Human = preload("res://source/match/players/human/Human.gd")
 
-# Each entry: { engineer: Node, original_scene: String, original_player: Node }
+# Each entry: { engineer: Node, original_scene: String, original_player: Node, on_died: Callable }
 var _crew: Array = []
 
 @onready var _unit = get_parent()
@@ -56,12 +56,15 @@ func load_unit(unit: Node) -> void:
 	engineer.position = _get_slot_offset(slot_index)
 	_set_unit_interactive(engineer, false)
 
+	var on_died_callable = _on_engineer_died.bind(engineer)
+	engineer.tree_exited.connect(on_died_callable)
+
 	_crew.append({
 		"engineer": engineer,
 		"original_scene": original_scene,
 		"original_player": original_player,
+		"on_died": on_died_callable,
 	})
-	engineer.tree_exited.connect(_on_engineer_died.bind(engineer))
 
 	_claim_ownership(original_player)
 	# Set after _claim_ownership so engineer.player resolves through the Ballista to the real
@@ -74,9 +77,26 @@ func load_unit(unit: Node) -> void:
 func abandon() -> void:
 	var to_restore = _crew.filter(func(e): return is_instance_valid(e.get("engineer")))
 	_crew.clear()
+
+	# Detach engineers from all game systems before releasing Ballista ownership.
+	# Order matters: _sync_unit reads engineer.player via crew_siege_unit meta, so meta must be
+	# stripped and engineers removed from "units" before the Ballista becomes neutral.
+	for entry in to_restore:
+		var engineer = entry.get("engineer")
+		if not is_instance_valid(engineer):
+			continue
+		var callable = entry.get("on_died")
+		if callable and engineer.tree_exited.is_connected(callable):
+			engineer.tree_exited.disconnect(callable)
+		if engineer.has_meta("crew_siege_unit"):
+			engineer.remove_meta("crew_siege_unit")
+		engineer.remove_from_group("units")
+
 	_release_ownership()
+
 	for entry in to_restore:
 		_restore_crew_unit(entry)
+
 	crew_changed.emit(0)
 
 
@@ -105,7 +125,6 @@ func _get_slot_offset(slot_index: int) -> Vector3:
 func _restore_crew_unit(entry: Dictionary) -> void:
 	var engineer = entry.get("engineer")
 	if is_instance_valid(engineer):
-		engineer.remove_meta("crew_siege_unit")
 		engineer.queue_free()
 	var original_scene_path: String = entry.get("original_scene", "")
 	var original_player = entry.get("original_player")
