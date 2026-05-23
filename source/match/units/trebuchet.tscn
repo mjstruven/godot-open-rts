@@ -38,6 +38,18 @@ size = Vector3(0.22, 0.22, 0.22)
 height = 0.5
 radius = 0.65
 
+[sub_resource type="Gradient" id="Gradient_trebcg"]
+resource_local_to_scene = true
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0)
+colors = PackedColorArray(1, 1, 1, 1, 0.3, 0.3, 0.3, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_trebcg"]
+resource_local_to_scene = true
+gradient = SubResource("Gradient_trebcg")
+width = 160
+height = 8
+
 [node name="Trebuchet" type="Area3D"]
 collision_layer = 2
 collision_mask = 0
@@ -98,3 +110,14 @@ capacity = 4
 [node name="CrewDots" parent="." instance=ExtResource("8_trebcd")]
 crew_count_public = true
 dot_height = 1.4
+
+[node name="ChargeBar" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+
+[node name="ChargeBarSprite" type="Sprite3D" parent="ChargeBar"]
+billboard = 1
+transparent = false
+no_depth_test = true
+texture_filter = 1
+render_priority = 1
+texture = SubResource("GradientTexture2D_trebcg")

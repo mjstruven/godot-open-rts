@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://cwcedr6jj7yty"]
+[gd_scene load_steps=14 format=3 uid="uid://cwcedr6jj7yty"]
 
 [ext_resource type="PackedScene" uid="uid://pawymiv0p8ab" path="res://source/match/hud/unit-menus/GenericMenu.tscn" id="1_4ci70"]
 [ext_resource type="Script" path="res://source/match/hud/UnitMenus.gd" id="1_hugbq"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://batrmenu00001" path="res://source/match/hud/unit-menus/BatteringRamMenu.tscn" id="13_rammenu"]
 [ext_resource type="PackedScene" uid="uid://dd2f1jxee2iyy" path="res://source/match/hud/unit-menus/SiegeTowerMenu.tscn" id="14_towermenu"]
 [ext_resource type="PackedScene" path="res://source/match/hud/unit-menus/BallistaMenu.tscn" id="15_balmenu"]
+[ext_resource type="PackedScene" path="res://source/match/hud/unit-menus/TrebuchetMenu.tscn" id="16_trebmenu"]
 
 [node name="UnitMenus" type="PanelContainer"]
 script = ExtResource("1_hugbq")
@@ -129,5 +130,9 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="BallistaMenu" parent="MarginContainer" instance=ExtResource("15_balmenu")]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TrebuchetMenu" parent="MarginContainer" instance=ExtResource("16_trebmenu")]
 layout_mode = 2
 mouse_filter = 2
