@@ -1,6 +1,6 @@
 extends "res://source/match/units/Unit.gd"
 
-const WANDER_RADIUS: float = 1.0
+const WANDER_RADIUS: float = 0.35
 const WANDER_WAIT: float = 2.5
 
 var _wait_timer: Timer = null

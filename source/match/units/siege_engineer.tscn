@@ -22,6 +22,7 @@ collision_mask = 0
 script = ExtResource("1_siengr")
 
 [node name="Geometry" type="Node3D" parent="."]
+scale = Vector3(0.25, 0.25, 0.25)
 
 [node name="Body" type="MeshInstance3D" parent="Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
@@ -32,6 +33,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 shape = SubResource("CylinderShape3D_siengcol")
 
 [node name="Movement" parent="." instance=ExtResource("2_siengmv")]
+avoidance_enabled = false
 path_desired_distance = 0.2
 target_desired_distance = 0.2
 path_height_offset = 0.35
