@@ -48,13 +48,13 @@ func load_unit(unit: Node) -> void:
 
 	var SiegeEngineerScene = load("res://source/match/units/siege_engineer.tscn")
 	var engineer = SiegeEngineerScene.instantiate()
-	engineer.set_meta("crew_siege_unit", _unit)
 	MatchSignals.setup_and_spawn_unit.emit(engineer, Transform3D(Basis.IDENTITY, spawn_pos), original_player)
 
 	# Rigidly attach: reparent engineer to siege unit so it moves with it automatically.
 	var slot_index = _crew.size()
 	engineer.reparent(_unit, false)
 	engineer.position = _get_slot_offset(slot_index)
+	_set_unit_interactive(engineer, false)
 
 	_crew.append({
 		"engineer": engineer,
@@ -64,6 +64,10 @@ func load_unit(unit: Node) -> void:
 	engineer.tree_exited.connect(_on_engineer_died.bind(engineer))
 
 	_claim_ownership(original_player)
+	# Set after _claim_ownership so engineer.player resolves through the Ballista to the real
+	# player node, not the neutral container. Must be after _ready() runs (which happens during
+	# setup_and_spawn_unit above), so _setup_color() uses get_parent()=HumanPlayer correctly.
+	engineer.set_meta("crew_siege_unit", _unit)
 	crew_changed.emit(_crew.size())
 
 
@@ -78,6 +82,17 @@ func abandon() -> void:
 
 func get_all_engineers() -> Array:
 	return _crew.map(func(e): return e.get("engineer")).filter(func(e): return is_instance_valid(e))
+
+
+func _set_unit_interactive(unit: Node, interactive: bool) -> void:
+	var cs = unit.find_child("CollisionShape3D")
+	if cs != null:
+		cs.disabled = not interactive
+	var targetability = unit.find_child("Targetability")
+	if targetability != null:
+		var ts = targetability.find_child("CollisionShape3D")
+		if ts != null:
+			ts.disabled = not interactive
 
 
 func _get_slot_offset(slot_index: int) -> Vector3:

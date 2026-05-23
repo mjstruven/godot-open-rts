@@ -30,6 +30,8 @@ var movement_speed:
 var sight_range = null
 var player:
 	get:
+		if has_meta("crew_siege_unit"):
+			return get_meta("crew_siege_unit").player
 		return get_parent()
 var color:
 	get:
