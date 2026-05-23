@@ -56,21 +56,26 @@ func load_unit(unit: Node) -> void:
 	engineer.position = _get_slot_offset(slot_index)
 	_set_unit_interactive(engineer, false)
 
+	# _claim_ownership must run before connecting tree_exited or appending to _crew.
+	# If Ballista is neutral, _claim_ownership reparents the Ballista, which fires tree_exited on
+	# all its children (including this engineer). With no connection established yet, the signal
+	# fires harmlessly. If the connect+append were first, _on_engineer_died would fire mid-claim
+	# and silently drop the entry from _crew, leaving an untracked ghost engineer.
+	_claim_ownership(original_player)
+
+	# Set meta after _claim_ownership so engineer.player resolves through the Ballista to the
+	# real player node, not the neutral container. _ready() has already run (triggered
+	# synchronously by setup_and_spawn_unit above), so _setup_color() is not affected.
+	engineer.set_meta("crew_siege_unit", _unit)
+
 	var on_died_callable = _on_engineer_died.bind(engineer)
 	engineer.tree_exited.connect(on_died_callable)
-
 	_crew.append({
 		"engineer": engineer,
 		"original_scene": original_scene,
 		"original_player": original_player,
 		"on_died": on_died_callable,
 	})
-
-	_claim_ownership(original_player)
-	# Set after _claim_ownership so engineer.player resolves through the Ballista to the real
-	# player node, not the neutral container. Must be after _ready() runs (which happens during
-	# setup_and_spawn_unit above), so _setup_color() uses get_parent()=HumanPlayer correctly.
-	engineer.set_meta("crew_siege_unit", _unit)
 	crew_changed.emit(_crew.size())
 
 
