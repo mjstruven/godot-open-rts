@@ -12,6 +12,9 @@ var _pack_progress: float = 0.0
 var _pack_target: float = 0.0
 
 @onready var _charge_bar_sprite = find_child("ChargeBarSprite")
+@onready var _mast_mesh = find_child("Mast")
+@onready var _arm_mesh = find_child("Arm")
+@onready var _counterweight_mesh = find_child("Counterweight")
 
 
 func _ready():
@@ -63,7 +66,7 @@ func _set_action(action_node):
 		var ecm = find_child("ExternalCrewManager")
 		if ecm != null and ecm.crew_count() < MIN_CREW_TO_FUNCTION:
 			action_node.queue_free()
-			if is_instance_valid(player):
+			if is_in_group("controlled_units"):
 				MatchSignals.alert_message.emit(player, "Needs at least 2 engineers to operate")
 			return
 	if (
@@ -76,7 +79,7 @@ func _set_action(action_node):
 	):
 		if not (_pack_progress == 0.0 and _pack_target == 0.0):
 			action_node.queue_free()
-			if is_instance_valid(player):
+			if is_in_group("controlled_units"):
 				MatchSignals.alert_message.emit(player, "Pack the trebuchet before moving")
 			return
 	super(action_node)
@@ -117,3 +120,10 @@ func _update_charge_bar() -> void:
 		return
 	var offset = 1.1 if _pack_progress >= 1.0 else _pack_progress
 	_charge_bar_sprite.texture.gradient.set_offset(1, offset)
+	var extended = _pack_progress > 0.0
+	if _mast_mesh != null:
+		_mast_mesh.visible = extended
+	if _arm_mesh != null:
+		_arm_mesh.visible = extended
+	if _counterweight_mesh != null:
+		_counterweight_mesh.visible = extended

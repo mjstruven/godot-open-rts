@@ -52,7 +52,7 @@ func _set_action(action_node):
 		var ecm = find_child("ExternalCrewManager")
 		if ecm != null and ecm.crew_count() < MIN_CREW_TO_FUNCTION:
 			action_node.queue_free()
-			if is_instance_valid(player):
+			if is_in_group("controlled_units"):
 				MatchSignals.alert_message.emit(player, "Needs at least 2 engineers to operate")
 			return
 	if action_node is BallistaAutoAttacking:
