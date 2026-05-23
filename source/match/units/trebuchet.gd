@@ -1,6 +1,7 @@
 extends "res://source/match/units/Unit.gd"
 
 const PACK_RATE: float = 1.0 / 15.0
+const MIN_CREW_TO_FUNCTION: int = 2
 
 const MovingAction = preload("res://source/match/units/actions/Moving.gd")
 const AttackMovingAction = preload("res://source/match/units/actions/AttackMoving.gd")
@@ -57,6 +58,13 @@ func set_pack_target(t: float) -> void:
 
 
 func _set_action(action_node):
+	if action_node != null:
+		var ecm = find_child("ExternalCrewManager")
+		if ecm != null and ecm.crew_count() < MIN_CREW_TO_FUNCTION:
+			action_node.queue_free()
+			if is_instance_valid(player):
+				MatchSignals.alert_message.emit(player, "Needs at least 2 engineers to operate")
+			return
 	if action_node != null and (action_node is MovingAction or action_node is AttackMovingAction):
 		if not (_pack_progress == 0.0 and _pack_target == 0.0):
 			action_node.queue_free()

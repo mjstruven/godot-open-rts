@@ -186,6 +186,8 @@ func _release_ownership() -> void:
 		_unit.remove_from_group("controlled_units")
 	if _unit.is_in_group("adversary_units"):
 		_unit.remove_from_group("adversary_units")
+	if _unit.is_in_group("revealed_units"):
+		_unit.remove_from_group("revealed_units")
 	if _unit.is_in_group("selected_units"):
 		_unit.remove_from_group("selected_units")
 		MatchSignals.unit_deselected.emit(_unit)
