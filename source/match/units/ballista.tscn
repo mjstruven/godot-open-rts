@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="6_balta"]
 [ext_resource type="PackedScene" path="res://source/match/units/traits/ExternalCrewManager.tscn" id="7_balecm"]
 [ext_resource type="PackedScene" path="res://source/match/units/traits/CrewDots.tscn" id="8_balcd"]
+[ext_resource type="PackedScene" path="res://source/match/units/ballista_model.tscn" id="9_balmdl"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_balframe"]
 albedo_color = Color(0.99, 0.81, 0.48, 1)
@@ -41,15 +42,20 @@ transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
 
 [node name="Base" type="MeshInstance3D" parent="Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+visible = false
 mesh = SubResource("BoxMesh_balbase")
 
 [node name="Arm" type="MeshInstance3D" parent="Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+visible = false
 mesh = SubResource("BoxMesh_balarm")
 
 [node name="Bolt" type="MeshInstance3D" parent="Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.42, 0)
+visible = false
 mesh = SubResource("BoxMesh_balbolt")
+
+[node name="BallistaModel" parent="Geometry" instance=ExtResource("9_balmdl")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)

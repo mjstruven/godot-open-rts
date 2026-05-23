@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/kenney-castlekit/siegeBallista.fbx" id="1_bm"]
+
+[node name="BallistaModel" type="Node3D"]
+
+[node name="SiegeBallista" parent="." instance=ExtResource("1_bm")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, -5.62, 0, 3.71)
