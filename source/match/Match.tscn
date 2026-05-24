@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=3 uid="uid://camns8fqod8d4"]
+[gd_scene load_steps=56 format=3 uid="uid://camns8fqod8d4"]
 
 [ext_resource type="Script" path="res://source/match/Match.gd" id="1_1555u"]
 [ext_resource type="Script" path="res://source/match/IsometricCamera3D.gd" id="1_qb2ry"]
@@ -135,6 +135,9 @@ albedo_color = Color(0.55, 0.75, 0.35, 1)
 material = SubResource("StandardMaterial3D_groundbase")
 size = Vector2(260, 260)
 center_offset = Vector3(128, 0, 128)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cmdbar"]
+bg_color = Color(0.12, 0.12, 0.12, 1)
 
 [node name="Match" type="Node3D"]
 script = ExtResource("1_1555u")
@@ -341,6 +344,7 @@ anchor_bottom = 1.0
 offset_top = -220.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_cmdbar")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HUD/CommandBar"]
 layout_mode = 2
@@ -429,7 +433,7 @@ stretch_mode = 5
 
 [node name="SelectionRegion" type="VBoxContainer" parent="HUD/CommandBar/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 3
+custom_minimum_size = Vector2(220, 0)
 theme_override_constants/separation = 2
 
 [node name="SelectionLabel" type="Label" parent="HUD/CommandBar/HBoxContainer/SelectionRegion"]
@@ -460,7 +464,7 @@ size_flags_vertical = 3
 
 [node name="AbilitiesRegion" type="VBoxContainer" parent="HUD/CommandBar/HBoxContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(116, 0)
+custom_minimum_size = Vector2(220, 0)
 theme_override_constants/separation = 2
 
 [node name="AbilitiesLabel" type="Label" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion"]

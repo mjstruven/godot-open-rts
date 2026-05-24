@@ -1,73 +1,447 @@
-[gd_scene format=3 uid="uid://engrmenuartww"]
+[gd_scene load_steps=2 format=3 uid="uid://engrmenuartww"]
 
 [ext_resource type="Script" path="res://source/match/hud/unit-menus/EngineerMenu.gd" id="1_engmu"]
 
-[node name="EngineerMenu" type="GridContainer"]
+[node name="EngineerMenu" type="Control"]
+custom_minimum_size = Vector2(204, 204)
+layout_mode = 2
 mouse_filter = 2
-columns = 2
 script = ExtResource("1_engmu")
 
-[node name="PlaceGrainMillButton" type="Button" parent="."]
+[node name="RootGrid" type="GridContainer" parent="."]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 4
+
+[node name="EconomicButton" type="Button" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+text = "Q"
+tooltip_text = "Economic & Civilian Buildings"
+
+[node name="MilitaryButton" type="Button" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+text = "W"
+tooltip_text = "Military Buildings"
+
+[node name="FortButton" type="Button" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+text = "E"
+tooltip_text = "Fortifications & Field Items"
+
+[node name="Pad4" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad5" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad6" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad7" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad8" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad9" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad10" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad11" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad12" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad13" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad14" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad15" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad16" type="Control" parent="RootGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="EconomicGrid" type="GridContainer" parent="."]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 4
+visible = false
+
+[node name="PlaceGrainMillButton" type="Button" parent="EconomicGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "GM"
-tooltip_text = "Grain Mill - Wood:50, Stone:20 [Q]"
+tooltip_text = "Grain Mill - Wood:50, Stone:20"
 
-[node name="PlaceLumberMillButton" type="Button" parent="."]
+[node name="PlaceLumberMillButton" type="Button" parent="EconomicGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "LM"
-tooltip_text = "Lumber Mill - Wood:50, Stone:20 [W]"
+tooltip_text = "Lumber Mill - Wood:50, Stone:20"
 
-[node name="PlaceStoneMillButton" type="Button" parent="."]
+[node name="PlaceStoneMillButton" type="Button" parent="EconomicGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "SM"
-tooltip_text = "Stone Mill - Wood:20, Stone:50 [E]"
+tooltip_text = "Stone Mill - Wood:20, Stone:50"
 
-[node name="PlaceTownCenterButton" type="Button" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-focus_mode = 0
-text = "ACD"
-tooltip_text = "Academy - Wood:300, Stone:200 [R]"
-
-[node name="PlaceCommandPostButton" type="Button" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-focus_mode = 0
-text = "CP"
-tooltip_text = "Command Post - Wood:600, Stone:400 [A]"
-
-[node name="PlaceSiegeWorkshopButton" type="Button" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-focus_mode = 0
-text = "SW"
-tooltip_text = "Siege Workshop - Wood:400, Stone:300 [F]"
-
-[node name="PlaceHouseButton" type="Button" parent="."]
+[node name="PlaceHouseButton" type="Button" parent="EconomicGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "HSE"
-tooltip_text = "House - Wood:100, Stone:50 | +10 pop cap | +10g/min [S]"
+tooltip_text = "House - Wood:100, Stone:50 | +10 pop cap | +10g/min"
 
-[node name="PlaceManorButton" type="Button" parent="."]
+[node name="PlaceManorButton" type="Button" parent="EconomicGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "MNR"
-tooltip_text = "Manor - Stone:100 | Place on a mill | +25 pop cap | +100g/min | +50% food [D]"
+tooltip_text = "Manor - Stone:100 | Place on a mill | +25 pop cap | +100g/min | +50% food"
 
-[connection signal="pressed" from="PlaceGrainMillButton" to="." method="_on_place_grain_mill_button_pressed"]
-[connection signal="pressed" from="PlaceLumberMillButton" to="." method="_on_place_lumber_mill_button_pressed"]
-[connection signal="pressed" from="PlaceStoneMillButton" to="." method="_on_place_stone_mill_button_pressed"]
-[connection signal="pressed" from="PlaceTownCenterButton" to="." method="_on_place_town_center_button_pressed"]
-[connection signal="pressed" from="PlaceCommandPostButton" to="." method="_on_place_command_post_button_pressed"]
-[connection signal="pressed" from="PlaceSiegeWorkshopButton" to="." method="_on_place_siege_workshop_button_pressed"]
-[connection signal="pressed" from="PlaceHouseButton" to="." method="_on_place_house_button_pressed"]
-[connection signal="pressed" from="PlaceManorButton" to="." method="_on_place_manor_button_pressed"]
+[node name="PlaceUniversityButton" type="Button" parent="EconomicGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+disabled = true
+modulate = Color(0.5, 0.5, 0.5, 1)
+text = "UNV"
+tooltip_text = "— coming soon"
+
+[node name="PlaceCapitolButton" type="Button" parent="EconomicGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+disabled = true
+modulate = Color(0.5, 0.5, 0.5, 1)
+text = "CAP"
+tooltip_text = "— coming soon"
+
+[node name="Pad8" type="Control" parent="EconomicGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad9" type="Control" parent="EconomicGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad10" type="Control" parent="EconomicGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad11" type="Control" parent="EconomicGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad12" type="Control" parent="EconomicGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad13" type="Control" parent="EconomicGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad14" type="Control" parent="EconomicGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad15" type="Control" parent="EconomicGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="EconomicBackButton" type="Button" parent="EconomicGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+text = "BCK"
+tooltip_text = "Back"
+
+[node name="MilitaryGrid" type="GridContainer" parent="."]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 4
+visible = false
+
+[node name="PlaceAcademyButton" type="Button" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+text = "ACD"
+tooltip_text = "Academy - Wood:300, Stone:200"
+
+[node name="PlaceCommandPostButton" type="Button" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+text = "CP"
+tooltip_text = "Command Post - Wood:600, Stone:400"
+
+[node name="PlaceSiegeWorkshopButton" type="Button" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+text = "SW"
+tooltip_text = "Siege Workshop - Wood:400, Stone:300"
+
+[node name="PlaceKeepButton" type="Button" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+disabled = true
+modulate = Color(0.5, 0.5, 0.5, 1)
+text = "KEEP"
+tooltip_text = "— coming soon"
+
+[node name="PlaceTowerButton" type="Button" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+disabled = true
+modulate = Color(0.5, 0.5, 0.5, 1)
+text = "TWR"
+tooltip_text = "— coming soon"
+
+[node name="PlaceWallButton" type="Button" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+disabled = true
+modulate = Color(0.5, 0.5, 0.5, 1)
+text = "WALL"
+tooltip_text = "— coming soon"
+
+[node name="PlaceLookoutButton" type="Button" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+disabled = true
+modulate = Color(0.5, 0.5, 0.5, 1)
+text = "LOK"
+tooltip_text = "— coming soon"
+
+[node name="Pad8" type="Control" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad9" type="Control" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad10" type="Control" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad11" type="Control" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad12" type="Control" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad13" type="Control" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad14" type="Control" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad15" type="Control" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MilitaryBackButton" type="Button" parent="MilitaryGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+text = "BCK"
+tooltip_text = "Back"
+
+[node name="FortGrid" type="GridContainer" parent="."]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 4
+visible = false
+
+[node name="PlacePalisadeButton" type="Button" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+disabled = true
+modulate = Color(0.5, 0.5, 0.5, 1)
+text = "PAL"
+tooltip_text = "— coming soon"
+
+[node name="PlaceTrenchButton" type="Button" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+disabled = true
+modulate = Color(0.5, 0.5, 0.5, 1)
+text = "TRCH"
+tooltip_text = "— coming soon"
+
+[node name="PlaceBridgeButton" type="Button" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+disabled = true
+modulate = Color(0.5, 0.5, 0.5, 1)
+text = "BRG"
+tooltip_text = "— coming soon"
+
+[node name="PlaceStakesButton" type="Button" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+disabled = true
+modulate = Color(0.5, 0.5, 0.5, 1)
+text = "STKS"
+tooltip_text = "— coming soon"
+
+[node name="Pad5" type="Control" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad6" type="Control" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad7" type="Control" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad8" type="Control" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad9" type="Control" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad10" type="Control" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad11" type="Control" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad12" type="Control" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad13" type="Control" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad14" type="Control" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad15" type="Control" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="FortBackButton" type="Button" parent="FortGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+text = "BCK"
+tooltip_text = "Back"
+
+[connection signal="pressed" from="RootGrid/EconomicButton" to="." method="_on_economic_pressed"]
+[connection signal="pressed" from="RootGrid/MilitaryButton" to="." method="_on_military_pressed"]
+[connection signal="pressed" from="RootGrid/FortButton" to="." method="_on_fort_pressed"]
+[connection signal="pressed" from="EconomicGrid/PlaceGrainMillButton" to="." method="_on_place_grain_mill_pressed"]
+[connection signal="pressed" from="EconomicGrid/PlaceLumberMillButton" to="." method="_on_place_lumber_mill_pressed"]
+[connection signal="pressed" from="EconomicGrid/PlaceStoneMillButton" to="." method="_on_place_stone_mill_pressed"]
+[connection signal="pressed" from="EconomicGrid/PlaceHouseButton" to="." method="_on_place_house_pressed"]
+[connection signal="pressed" from="EconomicGrid/PlaceManorButton" to="." method="_on_place_manor_pressed"]
+[connection signal="pressed" from="EconomicGrid/EconomicBackButton" to="." method="_on_economic_back_pressed"]
+[connection signal="pressed" from="MilitaryGrid/PlaceAcademyButton" to="." method="_on_place_academy_pressed"]
+[connection signal="pressed" from="MilitaryGrid/PlaceCommandPostButton" to="." method="_on_place_command_post_pressed"]
+[connection signal="pressed" from="MilitaryGrid/PlaceSiegeWorkshopButton" to="." method="_on_place_siege_workshop_pressed"]
+[connection signal="pressed" from="MilitaryGrid/MilitaryBackButton" to="." method="_on_military_back_pressed"]
+[connection signal="pressed" from="FortGrid/FortBackButton" to="." method="_on_fort_back_pressed"]

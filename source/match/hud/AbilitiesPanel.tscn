@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://abilitiespanel001"]
+[gd_scene load_steps=15 format=3 uid="uid://tgm41mateqo3"]
 
 [ext_resource type="Script" path="res://source/match/hud/AbilitiesPanel.gd" id="1_abpanel"]
 [ext_resource type="PackedScene" uid="uid://engrmenuartww" path="res://source/match/hud/unit-menus/EngineerMenu.tscn" id="2_engmu"]
@@ -10,10 +10,17 @@
 [ext_resource type="PackedScene" uid="uid://dd2f1jxee2iyy" path="res://source/match/hud/unit-menus/SiegeTowerMenu.tscn" id="8_towermenu"]
 [ext_resource type="PackedScene" path="res://source/match/hud/unit-menus/BallistaMenu.tscn" id="9_balmenu"]
 [ext_resource type="PackedScene" path="res://source/match/hud/unit-menus/TrebuchetMenu.tscn" id="10_trebmenu"]
-[ext_resource type="PackedScene" uid="uid://archermenu00001" path="res://source/match/hud/unit-menus/ArcherAbilitiesMenu.tscn" id="11_archmenu"]
+[ext_resource type="PackedScene" uid="uid://p674wr3boqdc" path="res://source/match/hud/unit-menus/ArcherAbilitiesMenu.tscn" id="11_archmenu"]
 [ext_resource type="PackedScene" uid="uid://cmdrmenu00001" path="res://source/match/hud/unit-menus/CommanderAbilitiesMenu.tscn" id="12_cmdrmenu"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.12, 0.12, 0.12, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cell"]
+bg_color = Color(0.18, 0.18, 0.18, 1)
+
 [node name="AbilitiesPanel" type="PanelContainer"]
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 script = ExtResource("1_abpanel")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
@@ -25,39 +32,87 @@ theme_override_constants/margin_bottom = 5
 
 [node name="BackgroundGrid" type="GridContainer" parent="MarginContainer"]
 layout_mode = 2
-columns = 2
+columns = 4
 
 [node name="Panel" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
 
 [node name="Panel2" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
 
 [node name="Panel3" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
 
 [node name="Panel4" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
 
 [node name="Panel5" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
 
 [node name="Panel6" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
 
 [node name="Panel7" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
 
 [node name="Panel8" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
+
+[node name="Panel9" type="Panel" parent="MarginContainer/BackgroundGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
+
+[node name="Panel10" type="Panel" parent="MarginContainer/BackgroundGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
+
+[node name="Panel11" type="Panel" parent="MarginContainer/BackgroundGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
+
+[node name="Panel12" type="Panel" parent="MarginContainer/BackgroundGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
+
+[node name="Panel13" type="Panel" parent="MarginContainer/BackgroundGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
+
+[node name="Panel14" type="Panel" parent="MarginContainer/BackgroundGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
+
+[node name="Panel15" type="Panel" parent="MarginContainer/BackgroundGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
+
+[node name="Panel16" type="Panel" parent="MarginContainer/BackgroundGrid"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
 
 [node name="EngineerMenu" parent="MarginContainer" instance=ExtResource("2_engmu")]
 layout_mode = 2

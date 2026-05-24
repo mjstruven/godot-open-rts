@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://source/match/hud/unit-menus/BatteringRamMenu.gd" id="1_rammenu"]
 
 [node name="BatteringRamMenu" type="GridContainer"]
-columns = 2
+columns = 4
 script = ExtResource("1_rammenu")
 
 [node name="UnmanButton" type="Button" parent="."]
@@ -13,37 +13,77 @@ focus_mode = 0
 text = "UNM"
 tooltip_text = "Unman — release all crew at full HP [Q]"
 
-[node name="Padding2" type="Control" parent="."]
+[node name="Pad2" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Padding3" type="Control" parent="."]
+[node name="Pad3" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Padding4" type="Control" parent="."]
+[node name="Pad4" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Padding5" type="Control" parent="."]
+[node name="Pad5" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Padding6" type="Control" parent="."]
+[node name="Pad6" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Padding7" type="Control" parent="."]
+[node name="Pad7" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Padding8" type="Control" parent="."]
+[node name="Pad8" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad9" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad10" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad11" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad12" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad13" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad14" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad15" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pad16" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2

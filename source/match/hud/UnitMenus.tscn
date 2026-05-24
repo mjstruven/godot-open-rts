@@ -1,11 +1,18 @@
-[gd_scene load_steps=5 format=3 uid="uid://cwcedr6jj7yty"]
+[gd_scene load_steps=7 format=3 uid="uid://cwcedr6jj7yty"]
 
 [ext_resource type="PackedScene" uid="uid://pawymiv0p8ab" path="res://source/match/hud/unit-menus/GenericMenu.tscn" id="1_4ci70"]
 [ext_resource type="Script" path="res://source/match/hud/UnitMenus.gd" id="1_hugbq"]
 [ext_resource type="PackedScene" uid="uid://combatmenu00001" path="res://source/match/hud/unit-menus/CombatMenu.tscn" id="2_cmbmnu"]
 [ext_resource type="PackedScene" uid="uid://formationmenu001" path="res://source/match/hud/unit-menus/FormationMenu.tscn" id="3_fmmnu"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_um_panel"]
+bg_color = Color(0.12, 0.12, 0.12, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_um_cell"]
+bg_color = Color(0.18, 0.18, 0.18, 1)
+
 [node name="UnitMenus" type="PanelContainer"]
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_panel")
 script = ExtResource("1_hugbq")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
@@ -22,66 +29,82 @@ columns = 4
 [node name="Panel" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel2" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel3" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel4" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel5" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel6" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel7" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel8" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel9" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel10" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel11" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel12" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel13" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel14" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel15" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="Panel16" type="Panel" parent="MarginContainer/BackgroundGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_um_cell")
 
 [node name="GenericMenu" parent="MarginContainer" instance=ExtResource("1_4ci70")]
 layout_mode = 2
