@@ -20,22 +20,22 @@ columns = 4
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
-text = "Q"
-tooltip_text = "Economic & Civilian Buildings"
+text = "CIV"
+tooltip_text = "Civilian Buildings"
 
 [node name="MilitaryButton" type="Button" parent="RootGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
-text = "W"
+text = "MIL"
 tooltip_text = "Military Buildings"
 
 [node name="FortButton" type="Button" parent="RootGrid"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
-text = "E"
-tooltip_text = "Fortifications & Field Items"
+text = "SUP"
+tooltip_text = "Support"
 
 [node name="Pad4" type="Control" parent="RootGrid"]
 custom_minimum_size = Vector2(48, 48)
