@@ -1,4 +1,4 @@
-[gd_scene load_steps=54 format=3 uid="uid://camns8fqod8d4"]
+[gd_scene load_steps=55 format=3 uid="uid://camns8fqod8d4"]
 
 [ext_resource type="Script" path="res://source/match/Match.gd" id="1_1555u"]
 [ext_resource type="Script" path="res://source/match/IsometricCamera3D.gd" id="1_qb2ry"]
@@ -35,6 +35,7 @@
 [ext_resource type="PackedScene" uid="uid://leftpanelart0001" path="res://source/match/hud/LeftPanel.tscn" id="36_leftpanel"]
 [ext_resource type="PackedScene" uid="uid://unitinfobox00001" path="res://source/match/hud/UnitInfoBox.tscn" id="37_unitinfo"]
 [ext_resource type="PackedScene" uid="uid://bfj80hva624tg" path="res://source/match/hud/GroupSummaryPanel.tscn" id="40_grpsum"]
+[ext_resource type="PackedScene" uid="uid://abilitiespanel001" path="res://source/match/hud/AbilitiesPanel.tscn" id="41_abpanel"]
 [ext_resource type="PackedScene" uid="uid://chatbox00001" path="res://source/match/hud/ChatBox.tscn" id="38_chatbox"]
 [ext_resource type="PackedScene" uid="uid://c44uv86osgfps" path="res://source/match/terrain/TerrainVisualSystem.tscn" id="39_tvs"]
 
@@ -467,80 +468,9 @@ text = "Abilities"
 modulate = Color(0.6, 0.6, 0.6, 1)
 theme_override_font_sizes/font_size = 10
 
-[node name="AbilitiesMargin" type="MarginContainer" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion"]
+[node name="AbilitiesPanel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion" instance=ExtResource("41_abpanel")]
 layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="AbilitiesGrid" type="GridContainer" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin"]
-layout_mode = 2
-columns = 4
-
-[node name="AbilityPad1" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad2" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad3" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad4" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad5" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad6" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad7" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad8" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad9" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad10" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad11" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad12" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad13" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad14" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad15" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
-
-[node name="AbilityPad16" type="Panel" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion/AbilitiesMargin/AbilitiesGrid"]
-layout_mode = 2
-custom_minimum_size = Vector2(48, 48)
+size_flags_vertical = 3
 
 [node name="OrdersRegion" type="VBoxContainer" parent="HUD/CommandBar/HBoxContainer"]
 layout_mode = 2

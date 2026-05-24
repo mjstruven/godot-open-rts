@@ -32,17 +32,15 @@ disabled = true
 text = "CA"
 tooltip_text = "Capture Structure [R] - Coming soon"
 
-[node name="SuppressButton" type="Button" parent="."]
+[node name="Pad5" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-focus_mode = 0
-text = "SP"
-tooltip_text = "Suppress [S]\nRoot archers. +2 range, +50% fire rate.\nCost: 1 wood per archer. Toggle: press again to cancel.\nCooldown: 5s after deactivation."
+mouse_filter = 2
 
-[node name="RallyButton" type="Button" parent="."]
+[node name="Pad6b" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-focus_mode = 0
-text = "RL"
-tooltip_text = "Rally [F]\nBoost nearby allied units: +20% speed, +20% attack rate.\nRadius: 8 tiles. Duration: 15s. Cooldown: 45s."
+mouse_filter = 2
 
 [node name="Pad6" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
@@ -85,6 +83,5 @@ tooltip_text = "Cancel action"
 [connection signal="pressed" from="PatrolButton" to="." method="_on_patrol_pressed"]
 [connection signal="pressed" from="StandGroundButton" to="." method="_on_stand_ground_pressed"]
 [connection signal="pressed" from="CaptureButton" to="." method="_on_capture_pressed"]
-[connection signal="pressed" from="RallyButton" to="." method="_handle_rally_click"]
 [connection signal="pressed" from="DismissButton" to="." method="_on_dismiss_pressed"]
 [connection signal="pressed" from="CancelButton" to="." method="_on_cancel_button_pressed"]
