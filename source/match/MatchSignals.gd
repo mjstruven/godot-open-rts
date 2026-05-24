@@ -27,6 +27,7 @@ signal not_enough_resources_for_construction(player)
 signal formation_changed
 signal combat_command_requested(command)
 signal unit_focus_changed(focused_controlled_units)
+signal unit_inspect_changed(focused_units)
 signal targeting_mode_changed(command)
 signal suppress_state_changed(unit, state)
 signal alert_message(player, text)

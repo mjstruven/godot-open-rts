@@ -166,9 +166,14 @@ func _narrow_selection_to_focused_type():
 func _emit_focus():
 	if _type_list.is_empty():
 		MatchSignals.unit_focus_changed.emit([])
+		MatchSignals.unit_inspect_changed.emit([])
 		return
 	var ft = _type_list[_focused_index]
-	var units = _selected_units.filter(
+	var controlled = _selected_units.filter(
 		func(u): return is_instance_valid(u) and u.type == ft and u.is_in_group("controlled_units")
 	)
-	MatchSignals.unit_focus_changed.emit(units)
+	MatchSignals.unit_focus_changed.emit(controlled)
+	var all_focused = _selected_units.filter(
+		func(u): return is_instance_valid(u) and u.type == ft
+	)
+	MatchSignals.unit_inspect_changed.emit(all_focused)

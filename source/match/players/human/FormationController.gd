@@ -4,8 +4,8 @@ const Moving = preload("res://source/match/units/actions/Moving.gd")
 const Constructing = preload("res://source/match/units/actions/Constructing.gd")
 const FormationGroup = preload("res://source/match/units/formations/FormationGroup.gd")
 
-const FORMATION_CORE_TYPES = ["cavalry", "infantry", "archer", "siege", "supply_train"]
-const FORMATION_ELIGIBLE_TYPES = ["cavalry", "infantry", "archer", "siege", "supply_train", "engineer"]
+const FORMATION_CORE_TYPES = ["cavalry", "flag_commander", "infantry", "archer", "siege", "supply_train"]
+const FORMATION_ELIGIBLE_TYPES = ["cavalry", "flag_commander", "infantry", "archer", "siege", "supply_train", "engineer"]
 
 var _group: Node = null
 var _pending_command: String = ""

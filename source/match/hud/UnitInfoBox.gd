@@ -17,19 +17,37 @@ extends PanelContainer
 @onready var _effect_val = find_child("EffectVal")
 @onready var _cargo_row = find_child("CargoRow")
 @onready var _cargo_val = find_child("CargoVal")
+@onready var _morale_row = find_child("MoraleRow")
+@onready var _morale_val = find_child("MoraleVal")
+
+var _current_unit = null
+var _current_count: int = 0
 
 
 func _ready():
-	MatchSignals.unit_focus_changed.connect(_on_unit_focus_changed)
+	MatchSignals.unit_inspect_changed.connect(_on_unit_inspect_changed)
+	MatchSignals.unit_damaged.connect(_on_unit_damaged)
 	_clear_display()
 
 
-func _on_unit_focus_changed(focused_units: Array):
+func _on_unit_inspect_changed(focused_units: Array):
 	var valid = focused_units.filter(func(u): return is_instance_valid(u))
 	if valid.is_empty():
+		_current_unit = null
+		_current_count = 0
 		_clear_display()
 		return
-	_update_display(valid[0], valid.size())
+	_current_unit = valid[0]
+	_current_count = valid.size()
+	_update_display(_current_unit, _current_count)
+
+
+func _on_unit_damaged(unit):
+	if not is_instance_valid(_current_unit):
+		_current_unit = null
+		return
+	if unit == _current_unit:
+		_update_display(_current_unit, _current_count)
 
 
 func _clear_display():
@@ -43,6 +61,7 @@ func _clear_display():
 	_sight_row.hide()
 	_effect_row.hide()
 	_cargo_row.hide()
+	_morale_row.hide()
 
 
 func _update_display(unit, count: int):
@@ -72,6 +91,9 @@ func _update_display(unit, count: int):
 		_cargo_val.text = cargo
 	else:
 		_cargo_row.hide()
+
+	_morale_row.show()
+	_morale_val.text = "— (coming soon)"
 
 
 func _set_row(row: Node, val_label: Label, value, fmt: String):
