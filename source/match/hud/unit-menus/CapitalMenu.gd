@@ -24,26 +24,6 @@ func _ready():
 	_refresh_fc_button()
 
 
-func _unhandled_input(event):
-	if not is_visible_in_tree():
-		return
-	if not (event is InputEventKey and event.pressed and not event.echo):
-		return
-	match event.keycode:
-		KEY_Q:
-			_on_produce_engineer_button_pressed()
-			get_viewport().set_input_as_handled()
-		KEY_W:
-			_on_produce_supply_train_button_pressed()
-			get_viewport().set_input_as_handled()
-		KEY_E:
-			_on_produce_flag_commander_button_pressed()
-			get_viewport().set_input_as_handled()
-		KEY_R:
-			_on_hire_mercenary_button_pressed()
-			get_viewport().set_input_as_handled()
-
-
 func _on_produce_engineer_button_pressed():
 	var available = units.filter(func(u): return u.is_constructed())
 	if available.is_empty():

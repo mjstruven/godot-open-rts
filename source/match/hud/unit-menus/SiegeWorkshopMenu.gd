@@ -60,25 +60,6 @@ func _refresh_buttons():
 		)
 
 
-func _unhandled_input(event):
-	if not is_visible_in_tree():
-		return
-	if not (event is InputEventKey and event.pressed and not event.echo):
-		return
-	if event.keycode == KEY_Q:
-		_on_produce_battering_ram_pressed()
-		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_W:
-		_on_produce_siege_tower_pressed()
-		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_E:
-		_on_produce_ballista_pressed()
-		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_R:
-		_on_produce_trebuchet_pressed()
-		get_viewport().set_input_as_handled()
-
-
 func _on_produce_battering_ram_pressed():
 	var available = units.filter(func(u): return is_instance_valid(u) and u.is_constructed())
 	if available.is_empty():

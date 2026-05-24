@@ -38,19 +38,6 @@ func _refresh_pack_button():
 			_pack_state_btn.tooltip_text = "Cancel — reverse the current transition [W]"
 
 
-func _unhandled_input(event):
-	if not is_visible_in_tree():
-		return
-	if not (event is InputEventKey and event.pressed and not event.echo):
-		return
-	if event.keycode == KEY_W:
-		_on_pack_state_pressed()
-		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_E:
-		_on_attack_ground_pressed()
-		get_viewport().set_input_as_handled()
-
-
 func _on_pack_state_pressed():
 	for u in units:
 		if not is_instance_valid(u):

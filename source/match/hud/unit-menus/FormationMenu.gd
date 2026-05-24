@@ -3,23 +3,6 @@ extends GridContainer
 const FormationGroup = preload("res://source/match/units/formations/FormationGroup.gd")
 
 
-func _unhandled_input(event):
-	if not is_visible_in_tree():
-		return
-	if not (event is InputEventKey and event.pressed and not event.echo):
-		return
-	match event.keycode:
-		KEY_Z:
-			_on_line_pressed()
-			get_viewport().set_input_as_handled()
-		KEY_X:
-			_on_box_pressed()
-			get_viewport().set_input_as_handled()
-		KEY_C:
-			_on_scatter_pressed()
-			get_viewport().set_input_as_handled()
-
-
 func update_buttons():
 	var fc = _fc()
 	if fc == null:

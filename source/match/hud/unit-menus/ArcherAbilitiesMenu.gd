@@ -38,7 +38,7 @@ func _ready():
 	_suppress_active_style.corner_radius_bottom_right = 4
 
 	MatchSignals.suppress_state_changed.connect(_on_suppress_state_changed)
-	_suppress_btn.gui_input.connect(_on_suppress_gui_input)
+	_suppress_btn.pressed.connect(_handle_suppress_click)
 	_suppress_btn.mouse_entered.connect(_on_suppress_btn_mouse_entered)
 	_suppress_btn.mouse_exited.connect(_on_suppress_btn_mouse_exited)
 
@@ -57,16 +57,6 @@ func _process(_delta):
 		var circle = _range_preview_circles[i]
 		if is_instance_valid(archer) and is_instance_valid(circle):
 			circle.global_position = Vector3(archer.global_position.x, 0.01, archer.global_position.z)
-
-
-func _unhandled_input(event):
-	if not is_visible_in_tree():
-		return
-	if not (event is InputEventKey and event.pressed and not event.echo):
-		return
-	if event.keycode == KEY_S:
-		_handle_suppress_click()
-		get_viewport().set_input_as_handled()
 
 
 func _get_archers() -> Array:
@@ -109,14 +99,6 @@ func _is_any_archer_on_cooldown(archers: Array) -> bool:
 	return archers.any(func(a):
 		return a.has_meta("suppress_cooldown_until_ms") and now < a.get_meta("suppress_cooldown_until_ms")
 	)
-
-
-func _on_suppress_gui_input(event: InputEvent):
-	if not (event is InputEventMouseButton and event.pressed):
-		return
-	if event.button_index == MOUSE_BUTTON_LEFT:
-		_handle_suppress_click()
-		_suppress_btn.get_viewport().set_input_as_handled()
 
 
 func _on_suppress_state_changed(unit, _state):

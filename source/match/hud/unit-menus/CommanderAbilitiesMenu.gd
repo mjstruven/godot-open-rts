@@ -26,16 +26,6 @@ func _ready():
 	_update_rally_button()
 
 
-func _unhandled_input(event):
-	if not is_visible_in_tree():
-		return
-	if not (event is InputEventKey and event.pressed and not event.echo):
-		return
-	if event.keycode == KEY_F:
-		_handle_rally_click()
-		get_viewport().set_input_as_handled()
-
-
 func _get_flag_commanders() -> Array:
 	return units.filter(func(u): return is_instance_valid(u) and u.type == "flag_commander")
 

@@ -5,16 +5,6 @@ var units = []:
 		units = value
 
 
-func _unhandled_input(event):
-	if not is_visible_in_tree():
-		return
-	if not (event is InputEventKey and event.pressed and not event.echo):
-		return
-	if event.keycode == KEY_Q:
-		_on_unman_pressed()
-		get_viewport().set_input_as_handled()
-
-
 func _on_unman_pressed():
 	for u in units:
 		if not is_instance_valid(u):
