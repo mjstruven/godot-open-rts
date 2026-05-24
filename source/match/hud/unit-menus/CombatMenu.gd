@@ -1,16 +1,15 @@
 extends GridContainer
 
 const ConstructingAction = preload("res://source/match/units/actions/Constructing.gd")
+const Structure = preload("res://source/match/units/Structure.gd")
 
 var units: Array = []:
 	set(value):
 		units = value
 		if is_node_ready():
-			_update_dismiss_button()
-			_update_abandon_button()
+			_update_decommission_button()
 
-@onready var _dismiss_btn = find_child("DismissButton")
-@onready var _abandon_btn = find_child("AbandonButton")
+@onready var _decommission_btn = find_child("DecommissionButton")
 
 var _poll_timer: Timer = null
 
@@ -21,13 +20,11 @@ func _ready():
 	_poll_timer.timeout.connect(_on_poll_timer_timeout)
 	add_child(_poll_timer)
 	_poll_timer.start()
-	_update_dismiss_button()
-	_update_abandon_button()
+	_update_decommission_button()
 
 
 func _on_poll_timer_timeout():
-	_update_dismiss_button()
-	_update_abandon_button()
+	_update_decommission_button()
 
 
 func _unhandled_input(event):
@@ -45,9 +42,6 @@ func _unhandled_input(event):
 		KEY_E:
 			_on_stand_ground_pressed()
 			get_viewport().set_input_as_handled()
-		KEY_R:
-			_on_capture_pressed()
-			get_viewport().set_input_as_handled()
 
 
 func _on_attack_move_pressed():
@@ -62,10 +56,6 @@ func _on_stand_ground_pressed():
 	MatchSignals.combat_command_requested.emit("stand_ground")
 
 
-func _on_capture_pressed():
-	pass
-
-
 func _on_cancel_button_pressed():
 	for unit in units:
 		if not is_instance_valid(unit):
@@ -75,11 +65,26 @@ func _on_cancel_button_pressed():
 		unit.action = null
 
 
+func _has_dismissible() -> bool:
+	return units.any(func(u): return is_instance_valid(u) and u.find_child("Dismiss") != null)
+
+
+func _has_scuttleable() -> bool:
+	return units.any(func(u):
+		return is_instance_valid(u) and (u.is_in_group("siege_units") or u is Structure)
+	)
+
+
 func _get_dismissible_units() -> Array:
 	return units.filter(func(u): return is_instance_valid(u) and u.find_child("Dismiss") != null)
 
 
-func _on_dismiss_pressed():
+func _on_decommission_pressed():
+	if _has_dismissible():
+		_execute_dismiss()
+
+
+func _execute_dismiss():
 	var dismissible = _get_dismissible_units()
 	if dismissible.is_empty():
 		return
@@ -97,62 +102,42 @@ func _on_dismiss_pressed():
 			var d = u.find_child("Dismiss")
 			if d != null:
 				d.start_dismiss()
-	_update_dismiss_button()
+	_update_decommission_button()
 
 
-func _update_dismiss_button():
-	if not is_instance_valid(_dismiss_btn):
+func _update_decommission_button():
+	if not is_instance_valid(_decommission_btn):
 		return
-	var dismissible = _get_dismissible_units()
-	if dismissible.is_empty():
-		_dismiss_btn.disabled = true
-		_dismiss_btn.modulate = Color(0.5, 0.5, 0.5)
-		_dismiss_btn.tooltip_text = "Dismiss (no dismissible units selected)"
-		return
-	var any_dismissing = dismissible.any(func(u):
-		var d = u.find_child("Dismiss")
-		return d != null and d.is_dismissing()
-	)
-	var any_blocked = dismissible.any(func(u):
-		var d = u.find_child("Dismiss")
-		return d != null and d.has_cooldown()
-	)
-	if any_blocked and not any_dismissing:
-		_dismiss_btn.disabled = true
-		_dismiss_btn.modulate = Color(0.5, 0.5, 0.5)
-		_dismiss_btn.tooltip_text = "Dismiss on cooldown (60s from first press)"
-	elif any_dismissing:
-		_dismiss_btn.disabled = false
-		_dismiss_btn.modulate = Color(1.0, 0.5, 0.2)
-		_dismiss_btn.tooltip_text = "Dismiss in progress — press to cancel"
+	if _has_dismissible():
+		_decommission_btn.text = "DIS"
+		var dismissible = _get_dismissible_units()
+		var any_dismissing = dismissible.any(func(u):
+			var d = u.find_child("Dismiss")
+			return d != null and d.is_dismissing()
+		)
+		var any_blocked = dismissible.any(func(u):
+			var d = u.find_child("Dismiss")
+			return d != null and d.has_cooldown()
+		)
+		if any_blocked and not any_dismissing:
+			_decommission_btn.disabled = true
+			_decommission_btn.modulate = Color(0.5, 0.5, 0.5)
+			_decommission_btn.tooltip_text = "Dismiss on cooldown (60s from first press)"
+		elif any_dismissing:
+			_decommission_btn.disabled = false
+			_decommission_btn.modulate = Color(1.0, 0.5, 0.2)
+			_decommission_btn.tooltip_text = "Dismiss in progress — press to cancel"
+		else:
+			_decommission_btn.disabled = false
+			_decommission_btn.modulate = Color.WHITE
+			_decommission_btn.tooltip_text = "Dismiss unit(s) — 15s countdown, then civilians spawn"
+	elif _has_scuttleable():
+		_decommission_btn.text = "SCT"
+		_decommission_btn.disabled = true
+		_decommission_btn.modulate = Color(0.5, 0.5, 0.5)
+		_decommission_btn.tooltip_text = "Scuttle — coming soon"
 	else:
-		_dismiss_btn.disabled = false
-		_dismiss_btn.modulate = Color.WHITE
-		_dismiss_btn.tooltip_text = "Dismiss unit(s) — 15s countdown, then civilians spawn"
-
-
-func _get_abandonable_units() -> Array:
-	return units.filter(func(u): return is_instance_valid(u) and u.find_child("ExternalCrewManager") != null)
-
-
-func _on_abandon_pressed():
-	for u in units:
-		if not is_instance_valid(u):
-			continue
-		var ecm = u.find_child("ExternalCrewManager")
-		if ecm != null:
-			ecm.abandon()
-
-
-func _update_abandon_button():
-	if not is_instance_valid(_abandon_btn):
-		return
-	var abandonable = _get_abandonable_units()
-	if abandonable.is_empty():
-		_abandon_btn.disabled = true
-		_abandon_btn.modulate = Color(0.5, 0.5, 0.5)
-		_abandon_btn.tooltip_text = "Abandon (no abandonable siege units selected)"
-	else:
-		_abandon_btn.disabled = false
-		_abandon_btn.modulate = Color.WHITE
-		_abandon_btn.tooltip_text = "Abandon — safely release all engineers at full HP"
+		_decommission_btn.text = "DIS"
+		_decommission_btn.disabled = true
+		_decommission_btn.modulate = Color(0.5, 0.5, 0.5)
+		_decommission_btn.tooltip_text = "Decommission (nothing to decommission)"

@@ -28,13 +28,10 @@ focus_mode = 0
 text = "SG"
 tooltip_text = "Stand Ground [E]"
 
-[node name="CaptureButton" type="Button" parent="."]
+[node name="Pad4" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-focus_mode = 0
-disabled = true
-text = "CA"
-tooltip_text = "Capture Structure [R] - Coming soon"
+mouse_filter = 2
 
 [node name="Pad5" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
@@ -76,7 +73,7 @@ custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="DismissButton" type="Button" parent="."]
+[node name="DecommissionButton" type="Button" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
@@ -90,12 +87,10 @@ focus_mode = 0
 text = "X"
 tooltip_text = "Cancel action"
 
-[node name="AbandonButton" type="Button" parent="."]
+[node name="Pad15" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-focus_mode = 0
-text = "ABN"
-tooltip_text = "Abandon — safely release all engineers at full HP"
+mouse_filter = 2
 
 [node name="Pad16" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
@@ -105,7 +100,5 @@ mouse_filter = 2
 [connection signal="pressed" from="AttackMoveButton" to="." method="_on_attack_move_pressed"]
 [connection signal="pressed" from="PatrolButton" to="." method="_on_patrol_pressed"]
 [connection signal="pressed" from="StandGroundButton" to="." method="_on_stand_ground_pressed"]
-[connection signal="pressed" from="CaptureButton" to="." method="_on_capture_pressed"]
-[connection signal="pressed" from="DismissButton" to="." method="_on_dismiss_pressed"]
+[connection signal="pressed" from="DecommissionButton" to="." method="_on_decommission_pressed"]
 [connection signal="pressed" from="CancelButton" to="." method="_on_cancel_button_pressed"]
-[connection signal="pressed" from="AbandonButton" to="." method="_on_abandon_pressed"]
