@@ -37,6 +37,7 @@ class Actions:
 
 
 var _pending_command: String = ""
+var _crosshair_image: Image = null
 
 
 func _input(event):
@@ -82,16 +83,37 @@ func _input(event):
 		get_viewport().set_input_as_handled()
 
 
+func _build_crosshair_image() -> Image:
+	var img = Image.create(32, 32, false, Image.FORMAT_RGBA8)
+	var white = Color(1, 1, 1, 1)
+	var outline = Color(0, 0, 0, 0.7)
+	for x in range(32):
+		for y in range(32):
+			var arm_v = (x == 15 or x == 16) and not (y >= 13 and y <= 18)
+			var arm_h = (y == 15 or y == 16) and not (x >= 13 and x <= 18)
+			var near_v = (x == 14 or x == 17) and not (y >= 12 and y <= 19)
+			var near_h = (y == 14 or y == 17) and not (x >= 12 and x <= 19)
+			if arm_v or arm_h:
+				img.set_pixel(x, y, white)
+			elif near_v or near_h:
+				img.set_pixel(x, y, outline)
+	return img
+
+
 func _enter_targeting_mode(command: String):
+	if get_tree().get_nodes_in_group("placement_active").size() > 0:
+		return
 	_pending_command = command
 	MatchSignals.targeting_mode_changed.emit(command)
-	DisplayServer.cursor_set_shape(DisplayServer.CURSOR_CROSS)
+	add_to_group("targeting_mode_active")
+	DisplayServer.cursor_set_custom_image(_crosshair_image, DisplayServer.CURSOR_ARROW, Vector2(15, 15))
 
 
 func _exit_targeting_mode():
 	_pending_command = ""
 	MatchSignals.targeting_mode_changed.emit("")
-	DisplayServer.cursor_set_shape(DisplayServer.CURSOR_ARROW)
+	remove_from_group("targeting_mode_active")
+	DisplayServer.cursor_set_custom_image(null, DisplayServer.CURSOR_ARROW)
 
 
 func _set_or_queue_action(unit, creator: Callable, waypoint: Variant):
@@ -114,6 +136,7 @@ func _emit_needs_crew_if_uncrewed_siege_selected() -> void:
 
 
 func _ready():
+	_crosshair_image = _build_crosshair_image()
 	MatchSignals.terrain_targeted.connect(_on_terrain_targeted)
 	MatchSignals.unit_targeted.connect(_on_unit_targeted)
 	MatchSignals.unit_spawned.connect(_on_unit_spawned)

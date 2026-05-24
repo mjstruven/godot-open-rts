@@ -264,6 +264,7 @@ func _update_feedback_label(blueprint_position_validity):
 func _start_structure_placement(structure_prototype):
 	if _structure_placement_started():
 		return
+	add_to_group("placement_active")
 	_pending_structure_prototype = structure_prototype
 	_active_blueprint_node = (
 		load(Constants.Match.Units.STRUCTURE_BLUEPRINTS[structure_prototype.resource_path])
@@ -390,6 +391,7 @@ func _cancel_structure_placement():
 		_feedback_label.hide()
 		_active_blueprint_node.queue_free()
 		_active_blueprint_node = null
+		remove_from_group("placement_active")
 
 
 func _finish_structure_placement():
@@ -448,4 +450,6 @@ func _finish_blueprint_rotation():
 
 
 func _on_structure_placement_request(structure_prototype):
+	if get_tree().get_nodes_in_group("targeting_mode_active").size() > 0:
+		return
 	_start_structure_placement(structure_prototype)
