@@ -20,6 +20,7 @@ func _ready():
 	if Engine.is_editor_hint():
 		return
 	MatchSignals.deselect_all_units.connect(deselect)
+	MatchSignals.unit_focus_changed.connect(_on_focus_changed)
 	_unit.input_event.connect(_on_input_event)
 	_circle.hide()
 
@@ -106,6 +107,15 @@ func _show_range_circle():
 		_range_circle.render_priority = 1
 		add_child(_range_circle)
 	_range_circle.show()
+
+
+func _on_focus_changed(focused_units: Array):
+	if not _selected or _range_circle == null:
+		return
+	if _unit in focused_units:
+		_range_circle.show()
+	else:
+		_range_circle.hide()
 
 
 func _on_input_event(_camera, event, _click_position, _click_normal, _shape_idx):

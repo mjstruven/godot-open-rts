@@ -44,6 +44,7 @@ func _ready():
 	action_changed.connect(_on_action_changed)
 	selected.connect(_show_range_circles)
 	deselected.connect(_hide_range_circles)
+	MatchSignals.unit_focus_changed.connect(_on_focus_changed)
 	_update_charge_bar()
 
 
@@ -146,6 +147,15 @@ func reset_player_color():
 		return
 	for child in geo.find_children("*", "MeshInstance3D", true, false):
 		child.material_override = null
+
+
+func _on_focus_changed(focused_units: Array):
+	if not is_in_group("selected_units"):
+		return
+	if self in focused_units:
+		_show_range_circles()
+	else:
+		_hide_range_circles()
 
 
 func _show_range_circles():

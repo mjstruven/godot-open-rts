@@ -155,9 +155,9 @@ func _narrow_selection_to_focused_type():
 		return
 	_narrowing = true
 	for u in to_deselect:
-		if u.is_in_group("selected_units"):
-			u.remove_from_group("selected_units")
-			MatchSignals.unit_deselected.emit(u)
+		var sel = u.find_child("Selection")
+		if sel != null:
+			sel.deselect()
 	_narrowing = false
 	_focused_index = 0
 	_rebuild()
