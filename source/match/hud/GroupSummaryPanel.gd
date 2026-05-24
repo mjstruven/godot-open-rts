@@ -17,7 +17,6 @@ func _ready():
 	MatchSignals.unit_selected.connect(_on_unit_selected)
 	MatchSignals.unit_deselected.connect(_on_unit_deselected)
 	MatchSignals.unit_died.connect(_on_unit_died)
-	hide()
 
 
 func _unhandled_input(event):
@@ -59,13 +58,11 @@ func _on_unit_died(unit):
 func _rebuild():
 	_selected_units = _selected_units.filter(func(u): return is_instance_valid(u))
 	_type_list = _build_sorted_type_list()
+	_focused_index = clampi(_focused_index, 0, max(0, _type_list.size() - 1))
+	_rebuild_buttons()
 	if _type_list.is_empty():
-		hide()
 		MatchSignals.unit_focus_changed.emit([])
 		return
-	_focused_index = clampi(_focused_index, 0, _type_list.size() - 1)
-	_rebuild_buttons()
-	show()
 	_emit_focus()
 
 

@@ -16,12 +16,6 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="HeaderLabel" type="Label" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "Selection"
-modulate = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 10
-
 [node name="TypeButtonsContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 4
