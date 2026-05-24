@@ -3,67 +3,52 @@
 [ext_resource type="Script" path="res://source/match/hud/unit-menus/TrebuchetMenu.gd" id="1_trebmenu"]
 
 [node name="TrebuchetMenu" type="GridContainer"]
-columns = 4
+columns = 2
 script = ExtResource("1_trebmenu")
 
-[node name="AbandonButton" type="Button" parent="."]
-layout_mode = 2
-focus_mode = 0
-text = "ABN"
-tooltip_text = "Abandon — safely release all engineers at full HP [Q]"
-
 [node name="PackStateButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
-text = "UNPACK"
+text = "UNP"
 tooltip_text = "Unpack — deploy trebuchet for firing (15s) [W]"
 
 [node name="AttackGroundButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
-text = "ATK GND"
+text = "AG"
 tooltip_text = "Attack Ground — fire at a ground position [E]"
 
 [node name="Padding3" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding4" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding5" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding6" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding7" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding8" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
-[node name="Padding9" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding10" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding11" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding12" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[connection signal="pressed" from="AbandonButton" to="." method="_on_abandon_pressed"]
 [connection signal="pressed" from="PackStateButton" to="." method="_on_pack_state_pressed"]
 [connection signal="pressed" from="AttackGroundButton" to="." method="_on_attack_ground_pressed"]

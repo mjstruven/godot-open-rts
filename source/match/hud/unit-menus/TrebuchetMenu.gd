@@ -28,13 +28,13 @@ func _refresh_pack_button():
 	var state = valid[0].get_pack_state()
 	match state:
 		"PACKED":
-			_pack_state_btn.text = "UNPACK"
+			_pack_state_btn.text = "UNP"
 			_pack_state_btn.tooltip_text = "Unpack — deploy trebuchet for firing (15s) [W]"
 		"UNPACKED":
-			_pack_state_btn.text = "PACK"
+			_pack_state_btn.text = "PCK"
 			_pack_state_btn.tooltip_text = "Pack — fold trebuchet for movement (15s) [W]"
 		_:
-			_pack_state_btn.text = "CANCEL"
+			_pack_state_btn.text = "CNC"
 			_pack_state_btn.tooltip_text = "Cancel — reverse the current transition [W]"
 
 
@@ -43,24 +43,12 @@ func _unhandled_input(event):
 		return
 	if not (event is InputEventKey and event.pressed and not event.echo):
 		return
-	if event.keycode == KEY_Q:
-		_on_abandon_pressed()
-		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_W:
+	if event.keycode == KEY_W:
 		_on_pack_state_pressed()
 		get_viewport().set_input_as_handled()
 	elif event.keycode == KEY_E:
 		_on_attack_ground_pressed()
 		get_viewport().set_input_as_handled()
-
-
-func _on_abandon_pressed():
-	for u in units:
-		if not is_instance_valid(u):
-			continue
-		var ecm = u.find_child("ExternalCrewManager")
-		if ecm != null:
-			ecm.abandon()
 
 
 func _on_pack_state_pressed():

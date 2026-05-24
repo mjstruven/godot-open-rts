@@ -3,10 +3,11 @@
 [ext_resource type="Script" path="res://source/match/hud/unit-menus/BatteringRamMenu.gd" id="1_rammenu"]
 
 [node name="BatteringRamMenu" type="GridContainer"]
-columns = 4
+columns = 2
 script = ExtResource("1_rammenu")
 
 [node name="UnmanButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "UNM"
@@ -15,49 +16,36 @@ tooltip_text = "Unman — release all crew at full HP [Q]"
 [node name="Padding2" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding3" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding4" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding5" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding6" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding7" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding8" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-
-[node name="Padding9" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding10" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding11" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding12" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding13" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
+mouse_filter = 2
 
 [connection signal="pressed" from="UnmanButton" to="." method="_on_unman_pressed"]

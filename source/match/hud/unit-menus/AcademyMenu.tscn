@@ -3,10 +3,11 @@
 [ext_resource type="Script" path="res://source/match/hud/unit-menus/AcademyMenu.gd" id="1_acmenu"]
 
 [node name="AcademyMenu" type="GridContainer"]
-columns = 4
+columns = 2
 script = ExtResource("1_acmenu")
 
 [node name="InfantryButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 toggle_mode = true
@@ -14,6 +15,7 @@ text = "INF"
 tooltip_text = "Infantry | 6s [Q]"
 
 [node name="ArcherButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 toggle_mode = true
@@ -21,6 +23,7 @@ text = "ARC"
 tooltip_text = "Archer | 12s [W]"
 
 [node name="CavalryButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 toggle_mode = true
@@ -28,58 +31,31 @@ text = "CAV"
 tooltip_text = "Cavalry | 12s [E]"
 
 [node name="StopButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "X"
 tooltip_text = "Stop production [R]"
 
-[node name="Padding" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding2" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding3" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding4" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
 [node name="Padding5" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding6" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding7" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding8" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-
-[node name="Padding9" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding10" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding11" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding12" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
+mouse_filter = 2
 
 [connection signal="toggled" from="InfantryButton" to="." method="_on_infantry_button_toggled"]
 [connection signal="toggled" from="ArcherButton" to="." method="_on_archer_button_toggled"]

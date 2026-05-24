@@ -47,27 +47,8 @@ custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Pass9" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Pass10" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Pass11" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Pass12" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-
 [node name="LineButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 toggle_mode = true
@@ -75,6 +56,7 @@ text = "LN"
 tooltip_text = "Line Formation [Z]"
 
 [node name="BoxButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 toggle_mode = true
@@ -82,11 +64,32 @@ text = "BX"
 tooltip_text = "Box Formation [X]"
 
 [node name="ScatterButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 toggle_mode = true
 text = "SC"
 tooltip_text = "Scatter Toggle [C]"
+
+[node name="Pass12" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass13" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass14" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Pass15" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
 
 [node name="Pass16" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)

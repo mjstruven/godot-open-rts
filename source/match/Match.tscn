@@ -445,6 +445,7 @@ size_flags_vertical = 3
 [node name="StatsRegion" type="VBoxContainer" parent="HUD/CommandBar/HBoxContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(220, 0)
+size_flags_horizontal = 3
 theme_override_constants/separation = 2
 
 [node name="StatsLabel" type="Label" parent="HUD/CommandBar/HBoxContainer/StatsRegion"]
@@ -459,7 +460,7 @@ size_flags_vertical = 3
 
 [node name="AbilitiesRegion" type="VBoxContainer" parent="HUD/CommandBar/HBoxContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(220, 0)
+custom_minimum_size = Vector2(116, 0)
 theme_override_constants/separation = 2
 
 [node name="AbilitiesLabel" type="Label" parent="HUD/CommandBar/HBoxContainer/AbilitiesRegion"]

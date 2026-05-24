@@ -4,102 +4,64 @@
 
 [node name="EngineerMenu" type="GridContainer"]
 mouse_filter = 2
-columns = 4
+columns = 2
 script = ExtResource("1_engmu")
 
 [node name="PlaceGrainMillButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "GM"
 tooltip_text = "Grain Mill - Wood:50, Stone:20 [Q]"
 
 [node name="PlaceLumberMillButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "LM"
 tooltip_text = "Lumber Mill - Wood:50, Stone:20 [W]"
 
 [node name="PlaceStoneMillButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "SM"
 tooltip_text = "Stone Mill - Wood:20, Stone:50 [E]"
 
 [node name="PlaceTownCenterButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "ACD"
 tooltip_text = "Academy - Wood:300, Stone:200 [R]"
 
 [node name="PlaceCommandPostButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "CP"
 tooltip_text = "Command Post - Wood:600, Stone:400 [A]"
 
 [node name="PlaceSiegeWorkshopButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "SW"
 tooltip_text = "Siege Workshop - Wood:400, Stone:300 [F]"
 
 [node name="PlaceHouseButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "HSE"
 tooltip_text = "House - Wood:100, Stone:50 | +10 pop cap | +10g/min [S]"
 
 [node name="PlaceManorButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "MNR"
 tooltip_text = "Manor - Stone:100 | Place on a mill | +25 pop cap | +100g/min | +50% food [D]"
-
-[node name="Padding" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Padding2" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Padding3" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Padding4" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Padding5" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="DismissButton" type="Button" parent="."]
-layout_mode = 2
-focus_mode = 0
-text = "DIS"
-tooltip_text = "Dismiss unit(s) — 15s countdown, then civilians spawn"
-
-[node name="Padding7" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Padding8" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Padding9" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
 
 [connection signal="pressed" from="PlaceGrainMillButton" to="." method="_on_place_grain_mill_button_pressed"]
 [connection signal="pressed" from="PlaceLumberMillButton" to="." method="_on_place_lumber_mill_button_pressed"]
@@ -109,4 +71,3 @@ mouse_filter = 2
 [connection signal="pressed" from="PlaceSiegeWorkshopButton" to="." method="_on_place_siege_workshop_button_pressed"]
 [connection signal="pressed" from="PlaceHouseButton" to="." method="_on_place_house_button_pressed"]
 [connection signal="pressed" from="PlaceManorButton" to="." method="_on_place_manor_button_pressed"]
-[connection signal="pressed" from="DismissButton" to="." method="_on_dismiss_pressed"]

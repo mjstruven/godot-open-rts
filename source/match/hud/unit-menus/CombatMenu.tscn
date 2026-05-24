@@ -8,24 +8,28 @@ columns = 4
 script = ExtResource("1_cmbmnu")
 
 [node name="AttackMoveButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "AM"
 tooltip_text = "Attack Move [Q]"
 
 [node name="PatrolButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "PA"
 tooltip_text = "Patrol [W]"
 
 [node name="StandGroundButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "SG"
 tooltip_text = "Stand Ground [E]"
 
 [node name="CaptureButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 disabled = true
@@ -33,11 +37,6 @@ text = "CA"
 tooltip_text = "Capture Structure [R] - Coming soon"
 
 [node name="Pad5" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Pad6b" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
@@ -52,11 +51,10 @@ custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="DismissButton" type="Button" parent="."]
+[node name="Pad8" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-focus_mode = 0
-text = "DIS"
-tooltip_text = "Dismiss unit(s) — 15s countdown, then civilians spawn"
+mouse_filter = 2
 
 [node name="Pad9" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
@@ -73,11 +71,36 @@ custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
+[node name="Pad12" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="DismissButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+text = "DIS"
+tooltip_text = "Dismiss unit(s) — 15s countdown, then civilians spawn"
+
 [node name="CancelButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "X"
 tooltip_text = "Cancel action"
+
+[node name="AbandonButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+text = "ABN"
+tooltip_text = "Abandon — safely release all engineers at full HP"
+
+[node name="Pad16" type="Control" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
 
 [connection signal="pressed" from="AttackMoveButton" to="." method="_on_attack_move_pressed"]
 [connection signal="pressed" from="PatrolButton" to="." method="_on_patrol_pressed"]
@@ -85,3 +108,4 @@ tooltip_text = "Cancel action"
 [connection signal="pressed" from="CaptureButton" to="." method="_on_capture_pressed"]
 [connection signal="pressed" from="DismissButton" to="." method="_on_dismiss_pressed"]
 [connection signal="pressed" from="CancelButton" to="." method="_on_cancel_button_pressed"]
+[connection signal="pressed" from="AbandonButton" to="." method="_on_abandon_pressed"]

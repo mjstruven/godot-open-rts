@@ -3,80 +3,56 @@
 [ext_resource type="Script" path="res://source/match/hud/unit-menus/CapitalMenu.gd" id="1_capmenu"]
 
 [node name="CapitalMenu" type="GridContainer"]
-columns = 4
+columns = 2
 script = ExtResource("1_capmenu")
 
 [node name="ProduceEngineerButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "ENG"
 tooltip_text = "Engineer | 10s [Q]"
 
 [node name="ProduceSupplyTrainButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "SUP"
 tooltip_text = "Supply Train | 45s [W]"
 
 [node name="ProduceFlagCommanderButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "FC"
 tooltip_text = "Flag Commander | 30s | 150 gold [E]"
 
 [node name="HireMercenaryButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 text = "MERC"
 tooltip_text = "Hire Mercenaries | x5 | 10s | 250 gold [R]"
 
-[node name="Padding2" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding3" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding4" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
 [node name="Padding5" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding6" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding7" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Padding8" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-
-[node name="Padding9" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding10" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding11" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding12" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-
-[node name="Padding13" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
+mouse_filter = 2
 
 [connection signal="pressed" from="ProduceEngineerButton" to="." method="_on_produce_engineer_button_pressed"]
 [connection signal="pressed" from="ProduceSupplyTrainButton" to="." method="_on_produce_supply_train_button_pressed"]
