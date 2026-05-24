@@ -28,6 +28,12 @@ func _ready():
 func select():
 	if _selected:
 		return
+	if _unit.is_in_group("controlled_units"):
+		for enemy in get_tree().get_nodes_in_group("selected_units").duplicate():
+			if is_instance_valid(enemy) and enemy.is_in_group("adversary_units"):
+				var sel = enemy.find_child("Selection")
+				if sel != null:
+					sel.deselect()
 	_selected = true
 	if not _unit.is_in_group("selected_units"):
 		_unit.add_to_group("selected_units")
@@ -120,6 +126,12 @@ func _on_focus_changed(focused_units: Array):
 
 func _on_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if _unit.is_in_group("adversary_units"):
+			if Input.is_action_pressed("shift_selecting"):
+				return
+			MatchSignals.deselect_all_units.emit()
+			select()
+			return
 		if _selected and Input.is_action_pressed("shift_selecting"):
 			deselect()
 			return
