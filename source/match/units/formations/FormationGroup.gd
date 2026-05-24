@@ -12,6 +12,7 @@ const SETTLE_DELAY = 0.5
 
 const _LINE_PRIORITY = {
 	"cavalry": 0,
+	"flag_commander": 0,
 	"infantry": 1,
 	"archer": 2,
 	"siege": 3,
@@ -210,7 +211,7 @@ func _issue_box(units: Array, target: Vector3, facing: Vector3, right: Vector3, 
 				interior.append(pos)
 
 	var infantry = units.filter(func(u): return u.type == "infantry")
-	var cavalry = units.filter(func(u): return u.type == "cavalry")
+	var cavalry = units.filter(func(u): return u.type == "cavalry" or u.type == "flag_commander")
 	var mid = units.filter(func(u): return u.type in ["archer", "siege", "supply_train"])
 	var engineers = units.filter(func(u): return u.type == "engineer")
 

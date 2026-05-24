@@ -29,10 +29,48 @@ const _CELL_KEYS = {
 	KEY_Z: 8, KEY_X: 9, KEY_C: 10, KEY_V: 11
 }
 
+const _ABILITY_LABELS = ["Q", "W", "E", "R", "A", "S", "D", "F", "Z", "X", "C", "V"]
+
 
 func _ready():
 	MatchSignals.unit_focus_changed.connect(_on_unit_focus_changed)
 	_hide_all_menus()
+	_stamp_ability_labels()
+
+
+func _stamp_ability_labels() -> void:
+	for menu in [
+		_academy_menu, _capital_menu, _structure_menu,
+		_siege_workshop_menu, _battering_ram_menu, _siege_tower_menu,
+		_ballista_menu, _trebuchet_menu, _archer_menu, _commander_menu
+	]:
+		_stamp_grid_labels(menu, _ABILITY_LABELS, -18.0)
+	for child in _engineer_menu.get_children():
+		if child is GridContainer:
+			_stamp_grid_labels(child, _ABILITY_LABELS, -18.0)
+
+
+func _stamp_grid_labels(grid: Node, labels: Array, left_offset: float) -> void:
+	for i in range(mini(12, grid.get_child_count())):
+		var child = grid.get_child(i)
+		if not child is Button:
+			continue
+		var lbl = Label.new()
+		lbl.text = labels[i]
+		lbl.layout_mode = 1
+		lbl.anchor_left = 1.0
+		lbl.anchor_top = 1.0
+		lbl.anchor_right = 1.0
+		lbl.anchor_bottom = 1.0
+		lbl.offset_left = left_offset
+		lbl.offset_top = -12.0
+		lbl.offset_right = -2.0
+		lbl.offset_bottom = -2.0
+		lbl.add_theme_font_size_override("font_size", 8)
+		lbl.modulate = Color(0.75, 0.75, 0.75, 0.85)
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		child.add_child(lbl)
 
 
 func _unhandled_input(event: InputEvent) -> void:

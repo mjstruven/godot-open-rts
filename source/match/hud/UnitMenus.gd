@@ -12,6 +12,12 @@ const _CELL_KEYS = {
 	KEY_Z: 8, KEY_X: 9, KEY_C: 10, KEY_V: 11
 }
 
+const _ORDER_LABELS = [
+	"Ctrl-Q", "Ctrl-W", "Ctrl-E", "Ctrl-R",
+	"Ctrl-A", "Ctrl-S", "Ctrl-D", "Ctrl-F",
+	"Ctrl-Z", "Ctrl-X", "Ctrl-C", "Ctrl-V"
+]
+
 var _focused_units: Array = []
 
 
@@ -19,6 +25,7 @@ func _ready():
 	_reset_menus()
 	MatchSignals.unit_focus_changed.connect(_on_unit_focus_changed)
 	MatchSignals.formation_changed.connect(func(): _reset_menus())
+	_stamp_order_labels()
 
 
 func _on_unit_focus_changed(focused_controlled_units: Array):
@@ -29,6 +36,34 @@ func _on_unit_focus_changed(focused_controlled_units: Array):
 func _reset_menus():
 	_hide_all_menus()
 	_try_showing_any_menu()
+
+
+func _stamp_order_labels() -> void:
+	for grid in [_combat_menu, _generic_menu, _formation_menu]:
+		_stamp_grid_labels(grid, _ORDER_LABELS)
+
+
+func _stamp_grid_labels(grid: Node, labels: Array) -> void:
+	for i in range(mini(12, grid.get_child_count())):
+		var child = grid.get_child(i)
+		if not child is Button:
+			continue
+		var lbl = Label.new()
+		lbl.text = labels[i]
+		lbl.layout_mode = 1
+		lbl.anchor_left = 1.0
+		lbl.anchor_top = 1.0
+		lbl.anchor_right = 1.0
+		lbl.anchor_bottom = 1.0
+		lbl.offset_left = -46.0
+		lbl.offset_top = -12.0
+		lbl.offset_right = -2.0
+		lbl.offset_bottom = -2.0
+		lbl.add_theme_font_size_override("font_size", 8)
+		lbl.modulate = Color(0.75, 0.75, 0.75, 0.85)
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		child.add_child(lbl)
 
 
 func _hide_all_menus():
