@@ -457,18 +457,6 @@ text = "Abilities"
 modulate = Color(0.6, 0.6, 0.6, 1)
 theme_override_font_sizes/font_size = 10
 
-[node name="FormationPlaceholder" type="PanelContainer" parent="HUD/MarginContainer3/OuterVBox/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 8
-custom_minimum_size = Vector2(100, 60)
-
-[node name="HeaderLabel" type="Label" parent="HUD/MarginContainer3/OuterVBox/HBoxContainer/FormationPlaceholder"]
-layout_mode = 2
-text = "Orders"
-modulate = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 10
-
 [node name="UnitMenus" parent="HUD/MarginContainer3/OuterVBox/HBoxContainer" instance=ExtResource("13_6cypl")]
 layout_mode = 2
 size_flags_horizontal = 4

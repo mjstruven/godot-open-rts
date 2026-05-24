@@ -21,16 +21,28 @@ extends PanelContainer
 
 func _ready():
 	MatchSignals.unit_focus_changed.connect(_on_unit_focus_changed)
-	hide()
+	_clear_display()
 
 
 func _on_unit_focus_changed(focused_units: Array):
 	var valid = focused_units.filter(func(u): return is_instance_valid(u))
 	if valid.is_empty():
-		hide()
+		_clear_display()
 		return
-	show()
 	_update_display(valid[0], valid.size())
+
+
+func _clear_display():
+	_unit_name_label.text = ""
+	_tab_hint_label.hide()
+	_hp_label.hide()
+	_damage_row.hide()
+	_atk_speed_row.hide()
+	_atk_range_row.hide()
+	_speed_row.hide()
+	_sight_row.hide()
+	_effect_row.hide()
+	_cargo_row.hide()
 
 
 func _update_display(unit, count: int):

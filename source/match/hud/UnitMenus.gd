@@ -39,10 +39,7 @@ func _on_unit_focus_changed(focused_controlled_units: Array):
 
 func _reset_menus():
 	_hide_all_menus()
-	if _try_showing_any_menu():
-		show()
-	else:
-		hide()
+	_try_showing_any_menu()
 
 
 func _hide_all_menus():
