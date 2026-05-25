@@ -62,12 +62,12 @@ func on_member_died(unit):
 
 func set_formation_type(t: int):
 	formation_type = t
-	_issue_slots(_last_target, _last_facing)
+	_issue_slots(_group_center(), _last_facing)
 
 
 func set_scattered(v: bool):
 	scattered = v
-	_issue_slots(_last_target, _last_facing)
+	_issue_slots(_group_center(), _last_facing)
 
 
 func _process(delta):
@@ -114,8 +114,10 @@ func _issue_slots(target: Vector3, facing: Vector3):
 
 	if formation_type == Type.BOX:
 		_issue_box(valid, target, facing, right, spacing)
+	elif formation_type == Type.COLUMN:
+		_issue_line(valid, target, facing, right, spacing, false)
 	else:
-		_issue_line(valid, target, facing, right, spacing, formation_type == Type.RANKS)
+		_issue_line(valid, target, facing, right, spacing, true)
 
 
 func _issue_line(units: Array, target: Vector3, facing: Vector3, right: Vector3, spacing: float, wide: bool):
