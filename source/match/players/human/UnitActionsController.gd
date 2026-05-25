@@ -540,6 +540,15 @@ func _on_charge_area_confirmed(
 		if Actions.AttackMoving.is_applicable(unit):
 			unit.action_queue.clear()
 			unit.action = Actions.AttackMoving.new(end_pos)
+	var fc_units = get_tree().get_nodes_in_group("selected_units").filter(
+		func(u): return u.is_in_group("controlled_units") and u.is_in_group("flag_commanders")
+	)
+	for j in range(fc_units.size()):
+		var lateral = perp * (float(n + j) - float(n - 1) * 0.5)
+		var lane_start = start_pos + lateral
+		var fc = fc_units[j]
+		fc.action_queue.clear()
+		fc.action = Actions.ChargingPhaseA.new(lane_start, direction, distance)
 
 
 func _on_navigate_unit_to_rally_point(unit, rally_point):

@@ -2,6 +2,8 @@ extends "res://source/match/units/actions/Action.gd"
 
 const Structure = preload("res://source/match/units/Structure.gd")
 const CHARGE_SPEED_MULTIPLIER: float = 1.25
+const TRAMPLE_INTERVAL: float = 0.5
+const TRAMPLE_RADIUS: float = 1.0
 
 var _lane_start: Vector3
 var _direction: Vector3
@@ -9,6 +11,7 @@ var _distance: float
 var _charge_speed: float = 0.0
 var _travelled: float = 0.0
 var _map_size: Vector2 = Vector2(10000.0, 10000.0)
+var _trample_timer: float = 0.0
 
 @onready var _unit = Utils.NodeEx.find_parent_with_group(self, "units")
 @onready var _movement = _unit.find_child("Movement")
@@ -47,6 +50,38 @@ func _physics_process(delta: float):
 		return
 	if _travelled >= _distance:
 		queue_free()
+		return
+	_trample_timer += delta
+	if _trample_timer >= TRAMPLE_INTERVAL:
+		_trample_timer -= TRAMPLE_INTERVAL
+		_apply_trample()
+
+
+func _apply_trample():
+	var my_pos = _unit.global_position_yless
+	for target in get_tree().get_nodes_in_group("units"):
+		if not is_instance_valid(target) or target == _unit:
+			continue
+		if target is Structure:
+			continue
+		if target.hp == null or target.hp <= 0:
+			continue
+		if my_pos.distance_to(target.global_position_yless) > TRAMPLE_RADIUS:
+			continue
+		var dmg = _trample_damage_for(target)
+		if dmg > 0:
+			target.hp -= dmg
+
+
+func _trample_damage_for(target) -> int:
+	if _unit.attack_damage == null:
+		return 0
+	if target.player == _unit.player:
+		if target.get("type") == "cavalry" or target.is_in_group("flag_commanders"):
+			return 0
+	if target.get("type") == "cavalry":
+		return int(_unit.attack_damage * 0.5)
+	return _unit.attack_damage
 
 
 func _exit_tree():
