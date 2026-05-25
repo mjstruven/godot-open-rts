@@ -60,9 +60,18 @@ func issue_move(target: Vector3):
 		_last_facing = dir.normalized()
 	_anchor_pos = center
 	_anchor_speed = _compute_anchor_speed()
-	print("[FormAnchor] source=issue_move anchor_start=%s anchor_end=%s" % [_anchor_pos, target])
 	_debug_caller = "issue_move"
 	_issue_slots(_anchor_pos, _last_facing)
+	# Shift anchor forward so the rearmost slot lands at the group center,
+	# preventing front-rank units from stepping backward on a move order.
+	var max_rear := 0.0
+	for offset in _slot_offsets.values():
+		max_rear = minf(max_rear, offset.dot(_last_facing))
+	var shift := -max_rear  # max_rear <= 0, so shift >= 0
+	_anchor_pos += _last_facing * shift
+	print("[FormAnchor] source=issue_move center=%s anchor_start=%s anchor_end=%s rear_shift=%.2f" % [center, _anchor_pos, target, shift])
+	if shift > ANCHOR_MOVE_THRESHOLD:
+		_update_slot_targets()
 	# DEBUG: confirm slot spread after assignment
 	for unit in _slot_positions:
 		var slot = _slot_positions[unit]
