@@ -44,6 +44,9 @@ func disband():
 
 
 func issue_move(target: Vector3):
+	var _stack = get_stack()
+	var _caller = _stack[1] if _stack.size() > 1 else {"source": "?", "function": "?", "line": -1}
+	print("[FormCaller] issue_move called by %s:%s:%d target=%s" % [_caller["source"], _caller["function"], _caller["line"], target])
 	_last_target = target
 	var center = _group_center()
 	var dir = target - center
