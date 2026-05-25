@@ -238,4 +238,4 @@ static func _apply_aoe_damage(
 			continue
 		var up = Vector2(u.global_position.x, u.global_position.z)
 		if up.distance_to(ip) <= AOE_RADIUS:
-			u.hp -= damage
+			u.hp -= int(damage * 0.1) if u.is_in_group("bolstering") else damage

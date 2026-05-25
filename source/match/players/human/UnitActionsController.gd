@@ -35,6 +35,9 @@ class Actions:
 	const StandingGround = preload("res://source/match/units/actions/StandingGround.gd")
 	const Patrolling = preload("res://source/match/units/actions/Patrolling.gd")
 	const ChargingPhaseA = preload("res://source/match/units/actions/ChargingPhaseA.gd")
+	const Bolstering = preload("res://source/match/units/actions/Bolstering.gd")
+	const BolsterAdvancing = preload("res://source/match/units/actions/BolsterAdvancing.gd")
+	const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTargets.gd")
 
 
 var _pending_command: String = ""
@@ -146,6 +149,9 @@ func _ready():
 	var ctm = get_parent().find_child("ChargeTargetingMode")
 	if ctm != null:
 		ctm.charge_area_confirmed.connect(_on_charge_area_confirmed)
+	var btm = get_parent().find_child("BolsterTargetingMode")
+	if btm != null:
+		btm.bolster_area_confirmed.connect(_on_bolster_area_confirmed)
 
 
 func _try_navigating_selected_units_towards_position(target_point):
@@ -370,6 +376,15 @@ func _on_combat_command_requested(command: String):
 			var ctm = get_parent().find_child("ChargeTargetingMode")
 			if ctm != null:
 				ctm.enter()
+		"bolster":
+			var btm = get_parent().find_child("BolsterTargetingMode")
+			if btm != null:
+				btm.enter()
+		"cancel_bolster":
+			for unit in get_tree().get_nodes_in_group("selected_units"):
+				if unit.is_in_group("controlled_units") and unit.is_in_group("bolstering"):
+					unit.action_queue.clear()
+					unit.action = Actions.WaitingForTargets.new()
 
 
 func _apply_stand_ground():
@@ -512,6 +527,26 @@ func _on_unit_spawned(unit):
 		_try_queuing_selected_workers_to_construct_structure(unit)
 	else:
 		_try_ordering_selected_workers_to_construct_structure(unit)
+
+
+func _on_bolster_area_confirmed(
+	start_pos: Vector3, end_pos: Vector3, direction: Vector3, distance: float
+):
+	var btm = get_parent().find_child("BolsterTargetingMode")
+	var participants: Array = btm.last_bolster_participants if btm != null else []
+	if participants.is_empty():
+		return
+	var in_place = distance < 0.5
+	var n = participants.size()
+	var perp = direction.cross(Vector3.UP)
+	for i in range(n):
+		var unit = participants[i]
+		unit.action_queue.clear()
+		if in_place:
+			unit.action = Actions.Bolstering.new()
+		else:
+			var lateral = perp * (float(i) - float(n - 1) * 0.5)
+			unit.action = Actions.BolsterAdvancing.new(end_pos + lateral)
 
 
 func _on_charge_area_confirmed(

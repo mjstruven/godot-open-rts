@@ -84,7 +84,13 @@ func _hit_target():
 			> TerrainManager.get_elevation_at(_target_unit.global_position)
 		):
 			damage = int(damage * 1.05)
-		_target_unit.hp -= damage
+		if _target_unit.is_in_group("bolstering"):
+			var reflected = int(damage * 0.5)
+			_target_unit.hp -= int(damage * 0.75)
+			if is_instance_valid(_unit) and _unit.hp != null and _unit.hp > 0:
+				_unit.hp -= reflected
+		else:
+			_target_unit.hp -= damage
 	_schedule_hit()
 
 

@@ -22,6 +22,7 @@ const Trebuchet = preload("res://source/match/units/trebuchet.gd")
 @onready var _archer_menu = find_child("ArcherAbilitiesMenu")
 @onready var _commander_menu = find_child("CommanderAbilitiesMenu")
 @onready var _cavalry_menu = find_child("CavalryAbilitiesMenu")
+@onready var _infantry_menu = find_child("InfantryAbilitiesMenu")
 
 
 const _CELL_KEYS = {
@@ -43,7 +44,8 @@ func _stamp_ability_labels() -> void:
 	for menu in [
 		_academy_menu, _capital_menu, _structure_menu,
 		_siege_workshop_menu, _battering_ram_menu, _siege_tower_menu,
-		_ballista_menu, _trebuchet_menu, _archer_menu, _commander_menu, _cavalry_menu
+		_ballista_menu, _trebuchet_menu, _archer_menu, _commander_menu, _cavalry_menu,
+		_infantry_menu
 	]:
 		_stamp_grid_labels(menu, _ABILITY_LABELS, -18.0)
 	for child in _engineer_menu.get_children():
@@ -95,7 +97,8 @@ func _get_abilities_cell_button(cell_index: int) -> Button:
 	for menu in [
 		_engineer_menu, _academy_menu, _capital_menu, _structure_menu,
 		_siege_workshop_menu, _battering_ram_menu, _siege_tower_menu,
-		_ballista_menu, _trebuchet_menu, _archer_menu, _commander_menu, _cavalry_menu
+		_ballista_menu, _trebuchet_menu, _archer_menu, _commander_menu, _cavalry_menu,
+		_infantry_menu
 	]:
 		if menu.visible:
 			return _get_grid_cell_button(menu, cell_index)
@@ -143,6 +146,7 @@ func _hide_all_menus():
 	_archer_menu.hide()
 	_commander_menu.hide()
 	_cavalry_menu.hide()
+	_infantry_menu.hide()
 
 
 func _try_showing_ability_menu(focused_units: Array):
@@ -185,3 +189,6 @@ func _try_showing_ability_menu(focused_units: Array):
 	elif first.get("type") == "cavalry":
 		_cavalry_menu.units = focused_units
 		_cavalry_menu.show()
+	elif first.get("type") == "infantry":
+		_infantry_menu.units = focused_units
+		_infantry_menu.show()

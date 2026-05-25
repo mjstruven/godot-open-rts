@@ -174,6 +174,8 @@ func _fire_arrow():
 					"landing_point": str(lp),
 					"unit_hit": unit_name,
 				})
+			if closest.is_in_group("bolstering"):
+				effective_damage = int(effective_damage * 0.1)
 			closest.hp -= effective_damage
 			GameLogger.debug(GameLogger.Category.COMBAT, "Arrow impact", {
 				"landing_point": str(lp),
