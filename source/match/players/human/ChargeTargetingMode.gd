@@ -5,7 +5,7 @@ signal charge_area_confirmed(start_pos: Vector3, end_pos: Vector3, direction: Ve
 const TILE_SIZE = 1.0
 const MIN_LENGTH = 2.0 * TILE_SIZE
 const MAX_LENGTH = 7.0 * TILE_SIZE
-const LINE_THICKNESS = 0.4
+const LINE_Y_OFFSET = 0.5
 
 enum _State { INACTIVE, WAITING_START, DRAGGING }
 
@@ -13,19 +13,49 @@ var _state: _State = _State.INACTIVE
 var _start_point: Vector3 = Vector3.ZERO
 var _locked_direction: Vector3 = Vector3(0.0, 0.0, 1.0)
 var _last_mouse_3d: Variant = null
+var _current_mouse_3d: Variant = null
 var _current_dir_index: int = 6
-var _mesh_instance: MeshInstance3D = null
-var _line_material: StandardMaterial3D = null
+var _charge_mesh: ImmediateMesh = null
+var _charge_mesh_instance: MeshInstance3D = null
 var _arrow_images: Array = []
 
 
 func _ready():
 	_build_arrow_images()
-	_line_material = StandardMaterial3D.new()
-	_line_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_line_material.albedo_color = Color(1.0, 0.85, 0.1, 1.0)
-	_line_material.no_depth_test = true
-	_line_material.render_priority = 2
+	_charge_mesh = ImmediateMesh.new()
+	_charge_mesh_instance = MeshInstance3D.new()
+	_charge_mesh_instance.mesh = _charge_mesh
+	_charge_mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(1.0, 0.2, 0.1, 0.9)
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.no_depth_test = true
+	_charge_mesh_instance.material_override = mat
+	add_child(_charge_mesh_instance)
+
+
+func _process(_delta):
+	_charge_mesh.clear_surfaces()
+	if _state != _State.DRAGGING or _current_mouse_3d == null:
+		return
+	var to_mouse = Vector3(
+		_current_mouse_3d.x - _start_point.x,
+		0.0,
+		_current_mouse_3d.z - _start_point.z
+	)
+	var clamped_dist = clampf(to_mouse.dot(_locked_direction), MIN_LENGTH, MAX_LENGTH)
+	var cavalry = get_tree().get_nodes_in_group("selected_units").filter(
+		func(u): return u.is_in_group("controlled_units") and u.get("type") == "cavalry"
+	)
+	for unit in cavalry:
+		var path_end = _get_unit_path_end(unit)
+		var a = path_end + Vector3(0.0, LINE_Y_OFFSET, 0.0)
+		var b = path_end + _locked_direction * clamped_dist + Vector3(0.0, LINE_Y_OFFSET, 0.0)
+		_charge_mesh.surface_begin(Mesh.PRIMITIVE_LINE_STRIP)
+		_charge_mesh.surface_add_vertex(a)
+		_charge_mesh.surface_add_vertex(b)
+		_charge_mesh.surface_end()
 
 
 func enter():
@@ -35,6 +65,7 @@ func enter():
 		return
 	_state = _State.WAITING_START
 	_last_mouse_3d = null
+	_current_mouse_3d = null
 	add_to_group("targeting_mode_active")
 	DisplayServer.cursor_set_custom_image(
 		_arrow_images[_current_dir_index], DisplayServer.CURSOR_ARROW, Vector2(15, 15)
@@ -60,6 +91,7 @@ func _input(event: InputEvent):
 				var pos = _get_ground_pos(event.position)
 				if pos != null:
 					_start_point = pos
+					_current_mouse_3d = pos
 					_state = _State.DRAGGING
 				get_viewport().set_input_as_handled()
 				return
@@ -72,9 +104,7 @@ func _input(event: InputEvent):
 		if _state == _State.WAITING_START:
 			_handle_waiting_motion(event)
 		elif _state == _State.DRAGGING:
-			var pos = _get_ground_pos(event.position)
-			if pos != null:
-				_update_visualization(pos)
+			_current_mouse_3d = _get_ground_pos(event.position)
 
 
 func _handle_waiting_motion(event: InputEventMouseMotion) -> void:
@@ -100,7 +130,7 @@ func _handle_waiting_motion(event: InputEventMouseMotion) -> void:
 
 func _cancel():
 	_state = _State.INACTIVE
-	_clear_visualization()
+	_current_mouse_3d = null
 	remove_from_group("targeting_mode_active")
 	DisplayServer.cursor_set_custom_image(null, DisplayServer.CURSOR_ARROW)
 
@@ -115,49 +145,26 @@ func _get_ground_pos(screen_pos: Vector2) -> Variant:
 	)
 
 
+func _get_unit_path_end(unit) -> Vector3:
+	for i in range(unit.action_queue.size() - 1, -1, -1):
+		var entry = unit.action_queue[i]
+		if entry.has("waypoint") and entry["waypoint"] != null:
+			return entry["waypoint"] as Vector3
+	return unit.global_position
+
+
 func _finalize(end_pos: Variant):
 	if end_pos == null:
 		_cancel()
 		return
 	var to_mouse = Vector3(end_pos.x - _start_point.x, 0.0, end_pos.z - _start_point.z)
-	var raw_dist = to_mouse.dot(_locked_direction)
-	var clamped_dist = clampf(raw_dist, MIN_LENGTH, MAX_LENGTH)
+	var clamped_dist = clampf(to_mouse.dot(_locked_direction), MIN_LENGTH, MAX_LENGTH)
 	var final_end = _start_point + _locked_direction * clamped_dist
 	print("[Charge] start=%s end=%s dir=%s length=%.2f" % [
 		_start_point, final_end, _locked_direction, clamped_dist
 	])
 	charge_area_confirmed.emit(_start_point, final_end, _locked_direction, clamped_dist)
 	_cancel()
-
-
-func _update_visualization(mouse_3d: Vector3):
-	var to_mouse = Vector3(mouse_3d.x - _start_point.x, 0.0, mouse_3d.z - _start_point.z)
-	var raw_dist = to_mouse.dot(_locked_direction)
-	var clamped_dist = clampf(raw_dist, MIN_LENGTH, MAX_LENGTH)
-	var elev = Vector3(0.0, 0.3, 0.0)
-	var a = _start_point + elev
-	var b = _start_point + _locked_direction * clamped_dist + elev
-	var perp = _locked_direction.cross(Vector3.UP) * (LINE_THICKNESS * 0.5)
-	var im = ImmediateMesh.new()
-	im.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
-	im.surface_add_vertex(a - perp)
-	im.surface_add_vertex(a + perp)
-	im.surface_add_vertex(b + perp)
-	im.surface_add_vertex(a - perp)
-	im.surface_add_vertex(b + perp)
-	im.surface_add_vertex(b - perp)
-	im.surface_end()
-	if _mesh_instance == null:
-		_mesh_instance = MeshInstance3D.new()
-		_mesh_instance.material_override = _line_material
-		add_child(_mesh_instance)
-	_mesh_instance.mesh = im
-
-
-func _clear_visualization():
-	if _mesh_instance != null:
-		_mesh_instance.queue_free()
-		_mesh_instance = null
 
 
 func _build_arrow_images() -> void:
