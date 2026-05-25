@@ -28,6 +28,7 @@ func _ready():
 func _exit_tree():
 	if is_instance_valid(_unit):
 		_unit.remove_from_group("bolstering")
+		_unit.set_meta("bolster_cooldown_end_ms", Time.get_ticks_msec() + 60000)
 	if is_instance_valid(_movement) and _original_speed > 0.0:
 		_movement.speed = _original_speed
 	if is_instance_valid(_marker):

@@ -19,6 +19,7 @@ var _preview_mesh: ImmediateMesh = null
 var _preview_mesh_instance: MeshInstance3D = null
 var _arrow_images: Array = []
 var last_bolster_participants: Array = []
+var last_bolster_cooldown_infantry: Array = []
 
 
 func _ready():
@@ -41,7 +42,7 @@ func _process(_delta):
 	if _state != _State.DRAGGING or _current_mouse_3d == null:
 		return
 	var n = get_tree().get_nodes_in_group("selected_units").filter(
-		func(u): return u.is_in_group("controlled_units") and u.get("type") == "infantry"
+		func(u): return u.is_in_group("controlled_units") and u.get("type") == "infantry" and _is_bolster_ready(u)
 	).size()
 	if n == 0:
 		return
@@ -71,7 +72,7 @@ func enter():
 	if get_tree().get_nodes_in_group("placement_active").size() > 0:
 		return
 	var available = get_tree().get_nodes_in_group("selected_units").filter(
-		func(u): return u.is_in_group("controlled_units") and u.get("type") == "infantry"
+		func(u): return u.is_in_group("controlled_units") and u.get("type") == "infantry" and _is_bolster_ready(u)
 	)
 	if available.is_empty():
 		return
@@ -140,6 +141,13 @@ func _handle_waiting_motion(event: InputEventMouseMotion) -> void:
 			)
 
 
+func _is_bolster_ready(unit) -> bool:
+	return (
+		not unit.has_meta("bolster_cooldown_end_ms")
+		or Time.get_ticks_msec() >= unit.get_meta("bolster_cooldown_end_ms")
+	)
+
+
 func _cancel():
 	_state = _State.INACTIVE
 	_current_mouse_3d = null
@@ -164,10 +172,11 @@ func _finalize(end_pos: Variant):
 	var to_mouse = Vector3(end_pos.x - _start_point.x, 0.0, end_pos.z - _start_point.z)
 	var clamped_dist = clampf(to_mouse.dot(_locked_direction), MIN_LENGTH, MAX_LENGTH)
 	var final_end = _start_point + _locked_direction * clamped_dist
-	var participants = get_tree().get_nodes_in_group("selected_units").filter(
+	var all_infantry = get_tree().get_nodes_in_group("selected_units").filter(
 		func(u): return u.is_in_group("controlled_units") and u.get("type") == "infantry"
 	)
-	last_bolster_participants = participants
+	last_bolster_participants = all_infantry.filter(func(u): return _is_bolster_ready(u))
+	last_bolster_cooldown_infantry = all_infantry.filter(func(u): return not _is_bolster_ready(u))
 	bolster_area_confirmed.emit(_start_point, final_end, _locked_direction, clamped_dist)
 	_cancel()
 

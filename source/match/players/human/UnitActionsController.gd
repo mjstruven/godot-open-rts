@@ -556,6 +556,11 @@ func _on_bolster_area_confirmed(
 		var lane_end := Vector3(end_pos.x + ox, 0.0, end_pos.z + oz)
 		unit.action_queue.clear()
 		unit.action = Actions.BolsterPhaseA.new(lane_start, lane_end)
+	if distance >= 0.5 and btm != null:
+		for unit in btm.last_bolster_cooldown_infantry:
+			if Actions.AttackMoving.is_applicable(unit):
+				unit.action_queue.clear()
+				unit.action = Actions.AttackMoving.new(end_pos)
 
 
 func _on_charge_area_confirmed(
