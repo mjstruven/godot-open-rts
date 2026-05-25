@@ -8,21 +8,28 @@ func update_buttons():
 	if fc == null:
 		return
 	var ft = fc.get_formation_type()
-	find_child("LineButton").set_pressed_no_signal(ft == FormationGroup.Type.LINE)
+	find_child("ColumnButton").set_pressed_no_signal(ft == FormationGroup.Type.COLUMN)
 	find_child("BoxButton").set_pressed_no_signal(ft == FormationGroup.Type.BOX)
+	find_child("RanksButton").set_pressed_no_signal(ft == FormationGroup.Type.RANKS)
 	find_child("ScatterButton").set_pressed_no_signal(fc.get_scattered())
 
 
-func _on_line_pressed():
+func _on_column_pressed():
 	var fc = _fc()
 	if fc != null:
-		fc.set_formation_type(FormationGroup.Type.LINE)
+		fc.set_formation_type(FormationGroup.Type.COLUMN)
 
 
 func _on_box_pressed():
 	var fc = _fc()
 	if fc != null:
 		fc.set_formation_type(FormationGroup.Type.BOX)
+
+
+func _on_ranks_pressed():
+	var fc = _fc()
+	if fc != null:
+		fc.set_formation_type(FormationGroup.Type.RANKS)
 
 
 func _on_scatter_pressed():

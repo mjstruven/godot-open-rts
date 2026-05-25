@@ -29,7 +29,7 @@ func has_active_formation() -> bool:
 
 
 func get_formation_type() -> int:
-	return _group.formation_type if _group != null else FormationGroup.Type.LINE
+	return _group.formation_type if _group != null else FormationGroup.Type.COLUMN
 
 
 func get_scattered() -> bool:

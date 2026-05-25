@@ -2,13 +2,11 @@ extends Node
 
 const Moving = preload("res://source/match/units/actions/Moving.gd")
 
-enum Type { LINE, BOX }
+enum Type { COLUMN, BOX, RANKS }
 
 const SLOT_SPACING = 1.0
-const SLOT_SPACING_SCATTERED = 1.5
-const ARRIVAL_THRESHOLD = 1.1
+const SLOT_SPACING_SCATTERED = 1.25
 const SPEED_CAP_INTERVAL = 0.1
-const SETTLE_DELAY = 0.5
 
 const _LINE_PRIORITY = {
 	"cavalry": 0,
@@ -20,17 +18,14 @@ const _LINE_PRIORITY = {
 	"engineer": 5,
 }
 
-var formation_type: int = Type.LINE
+var formation_type: int = Type.COLUMN
 var scattered: bool = false
 var members: Array = []
 
 var _slot_positions: Dictionary = {}
-var _moving: bool = false
-var _wide_issued: bool = false
 var _last_target: Vector3 = Vector3.ZERO
 var _last_facing: Vector3 = -Vector3.FORWARD
 var _speed_timer: float = 0.0
-var _settle_timer: float = 0.0
 
 
 func setup(units: Array):
@@ -44,22 +39,16 @@ func disband():
 		_release_unit(unit)
 	members.clear()
 	_slot_positions.clear()
-	_moving = false
 
 
 func issue_move(target: Vector3):
 	_last_target = target
-	_moving = true
-	_wide_issued = false
-	_settle_timer = 0.0
-
 	var center = _group_center()
 	var dir = target - center
 	dir.y = 0.0
 	if dir.length() > 0.1:
 		_last_facing = dir.normalized()
-
-	_issue_slots(target, _last_facing, false)
+	_issue_slots(target, _last_facing)
 
 
 func on_member_died(unit):
@@ -73,29 +62,21 @@ func on_member_died(unit):
 
 func set_formation_type(t: int):
 	formation_type = t
-	_issue_slots(_last_target, _last_facing, _wide_issued and formation_type == Type.LINE)
+	_issue_slots(_last_target, _last_facing)
 
 
 func set_scattered(v: bool):
 	scattered = v
-	_issue_slots(_last_target, _last_facing, _wide_issued and formation_type == Type.LINE)
+	_issue_slots(_last_target, _last_facing)
 
 
 func _process(delta):
 	if members.is_empty():
 		return
-
 	_speed_timer += delta
 	if _speed_timer >= SPEED_CAP_INTERVAL:
 		_speed_timer = 0.0
 		_apply_speed_cap()
-
-	if _moving and not _wide_issued and formation_type == Type.LINE:
-		_settle_timer += delta
-		if _settle_timer >= SETTLE_DELAY and _all_near_slots():
-			_wide_issued = true
-			_moving = false
-			_issue_slots(_last_target, _last_facing, true)
 
 
 func _apply_speed_cap():
@@ -117,19 +98,7 @@ func _apply_speed_cap():
 			mv.speed = cap
 
 
-func _all_near_slots() -> bool:
-	for unit in members:
-		if not is_instance_valid(unit):
-			continue
-		var slot = _slot_positions.get(unit)
-		if slot == null:
-			continue
-		if unit.global_position.distance_to(slot) > ARRIVAL_THRESHOLD:
-			return false
-	return true
-
-
-func _issue_slots(target: Vector3, facing: Vector3, wide: bool):
+func _issue_slots(target: Vector3, facing: Vector3):
 	facing.y = 0.0
 	if facing.length() < 0.01:
 		facing = -Vector3.FORWARD
@@ -143,10 +112,10 @@ func _issue_slots(target: Vector3, facing: Vector3, wide: bool):
 
 	_slot_positions.clear()
 
-	if formation_type == Type.LINE:
-		_issue_line(valid, target, facing, right, spacing, wide)
-	else:
+	if formation_type == Type.BOX:
 		_issue_box(valid, target, facing, right, spacing)
+	else:
+		_issue_line(valid, target, facing, right, spacing, formation_type == Type.RANKS)
 
 
 func _issue_line(units: Array, target: Vector3, facing: Vector3, right: Vector3, spacing: float, wide: bool):
