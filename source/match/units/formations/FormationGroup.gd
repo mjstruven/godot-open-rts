@@ -34,13 +34,23 @@ var _tick_log_timer: float = 0.0
 var _debug_caller: String = ""
 
 
+func _ready():
+	print("[FormGroupLife] CREATED id=%d" % get_instance_id())
+
+
+func _exit_tree():
+	print("[FormGroupLife] FREED id=%d members_at_free=%d" % [get_instance_id(), members.size()])
+
+
 func setup(units: Array):
 	members = units.duplicate()
 	for unit in members:
 		unit.add_to_group("in_formation")
+	print("[FormGroupLife] SETUP id=%d member_count=%d" % [get_instance_id(), members.size()])
 
 
 func disband():
+	print("[FormGroupLife] DISBAND id=%d member_count=%d" % [get_instance_id(), members.size()])
 	for unit in members.duplicate():
 		_release_unit(unit)
 	members.clear()
@@ -156,6 +166,7 @@ func _process(delta):
 			"[FormAnchorMove] anchor=%s end=%s dist_remaining=%.2f speed=%.2f"
 			% [_anchor_pos, _last_target, _anchor_pos.distance_to(_last_target), _anchor_speed]
 		)
+		print("[FormGroupTick] id=%d member_count=%d" % [get_instance_id(), members.size()])
 
 
 func _update_slot_targets():
