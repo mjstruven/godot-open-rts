@@ -45,6 +45,22 @@ var _crosshair_image: Image = null
 
 
 func _input(event):
+	if (
+		_pending_command.is_empty()
+		and event is InputEventKey
+		and event.pressed
+		and not event.echo
+		and event.ctrl_pressed
+	):
+		match event.keycode:
+			KEY_Q:
+				_try_subselect_infantry(false)
+				get_viewport().set_input_as_handled()
+				return
+			KEY_W:
+				_try_subselect_infantry(true)
+				get_viewport().set_input_as_handled()
+				return
 	if _pending_command.is_empty():
 		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
@@ -584,3 +600,18 @@ func _on_navigate_unit_to_rally_point(unit, rally_point):
 		_navigate_unit_towards_unit(unit, rally_point.target_unit)
 	elif rally_point.global_position != rally_point.get_parent().global_position:
 		unit.action = Actions.Moving.new(rally_point.global_position)
+
+
+func _try_subselect_infantry(bolstered: bool):
+	var selected = get_tree().get_nodes_in_group("selected_units")
+	var infantry = selected.filter(func(u): return is_instance_valid(u) and u.get("type") == "infantry")
+	var bolstering = infantry.filter(func(u): return u.is_in_group("bolstering"))
+	var non_bolstering = infantry.filter(func(u): return not u.is_in_group("bolstering"))
+	if bolstering.is_empty() or non_bolstering.is_empty():
+		return
+	var targets = bolstering if bolstered else non_bolstering
+	MatchSignals.deselect_all_units.emit()
+	for unit in targets:
+		var sel = unit.find_child("Selection")
+		if sel != null:
+			sel.select()

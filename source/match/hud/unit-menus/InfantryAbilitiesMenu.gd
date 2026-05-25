@@ -2,6 +2,7 @@ extends GridContainer
 
 var units: Array = []
 var _counter_label: Label = null
+var _cancel_btn: Button = null
 
 
 func _ready():
@@ -21,34 +22,56 @@ func _ready():
 	_counter_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_counter_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	btn.add_child(_counter_label)
+	_cancel_btn = get_node("CancelButton")
+	_cancel_btn.pressed.connect(_handle_cancel_click)
 
 
 func _process(_delta):
 	if not visible:
 		return
 	var infantry = units.filter(func(u): return is_instance_valid(u) and u.get("type") == "infantry")
-	var any_bolstering = infantry.any(func(u): return u.is_in_group("bolstering"))
-	var ready_count = infantry.filter(
-		func(u): return _is_bolster_ready(u) and not u.is_in_group("bolstering")
-	).size()
+	var bolstering = infantry.filter(func(u): return u.is_in_group("bolstering"))
+	var non_bolstering = infantry.filter(func(u): return not u.is_in_group("bolstering"))
+	var is_mixed = bolstering.size() > 0 and non_bolstering.size() > 0
+	var ready_count = non_bolstering.filter(func(u): return _is_bolster_ready(u)).size()
+
 	var btn = get_node("BolsterButton")
-	if any_bolstering:
-		btn.text = "CNCL"
-		btn.tooltip_text = "Cancel Bolster"
-	else:
+	var pad2 = get_node("Pad2")
+
+	if is_mixed:
+		pad2.visible = false
+		_cancel_btn.visible = true
+		_cancel_btn.disabled = false
 		btn.text = "BLT"
 		btn.tooltip_text = "Bolster"
+		btn.disabled = ready_count == 0
+	else:
+		pad2.visible = true
+		_cancel_btn.visible = false
+		_cancel_btn.disabled = true
+		if bolstering.is_empty():
+			btn.text = "BLT"
+			btn.tooltip_text = "Bolster"
+			btn.disabled = ready_count == 0
+		else:
+			btn.text = "CNCL"
+			btn.tooltip_text = "Cancel Bolster"
+			btn.disabled = false
+
 	_counter_label.text = "%d/%d" % [ready_count, infantry.size()]
-	btn.disabled = ready_count == 0 and not any_bolstering
 
 
 func _handle_bolster_click():
 	var infantry = units.filter(func(u): return is_instance_valid(u) and u.get("type") == "infantry")
-	var any_bolstering = infantry.any(func(u): return u.is_in_group("bolstering"))
-	if any_bolstering:
+	var all_bolstering = infantry.all(func(u): return u.is_in_group("bolstering"))
+	if all_bolstering:
 		MatchSignals.combat_command_requested.emit("cancel_bolster")
 	else:
 		MatchSignals.combat_command_requested.emit("bolster")
+
+
+func _handle_cancel_click():
+	MatchSignals.combat_command_requested.emit("cancel_bolster")
 
 
 func _is_bolster_ready(unit) -> bool:
