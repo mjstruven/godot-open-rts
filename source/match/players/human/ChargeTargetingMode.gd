@@ -39,19 +39,23 @@ func _process(_delta):
 	_charge_mesh.clear_surfaces()
 	if _state != _State.DRAGGING or _current_mouse_3d == null:
 		return
+	var n = get_tree().get_nodes_in_group("selected_units").filter(
+		func(u): return u.is_in_group("controlled_units") and u.get("type") == "cavalry"
+	).size()
+	if n == 0:
+		return
 	var to_mouse = Vector3(
 		_current_mouse_3d.x - _start_point.x,
 		0.0,
 		_current_mouse_3d.z - _start_point.z
 	)
 	var clamped_dist = clampf(to_mouse.dot(_locked_direction), MIN_LENGTH, MAX_LENGTH)
-	var cavalry = get_tree().get_nodes_in_group("selected_units").filter(
-		func(u): return u.is_in_group("controlled_units") and u.get("type") == "cavalry"
-	)
-	for unit in cavalry:
-		var path_end = _get_unit_path_end(unit)
-		var a = path_end + Vector3(0.0, LINE_Y_OFFSET, 0.0)
-		var b = path_end + _locked_direction * clamped_dist + Vector3(0.0, LINE_Y_OFFSET, 0.0)
+	var perp = _locked_direction.cross(Vector3.UP)
+	var elev = Vector3(0.0, LINE_Y_OFFSET, 0.0)
+	for i in range(n):
+		var lateral = perp * (i - (n - 1) * 0.5)
+		var a = _start_point + lateral + elev
+		var b = _start_point + lateral + _locked_direction * clamped_dist + elev
 		_charge_mesh.surface_begin(Mesh.PRIMITIVE_LINE_STRIP)
 		_charge_mesh.surface_add_vertex(a)
 		_charge_mesh.surface_add_vertex(b)
@@ -143,14 +147,6 @@ func _get_ground_pos(screen_pos: Vector2) -> Variant:
 		camera.project_ray_origin(screen_pos),
 		camera.project_ray_normal(screen_pos)
 	)
-
-
-func _get_unit_path_end(unit) -> Vector3:
-	for i in range(unit.action_queue.size() - 1, -1, -1):
-		var entry = unit.action_queue[i]
-		if entry.has("waypoint") and entry["waypoint"] != null:
-			return entry["waypoint"] as Vector3
-	return unit.global_position
 
 
 func _finalize(end_pos: Variant):
