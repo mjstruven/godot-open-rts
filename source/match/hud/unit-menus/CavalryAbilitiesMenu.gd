@@ -7,15 +7,8 @@ var _counter_label: Label = null
 func _ready():
 	var btn = get_node("ChargeButton")
 	_counter_label = Label.new()
-	_counter_label.layout_mode = 1
-	_counter_label.anchor_left = 0.0
-	_counter_label.anchor_top = 0.0
-	_counter_label.anchor_right = 0.0
-	_counter_label.anchor_bottom = 0.0
-	_counter_label.offset_left = 2.0
-	_counter_label.offset_top = 2.0
-	_counter_label.offset_right = 24.0
-	_counter_label.offset_bottom = 12.0
+	_counter_label.position = Vector2(2.0, 2.0)
+	_counter_label.size = Vector2(22.0, 10.0)
 	_counter_label.add_theme_font_size_override("font_size", 8)
 	_counter_label.modulate = Color(0.75, 0.75, 0.75, 0.85)
 	_counter_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
