@@ -4,9 +4,10 @@ const Moving = preload("res://source/match/units/actions/Moving.gd")
 
 enum Type { COLUMN, BOX, RANKS }
 
-const SLOT_SPACING = 1.5
-const SLOT_SPACING_SCATTERED = 1.75
+const SLOT_SPACING = 1.0
+const SLOT_SPACING_SCATTERED = 2.0
 const SPEED_CAP_INTERVAL = 0.1
+const ANCHOR_MOVE_THRESHOLD = 0.1
 
 const _LINE_PRIORITY = {
 	"cavalry": 0,
@@ -23,8 +24,11 @@ var scattered: bool = false
 var members: Array = []
 
 var _slot_positions: Dictionary = {}
+var _slot_offsets: Dictionary = {}
 var _last_target: Vector3 = Vector3.ZERO
 var _last_facing: Vector3 = -Vector3.FORWARD
+var _anchor_pos: Vector3 = Vector3.ZERO
+var _anchor_speed: float = 0.0
 var _speed_timer: float = 0.0
 var _tick_log_timer: float = 0.0
 var _debug_caller: String = ""
@@ -41,6 +45,7 @@ func disband():
 		_release_unit(unit)
 	members.clear()
 	_slot_positions.clear()
+	_slot_offsets.clear()
 
 
 func issue_move(target: Vector3):
@@ -53,9 +58,11 @@ func issue_move(target: Vector3):
 	dir.y = 0.0
 	if dir.length() > 0.1:
 		_last_facing = dir.normalized()
-	print("[FormAnchor] source=issue_move anchor=stored_target value=%s" % target)
+	_anchor_pos = center
+	_anchor_speed = _compute_anchor_speed()
+	print("[FormAnchor] source=issue_move anchor_start=%s anchor_end=%s" % [_anchor_pos, target])
 	_debug_caller = "issue_move"
-	_issue_slots(target, _last_facing)
+	_issue_slots(_anchor_pos, _last_facing)
 	# DEBUG: confirm slot spread after assignment
 	for unit in _slot_positions:
 		var slot = _slot_positions[unit]
@@ -68,6 +75,7 @@ func issue_move(target: Vector3):
 func on_member_died(unit):
 	members.erase(unit)
 	_slot_positions.erase(unit)
+	_slot_offsets.erase(unit)
 	if unit.is_in_group("in_formation"):
 		unit.remove_from_group("in_formation")
 	if members.is_empty():
@@ -78,9 +86,9 @@ func set_formation_type(t: int):
 	formation_type = t
 	var anchor: Vector3
 	var anchor_source: String
-	if _last_target != Vector3.ZERO:
-		anchor = _last_target
-		anchor_source = "stored_last_target"
+	if _anchor_pos != Vector3.ZERO:
+		anchor = _anchor_pos
+		anchor_source = "anchor_pos"
 	else:
 		anchor = _group_center()
 		anchor_source = "live_center_fallback"
@@ -94,9 +102,9 @@ func set_scattered(v: bool):
 	scattered = v
 	var anchor: Vector3
 	var anchor_source: String
-	if _last_target != Vector3.ZERO:
-		anchor = _last_target
-		anchor_source = "stored_last_target"
+	if _anchor_pos != Vector3.ZERO:
+		anchor = _anchor_pos
+		anchor_source = "anchor_pos"
 	else:
 		anchor = _group_center()
 		anchor_source = "live_center_fallback"
@@ -109,11 +117,16 @@ func set_scattered(v: bool):
 func _process(delta):
 	if members.is_empty():
 		return
+	# Advance moving anchor toward destination
+	if _anchor_pos.distance_to(_last_target) > 0.01 and _anchor_speed > 0.0:
+		_anchor_pos = _anchor_pos.move_toward(_last_target, _anchor_speed * delta)
+		_update_slot_targets()
+	# Speed cap timer
 	_speed_timer += delta
 	if _speed_timer >= SPEED_CAP_INTERVAL:
 		_speed_timer = 0.0
 		_apply_speed_cap()
-	# DEBUG: once-per-second action/position tick
+	# DEBUG: once-per-second tick
 	_tick_log_timer += delta
 	if _tick_log_timer >= 1.0:
 		_tick_log_timer = 0.0
@@ -130,6 +143,35 @@ func _process(delta):
 				"[FormTick] unit=%s current_action=%s slot_pos=%s actual_pos=%s dist_to_slot=%.2f"
 				% [unit.name, act_name, slot, unit.global_position, dist]
 			)
+		print(
+			"[FormAnchorMove] anchor=%s end=%s dist_remaining=%.2f speed=%.2f"
+			% [_anchor_pos, _last_target, _anchor_pos.distance_to(_last_target), _anchor_speed]
+		)
+
+
+func _update_slot_targets():
+	for unit in _slot_offsets:
+		if not is_instance_valid(unit):
+			continue
+		var new_slot = _anchor_pos + _slot_offsets[unit]
+		new_slot.y = _last_target.y
+		var old_slot = _slot_positions.get(unit, new_slot + Vector3.ONE * 999.0)
+		if old_slot.distance_to(new_slot) > ANCHOR_MOVE_THRESHOLD:
+			_slot_positions[unit] = new_slot
+			unit.action = Moving.new(new_slot)
+
+
+func _compute_anchor_speed() -> float:
+	var min_base := INF
+	for unit in members:
+		if not is_instance_valid(unit) or unit.is_in_group("bolstering"):
+			continue
+		var mv = unit.find_child("Movement")
+		if mv != null:
+			min_base = minf(min_base, mv._base_speed)
+	if min_base == INF:
+		return 0.0
+	return min_base * (0.9 if scattered else 1.0)
 
 
 func _apply_speed_cap():
@@ -143,6 +185,7 @@ func _apply_speed_cap():
 	if min_base == INF:
 		return
 	var cap = min_base * (0.9 if scattered else 1.0)
+	_anchor_speed = cap
 	for unit in members:
 		if not is_instance_valid(unit) or unit.is_in_group("bolstering"):
 			continue
@@ -166,6 +209,7 @@ func _issue_slots(target: Vector3, facing: Vector3):
 		return
 
 	_slot_positions.clear()
+	_slot_offsets.clear()
 
 	if formation_type == Type.BOX:
 		_issue_box(valid, target, facing, right, spacing)
@@ -199,6 +243,9 @@ func _issue_line(units: Array, target: Vector3, facing: Vector3, right: Vector3,
 			)
 			pos.y = target.y
 			var unit = sorted[idx]
+			var offset = pos - target
+			offset.y = 0.0
+			_slot_offsets[unit] = offset
 			_slot_positions[unit] = pos
 			# DEBUG: confirm per-unit slot assignment
 			print("[FormSlot] unit=%s assigned Moving to %s" % [unit.name, pos])
@@ -252,9 +299,13 @@ func _issue_box(units: Array, target: Vector3, facing: Vector3, right: Vector3, 
 		_slot_positions[leftover_u[i]] = leftover_s[i]
 
 	for unit in _slot_positions:
+		var slot = _slot_positions[unit]
+		var offset = slot - target
+		offset.y = 0.0
+		_slot_offsets[unit] = offset
 		# DEBUG: confirm per-unit slot assignment
-		print("[FormSlot] unit=%s assigned Moving to %s" % [unit.name, _slot_positions[unit]])
-		unit.action = Moving.new(_slot_positions[unit])
+		print("[FormSlot] unit=%s assigned Moving to %s" % [unit.name, slot])
+		unit.action = Moving.new(slot)
 
 
 func _pair_assign(units: Array, slots: Array, leftover_u: Array, leftover_s: Array):
