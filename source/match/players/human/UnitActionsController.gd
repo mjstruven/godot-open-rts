@@ -34,6 +34,7 @@ class Actions:
 	const AttackMoving = preload("res://source/match/units/actions/AttackMoving.gd")
 	const StandingGround = preload("res://source/match/units/actions/StandingGround.gd")
 	const Patrolling = preload("res://source/match/units/actions/Patrolling.gd")
+	const ChargingPhaseA = preload("res://source/match/units/actions/ChargingPhaseA.gd")
 
 
 var _pending_command: String = ""
@@ -142,6 +143,9 @@ func _ready():
 	MatchSignals.unit_spawned.connect(_on_unit_spawned)
 	MatchSignals.navigate_unit_to_rally_point.connect(_on_navigate_unit_to_rally_point)
 	MatchSignals.combat_command_requested.connect(_on_combat_command_requested)
+	var ctm = get_parent().find_child("ChargeTargetingMode")
+	if ctm != null:
+		ctm.charge_area_confirmed.connect(_on_charge_area_confirmed)
 
 
 func _try_navigating_selected_units_towards_position(target_point):
@@ -508,6 +512,23 @@ func _on_unit_spawned(unit):
 		_try_queuing_selected_workers_to_construct_structure(unit)
 	else:
 		_try_ordering_selected_workers_to_construct_structure(unit)
+
+
+func _on_charge_area_confirmed(
+	start_pos: Vector3, _end_pos: Vector3, direction: Vector3, distance: float
+):
+	var ctm = get_parent().find_child("ChargeTargetingMode")
+	var participants: Array = ctm.last_charge_participants if ctm != null else []
+	if participants.is_empty():
+		return
+	var n = participants.size()
+	var perp = direction.cross(Vector3.UP)
+	for i in range(n):
+		var lateral = perp * (float(i) - float(n - 1) * 0.5)
+		var lane_start = start_pos + lateral
+		var unit = participants[i]
+		unit.action_queue.clear()
+		unit.action = Actions.ChargingPhaseA.new(lane_start, direction, distance)
 
 
 func _on_navigate_unit_to_rally_point(unit, rally_point):

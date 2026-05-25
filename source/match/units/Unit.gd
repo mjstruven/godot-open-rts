@@ -181,6 +181,9 @@ func _set_action(action_node):
 	if is_in_group("suppress_armed") and action_node != null and not (action_node is _ArcherAutoAttackingScript):
 		action_node.queue_free()
 		return
+	if is_in_group("charging") and action_node != null:
+		action_node.queue_free()
+		return
 	_action_locked = true
 	_teardown_current_action()
 	action = action_node

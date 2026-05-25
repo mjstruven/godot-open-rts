@@ -18,6 +18,7 @@ var _current_dir_index: int = 6
 var _charge_mesh: ImmediateMesh = null
 var _charge_mesh_instance: MeshInstance3D = null
 var _arrow_images: Array = []
+var last_charge_participants: Array = []
 
 
 func _ready():
@@ -170,6 +171,7 @@ func _finalize(end_pos: Variant):
 	print("[Charge] start=%s end=%s dir=%s length=%.2f participants=%d" % [
 		_start_point, final_end, _locked_direction, clamped_dist, participants.size()
 	])
+	last_charge_participants = participants
 	charge_area_confirmed.emit(_start_point, final_end, _locked_direction, clamped_dist)
 	_cancel()
 
