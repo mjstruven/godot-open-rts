@@ -2,7 +2,6 @@ extends "res://source/match/units/actions/Action.gd"
 
 const Structure = preload("res://source/match/units/Structure.gd")
 const CHARGE_SPEED_MULTIPLIER: float = 1.25
-const TRAMPLE_INTERVAL: float = 0.5
 const TRAMPLE_RADIUS: float = 1.0
 
 var _lane_start: Vector3
@@ -11,7 +10,7 @@ var _distance: float
 var _charge_speed: float = 0.0
 var _travelled: float = 0.0
 var _map_size: Vector2 = Vector2(10000.0, 10000.0)
-var _trample_timer: float = 0.0
+var _trampled: Dictionary = {}
 
 @onready var _unit = Utils.NodeEx.find_parent_with_group(self, "units")
 @onready var _movement = _unit.find_child("Movement")
@@ -51,10 +50,7 @@ func _physics_process(delta: float):
 	if _travelled >= _distance:
 		queue_free()
 		return
-	_trample_timer += delta
-	if _trample_timer >= TRAMPLE_INTERVAL:
-		_trample_timer -= TRAMPLE_INTERVAL
-		_apply_trample()
+	_apply_trample()
 
 
 func _apply_trample():
@@ -68,8 +64,19 @@ func _apply_trample():
 			continue
 		if my_pos.distance_to(target.global_position_yless) > TRAMPLE_RADIUS:
 			continue
-		var dmg = _trample_damage_for(target)
-		if dmg > 0:
+		var tid: int = target.get_instance_id()
+		if _trampled.has(tid):
+			continue
+		var dmg: int = _trample_damage_for(target)
+		if dmg <= 0:
+			continue
+		_trampled[tid] = true
+		if target.is_in_group("bolstering"):
+			var reduced: int = int(dmg * 0.75)
+			target.hp -= reduced
+			if is_instance_valid(_unit) and _unit.hp != null and _unit.hp > 0:
+				_unit.hp -= int(reduced * 0.5)
+		else:
 			target.hp -= dmg
 
 
