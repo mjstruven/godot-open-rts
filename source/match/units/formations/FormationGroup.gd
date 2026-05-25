@@ -27,6 +27,7 @@ var _last_target: Vector3 = Vector3.ZERO
 var _last_facing: Vector3 = -Vector3.FORWARD
 var _speed_timer: float = 0.0
 var _tick_log_timer: float = 0.0
+var _debug_caller: String = ""
 
 
 func setup(units: Array):
@@ -49,6 +50,8 @@ func issue_move(target: Vector3):
 	dir.y = 0.0
 	if dir.length() > 0.1:
 		_last_facing = dir.normalized()
+	print("[FormAnchor] source=issue_move anchor=stored_target value=%s" % target)
+	_debug_caller = "issue_move"
 	_issue_slots(target, _last_facing)
 	# DEBUG: confirm slot spread after assignment
 	for unit in _slot_positions:
@@ -70,12 +73,20 @@ func on_member_died(unit):
 
 func set_formation_type(t: int):
 	formation_type = t
-	_issue_slots(_group_center(), _last_facing)
+	var center = _group_center()
+	print("[FormReform] set_formation_type type=%d anchor=live_center=%s _last_target=%s" % [t, center, _last_target])
+	print("[FormAnchor] source=set_formation_type anchor=live_center value=%s" % center)
+	_debug_caller = "set_formation_type"
+	_issue_slots(center, _last_facing)
 
 
 func set_scattered(v: bool):
 	scattered = v
-	_issue_slots(_group_center(), _last_facing)
+	var center = _group_center()
+	print("[FormReform] set_scattered scattered=%s anchor=live_center=%s _last_target=%s" % [v, center, _last_target])
+	print("[FormAnchor] source=set_scattered anchor=live_center value=%s" % center)
+	_debug_caller = "set_scattered"
+	_issue_slots(center, _last_facing)
 
 
 func _process(delta):
@@ -124,6 +135,8 @@ func _apply_speed_cap():
 
 
 func _issue_slots(target: Vector3, facing: Vector3):
+	print("[FormIssue] caller=%s anchor=%s facing=%s" % [_debug_caller, target, facing])
+	_debug_caller = ""
 	facing.y = 0.0
 	if facing.length() < 0.01:
 		facing = -Vector3.FORWARD
