@@ -30,27 +30,15 @@ var _last_facing: Vector3 = -Vector3.FORWARD
 var _anchor_pos: Vector3 = Vector3.ZERO
 var _anchor_speed: float = 0.0
 var _speed_timer: float = 0.0
-var _tick_log_timer: float = 0.0
-var _debug_caller: String = ""
-
-
-func _ready():
-	print("[FormGroupLife] CREATED id=%d" % get_instance_id())
-
-
-func _exit_tree():
-	print("[FormGroupLife] FREED id=%d members_at_free=%d" % [get_instance_id(), members.size()])
 
 
 func setup(units: Array):
 	members = units.duplicate()
 	for unit in members:
 		unit.add_to_group("in_formation")
-	print("[FormGroupLife] SETUP id=%d member_count=%d" % [get_instance_id(), members.size()])
 
 
 func disband():
-	print("[FormGroupLife] DISBAND id=%d member_count=%d" % [get_instance_id(), members.size()])
 	for unit in members.duplicate():
 		_release_unit(unit)
 	members.clear()
@@ -59,9 +47,6 @@ func disband():
 
 
 func issue_move(target: Vector3):
-	var _stack = get_stack()
-	var _caller = _stack[1] if _stack.size() > 1 else {"source": "?", "function": "?", "line": -1}
-	print("[FormCaller] issue_move called by %s:%s:%d target=%s" % [_caller["source"], _caller["function"], _caller["line"], target])
 	_last_target = target
 	var center = _group_center()
 	var dir = target - center
@@ -70,7 +55,6 @@ func issue_move(target: Vector3):
 		_last_facing = dir.normalized()
 	_anchor_pos = center
 	_anchor_speed = _compute_anchor_speed()
-	_debug_caller = "issue_move"
 	_issue_slots(_anchor_pos, _last_facing)
 	# Shift anchor forward so the rearmost slot lands at the group center,
 	# preventing front-rank units from stepping backward on a move order.
@@ -79,16 +63,8 @@ func issue_move(target: Vector3):
 		max_rear = minf(max_rear, offset.dot(_last_facing))
 	var shift := -max_rear  # max_rear <= 0, so shift >= 0
 	_anchor_pos += _last_facing * shift
-	print("[FormAnchor] source=issue_move center=%s anchor_start=%s anchor_end=%s rear_shift=%.2f" % [center, _anchor_pos, target, shift])
 	if shift > ANCHOR_MOVE_THRESHOLD:
 		_update_slot_targets()
-	# DEBUG: confirm slot spread after assignment
-	for unit in _slot_positions:
-		var slot = _slot_positions[unit]
-		print(
-			"[FormMove] unit=%s type=%s slot_pos=%s group_target=%s dist_slot_to_target=%.2f"
-			% [unit.name, unit.get("type"), slot, target, slot.distance_to(target)]
-		)
 
 
 func on_member_died(unit):
@@ -103,33 +79,13 @@ func on_member_died(unit):
 
 func set_formation_type(t: int):
 	formation_type = t
-	var anchor: Vector3
-	var anchor_source: String
-	if _anchor_pos != Vector3.ZERO:
-		anchor = _anchor_pos
-		anchor_source = "anchor_pos"
-	else:
-		anchor = _group_center()
-		anchor_source = "live_center_fallback"
-	print("[FormReform] set_formation_type type=%d anchor_source=%s anchor=%s _last_target=%s" % [t, anchor_source, anchor, _last_target])
-	print("[FormAnchor] source=set_formation_type anchor=%s value=%s" % [anchor_source, anchor])
-	_debug_caller = "set_formation_type"
+	var anchor = _anchor_pos if _anchor_pos != Vector3.ZERO else _group_center()
 	_issue_slots(anchor, _last_facing)
 
 
 func set_scattered(v: bool):
 	scattered = v
-	var anchor: Vector3
-	var anchor_source: String
-	if _anchor_pos != Vector3.ZERO:
-		anchor = _anchor_pos
-		anchor_source = "anchor_pos"
-	else:
-		anchor = _group_center()
-		anchor_source = "live_center_fallback"
-	print("[FormReform] set_scattered scattered=%s anchor_source=%s anchor=%s _last_target=%s" % [v, anchor_source, anchor, _last_target])
-	print("[FormAnchor] source=set_scattered anchor=%s value=%s" % [anchor_source, anchor])
-	_debug_caller = "set_scattered"
+	var anchor = _anchor_pos if _anchor_pos != Vector3.ZERO else _group_center()
 	_issue_slots(anchor, _last_facing)
 
 
@@ -145,28 +101,6 @@ func _process(delta):
 	if _speed_timer >= SPEED_CAP_INTERVAL:
 		_speed_timer = 0.0
 		_apply_speed_cap()
-	# DEBUG: once-per-second tick
-	_tick_log_timer += delta
-	if _tick_log_timer >= 1.0:
-		_tick_log_timer = 0.0
-		for unit in members:
-			if not is_instance_valid(unit):
-				continue
-			var slot = _slot_positions.get(unit)
-			var act_name := "null"
-			if unit.action != null:
-				var sc = unit.action.get_script()
-				act_name = sc.resource_path.get_file() if sc != null else unit.action.get_class()
-			var dist: float = unit.global_position.distance_to(slot) if slot != null else -1.0
-			print(
-				"[FormTick] unit=%s current_action=%s slot_pos=%s actual_pos=%s dist_to_slot=%.2f"
-				% [unit.name, act_name, slot, unit.global_position, dist]
-			)
-		print(
-			"[FormAnchorMove] anchor=%s end=%s dist_remaining=%.2f speed=%.2f"
-			% [_anchor_pos, _last_target, _anchor_pos.distance_to(_last_target), _anchor_speed]
-		)
-		print("[FormGroupTick] id=%d member_count=%d" % [get_instance_id(), members.size()])
 
 
 func _update_slot_targets():
@@ -215,8 +149,6 @@ func _apply_speed_cap():
 
 
 func _issue_slots(target: Vector3, facing: Vector3):
-	print("[FormIssue] caller=%s anchor=%s facing=%s" % [_debug_caller, target, facing])
-	_debug_caller = ""
 	facing.y = 0.0
 	if facing.length() < 0.01:
 		facing = -Vector3.FORWARD
@@ -267,8 +199,6 @@ func _issue_line(units: Array, target: Vector3, facing: Vector3, right: Vector3,
 			offset.y = 0.0
 			_slot_offsets[unit] = offset
 			_slot_positions[unit] = pos
-			# DEBUG: confirm per-unit slot assignment
-			print("[FormSlot] unit=%s assigned Moving to %s" % [unit.name, pos])
 			unit.action = Moving.new(pos)
 			idx += 1
 
@@ -323,8 +253,6 @@ func _issue_box(units: Array, target: Vector3, facing: Vector3, right: Vector3, 
 		var offset = slot - target
 		offset.y = 0.0
 		_slot_offsets[unit] = offset
-		# DEBUG: confirm per-unit slot assignment
-		print("[FormSlot] unit=%s assigned Moving to %s" % [unit.name, slot])
 		unit.action = Moving.new(slot)
 
 

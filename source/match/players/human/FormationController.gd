@@ -71,7 +71,6 @@ func _on_terrain_targeted(position: Vector3):
 	if _group != null:
 		var current = _group.members.filter(func(u): return is_instance_valid(u))
 		if _same_members(current, eligible):
-			print("[FormGroupCmd] REUSE id=%d members=%s" % [_group.get_instance_id(), current.map(func(u): return u.name)])
 			_group.issue_move(position)
 			return
 		_disband()
@@ -81,7 +80,6 @@ func _on_terrain_targeted(position: Vector3):
 	_group.formation_type = _formation_type
 	_group.scattered = _scattered
 	_group.setup(eligible)
-	print("[FormGroupCmd] NEW id=%d members=%s" % [_group.get_instance_id(), eligible.map(func(u): return u.name)])
 	_group.issue_move(position)
 	MatchSignals.formation_changed.emit()
 
