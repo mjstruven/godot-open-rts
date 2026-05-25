@@ -41,9 +41,6 @@ var _crosshair_image: Image = null
 
 
 func _input(event):
-	# DEBUG: trace LMB events to check if UAC sees them and whether it marks handled
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		print("[UAC-DEBUG] _input LMB press, pending_command='%s'" % _pending_command)
 	if _pending_command.is_empty():
 		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
@@ -366,14 +363,9 @@ func _on_combat_command_requested(command: String):
 		"attack_ground":
 			_enter_targeting_mode(command)
 		"charge":
-			print("[UAC-DEBUG] charge command received")
 			var ctm = get_parent().find_child("ChargeTargetingMode")
-			print("[UAC-DEBUG] find_child('ChargeTargetingMode') returned: %s" % str(ctm))
 			if ctm != null:
-				print("[UAC-DEBUG] calling ctm.enter()")
 				ctm.enter()
-			else:
-				print("[UAC-DEBUG] ERROR: ChargeTargetingMode not found under parent=%s" % get_parent().name)
 
 
 func _apply_stand_ground():
