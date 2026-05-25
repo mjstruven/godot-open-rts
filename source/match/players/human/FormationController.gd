@@ -9,6 +9,8 @@ const FORMATION_ELIGIBLE_TYPES = ["cavalry", "flag_commander", "infantry", "arch
 
 var _group: Node = null
 var _pending_command: String = ""
+var _formation_type: int = FormationGroup.Type.COLUMN
+var _scattered: bool = false
 
 
 func _ready():
@@ -29,24 +31,24 @@ func has_active_formation() -> bool:
 
 
 func get_formation_type() -> int:
-	return _group.formation_type if _group != null else FormationGroup.Type.COLUMN
+	return _group.formation_type if _group != null else _formation_type
 
 
 func get_scattered() -> bool:
-	return _group.scattered if _group != null else false
+	return _group.scattered if _group != null else _scattered
 
 
 func set_formation_type(t: int):
-	if _group == null:
-		return
-	_group.set_formation_type(t)
+	_formation_type = t
+	if _group != null:
+		_group.set_formation_type(t)
 	MatchSignals.formation_changed.emit()
 
 
 func set_scattered(v: bool):
-	if _group == null:
-		return
-	_group.set_scattered(v)
+	_scattered = v
+	if _group != null:
+		_group.set_scattered(v)
 	MatchSignals.formation_changed.emit()
 
 
@@ -75,6 +77,8 @@ func _on_terrain_targeted(position: Vector3):
 
 	_group = FormationGroup.new()
 	add_child(_group)
+	_group.formation_type = _formation_type
+	_group.scattered = _scattered
 	_group.setup(eligible)
 	_group.issue_move(position)
 	MatchSignals.formation_changed.emit()
