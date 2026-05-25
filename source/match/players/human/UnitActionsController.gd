@@ -515,7 +515,7 @@ func _on_unit_spawned(unit):
 
 
 func _on_charge_area_confirmed(
-	start_pos: Vector3, _end_pos: Vector3, direction: Vector3, distance: float
+	start_pos: Vector3, end_pos: Vector3, direction: Vector3, distance: float
 ):
 	var ctm = get_parent().find_child("ChargeTargetingMode")
 	var participants: Array = ctm.last_charge_participants if ctm != null else []
@@ -529,6 +529,17 @@ func _on_charge_area_confirmed(
 		var unit = participants[i]
 		unit.action_queue.clear()
 		unit.action = Actions.ChargingPhaseA.new(lane_start, direction, distance)
+	var on_cooldown_cavalry = get_tree().get_nodes_in_group("selected_units").filter(
+		func(u): return (
+			u.is_in_group("controlled_units")
+			and u.get("type") == "cavalry"
+			and not participants.has(u)
+		)
+	)
+	for unit in on_cooldown_cavalry:
+		if Actions.AttackMoving.is_applicable(unit):
+			unit.action_queue.clear()
+			unit.action = Actions.AttackMoving.new(end_pos)
 
 
 func _on_navigate_unit_to_rally_point(unit, rally_point):

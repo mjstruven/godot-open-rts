@@ -4,7 +4,7 @@ signal charge_area_confirmed(start_pos: Vector3, end_pos: Vector3, direction: Ve
 
 const TILE_SIZE = 1.0
 const MIN_LENGTH = 2.0 * TILE_SIZE
-const MAX_LENGTH = 7.0 * TILE_SIZE
+const MAX_LENGTH = 15.0 * TILE_SIZE
 const LINE_Y_OFFSET = 0.5
 
 enum _State { INACTIVE, WAITING_START, DRAGGING }
