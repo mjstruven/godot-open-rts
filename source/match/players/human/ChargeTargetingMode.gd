@@ -40,7 +40,7 @@ func _process(_delta):
 	if _state != _State.DRAGGING or _current_mouse_3d == null:
 		return
 	var n = get_tree().get_nodes_in_group("selected_units").filter(
-		func(u): return u.is_in_group("controlled_units") and u.get("type") == "cavalry"
+		func(u): return u.is_in_group("controlled_units") and u.get("type") == "cavalry" and _is_charge_ready(u)
 	).size()
 	if n == 0:
 		return
@@ -66,6 +66,11 @@ func enter():
 	if _state != _State.INACTIVE:
 		return
 	if get_tree().get_nodes_in_group("placement_active").size() > 0:
+		return
+	var available = get_tree().get_nodes_in_group("selected_units").filter(
+		func(u): return u.is_in_group("controlled_units") and u.get("type") == "cavalry" and _is_charge_ready(u)
+	)
+	if available.is_empty():
 		return
 	_state = _State.WAITING_START
 	_last_mouse_3d = null
@@ -156,11 +161,24 @@ func _finalize(end_pos: Variant):
 	var to_mouse = Vector3(end_pos.x - _start_point.x, 0.0, end_pos.z - _start_point.z)
 	var clamped_dist = clampf(to_mouse.dot(_locked_direction), MIN_LENGTH, MAX_LENGTH)
 	var final_end = _start_point + _locked_direction * clamped_dist
-	print("[Charge] start=%s end=%s dir=%s length=%.2f" % [
-		_start_point, final_end, _locked_direction, clamped_dist
+	var participants = get_tree().get_nodes_in_group("selected_units").filter(
+		func(u): return u.is_in_group("controlled_units") and u.get("type") == "cavalry" and _is_charge_ready(u)
+	)
+	var cooldown_end_ms = Time.get_ticks_msec() + 60000
+	for unit in participants:
+		unit.set_meta("charge_cooldown_end_ms", cooldown_end_ms)
+	print("[Charge] start=%s end=%s dir=%s length=%.2f participants=%d" % [
+		_start_point, final_end, _locked_direction, clamped_dist, participants.size()
 	])
 	charge_area_confirmed.emit(_start_point, final_end, _locked_direction, clamped_dist)
 	_cancel()
+
+
+func _is_charge_ready(unit) -> bool:
+	return (
+		not unit.has_meta("charge_cooldown_end_ms")
+		or Time.get_ticks_msec() >= unit.get_meta("charge_cooldown_end_ms")
+	)
 
 
 func _build_arrow_images() -> void:
