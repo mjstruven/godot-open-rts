@@ -112,11 +112,13 @@ func _apply_speed_cap():
 	if min_base == INF:
 		return
 	var cap = min_base * (0.9 if scattered else 1.0)
+	print("[FormationGroup] _apply_speed_cap: min_base=", min_base, " cap=", cap)
 	for unit in members:
 		if not is_instance_valid(unit) or unit.is_in_group("bolstering"):
 			continue
 		var mv = unit.find_child("Movement")
 		if mv != null:
+			print("[FormationGroup] applying cap to ", unit.name, ": _base_speeds[unit]=", _base_speeds.get(unit, -1.0), " mv._base_speed=", mv._base_speed, " mv.speed_before=", mv.speed)
 			mv.speed = cap
 
 
