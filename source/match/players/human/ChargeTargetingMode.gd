@@ -20,6 +20,7 @@ var _arrow_images: Array = []
 
 
 func _ready():
+	print("[CTM-DEBUG] ChargeTargetingMode _ready(), node=%s parent=%s" % [name, get_parent().name if get_parent() else "NO_PARENT"])
 	_build_arrow_images()
 	_line_material = StandardMaterial3D.new()
 	_line_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -29,9 +30,13 @@ func _ready():
 
 
 func enter():
+	print("[CTM-DEBUG] enter() called — state=%s" % _State.keys()[_state])
 	if _state != _State.INACTIVE:
+		print("[CTM-DEBUG] enter() bail: state not INACTIVE")
 		return
-	if get_tree().get_nodes_in_group("placement_active").size() > 0:
+	var placement_nodes = get_tree().get_nodes_in_group("placement_active")
+	if placement_nodes.size() > 0:
+		print("[CTM-DEBUG] enter() bail: placement_active has %d nodes" % placement_nodes.size())
 		return
 	_state = _State.WAITING_START
 	_last_mouse_3d = null
@@ -39,9 +44,16 @@ func enter():
 	DisplayServer.cursor_set_custom_image(
 		_arrow_images[_current_dir_index], DisplayServer.CURSOR_ARROW, Vector2(15, 15)
 	)
+	print("[CTM-DEBUG] enter() complete — now in WAITING_START, arrow_images.size=%d" % _arrow_images.size())
 
 
 func _input(event: InputEvent):
+	# Log ALL mouse button events regardless of state so we know if _input is even firing
+	if event is InputEventMouseButton:
+		print("[CTM-DEBUG] _input mouse btn: button=%d pressed=%s state=%s" % [
+			event.button_index, event.pressed, _State.keys()[_state]
+		])
+
 	if _state == _State.INACTIVE:
 		return
 
@@ -57,13 +69,19 @@ func _input(event: InputEvent):
 			return
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed and _state == _State.WAITING_START:
+				print("[CTM-DEBUG] LMB press in WAITING_START — calling _get_ground_pos(%s)" % event.position)
 				var pos = _get_ground_pos(event.position)
+				print("[CTM-DEBUG] _get_ground_pos returned: %s" % str(pos))
 				if pos != null:
 					_start_point = pos
 					_state = _State.DRAGGING
+					print("[CTM-DEBUG] transitioned to DRAGGING, start_point=%s" % _start_point)
+				else:
+					print("[CTM-DEBUG] ground pos null — staying in WAITING_START")
 				get_viewport().set_input_as_handled()
 				return
 			if not event.pressed and _state == _State.DRAGGING:
+				print("[CTM-DEBUG] LMB release in DRAGGING — finalizing")
 				_finalize(_get_ground_pos(event.position))
 				get_viewport().set_input_as_handled()
 				return
@@ -107,12 +125,15 @@ func _cancel():
 
 func _get_ground_pos(screen_pos: Vector2) -> Variant:
 	var camera = get_viewport().get_camera_3d()
+	print("[CTM-DEBUG] _get_ground_pos: camera=%s (type=%s)" % [str(camera), camera.get_class() if camera else "N/A"])
 	if camera == null:
+		print("[CTM-DEBUG] _get_ground_pos: camera IS NULL")
 		return null
-	return Plane(Vector3.UP, 0.0).intersects_ray(
-		camera.project_ray_origin(screen_pos),
-		camera.project_ray_normal(screen_pos)
-	)
+	var ray_origin = camera.project_ray_origin(screen_pos)
+	var ray_normal = camera.project_ray_normal(screen_pos)
+	var result = Plane(Vector3.UP, 0.0).intersects_ray(ray_origin, ray_normal)
+	print("[CTM-DEBUG] _get_ground_pos: ray_origin=%s ray_normal=%s result=%s" % [ray_origin, ray_normal, str(result)])
+	return result
 
 
 func _finalize(end_pos: Variant):
@@ -148,6 +169,7 @@ func _update_visualization(mouse_3d: Vector3):
 	im.surface_add_vertex(b - perp)
 	im.surface_end()
 	if _mesh_instance == null:
+		print("[CTM-DEBUG] _update_visualization: creating MeshInstance3D")
 		_mesh_instance = MeshInstance3D.new()
 		_mesh_instance.material_override = _line_material
 		add_child(_mesh_instance)
