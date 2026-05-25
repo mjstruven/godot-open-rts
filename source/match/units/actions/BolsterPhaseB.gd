@@ -1,8 +1,12 @@
 extends "res://source/match/units/actions/Action.gd"
 
 const SCAN_INTERVAL = 1.0 / 60.0 * 10.0
+const SPEED_MULTIPLIER = 0.1
 const AttackingWhileInRange = preload("res://source/match/units/actions/AttackingWhileInRange.gd")
 
+var _lane_start: Vector3
+var _direction: Vector3
+var _distance: float
 var _destination: Vector3
 var _original_speed: float = 0.0
 var _scan_timer: Timer = null
@@ -13,14 +17,17 @@ var _marker: MeshInstance3D = null
 @onready var _movement = _unit.find_child("Movement")
 
 
-func _init(destination: Vector3):
-	_destination = destination
+func _init(lane_start: Vector3, direction: Vector3, distance: float):
+	_lane_start = lane_start
+	_direction = direction
+	_distance = distance
 
 
 func _ready():
+	_destination = _lane_start + _direction * _distance
 	_unit.add_to_group("bolstering")
 	_original_speed = _movement.speed
-	_movement.speed = _original_speed * 0.5
+	_movement.speed = _original_speed * SPEED_MULTIPLIER
 	_marker = _create_marker()
 	_movement.move(_destination)
 	_movement.movement_finished.connect(_on_movement_finished)
@@ -32,12 +39,12 @@ func _ready():
 
 
 func _exit_tree():
-	if is_inside_tree() and is_instance_valid(_movement):
+	if is_instance_valid(_movement):
 		_movement.stop()
+		if _original_speed > 0.0:
+			_movement.speed = _original_speed
 	if is_instance_valid(_unit):
 		_unit.remove_from_group("bolstering")
-	if is_instance_valid(_movement):
-		_movement.speed = _original_speed
 	if is_instance_valid(_marker):
 		_marker.queue_free()
 		_marker = null
@@ -98,11 +105,11 @@ func _create_marker() -> MeshInstance3D:
 	marker.mesh = mesh
 	marker.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var mat = StandardMaterial3D.new()
-	mat.albedo_color = Color.WHITE
+	mat.albedo_color = Color.BLACK
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.no_depth_test = true
 	marker.material_override = mat
-	var s: float = 0.25
+	var s: float = 0.15
 	mesh.surface_begin(Mesh.PRIMITIVE_LINE_STRIP)
 	mesh.surface_add_vertex(Vector3(-s, 0.0, -s))
 	mesh.surface_add_vertex(Vector3(s, 0.0, s))
@@ -111,6 +118,6 @@ func _create_marker() -> MeshInstance3D:
 	mesh.surface_add_vertex(Vector3(-s, 0.0, s))
 	mesh.surface_add_vertex(Vector3(s, 0.0, -s))
 	mesh.surface_end()
-	marker.position = Vector3(0.0, 1.5, 0.0)
+	marker.position = Vector3(0.0, 0.0, 0.0)
 	_unit.add_child(marker)
 	return marker

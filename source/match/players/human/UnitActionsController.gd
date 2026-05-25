@@ -36,7 +36,7 @@ class Actions:
 	const Patrolling = preload("res://source/match/units/actions/Patrolling.gd")
 	const ChargingPhaseA = preload("res://source/match/units/actions/ChargingPhaseA.gd")
 	const Bolstering = preload("res://source/match/units/actions/Bolstering.gd")
-	const BolsterAdvancing = preload("res://source/match/units/actions/BolsterAdvancing.gd")
+	const BolsterPhaseA = preload("res://source/match/units/actions/BolsterPhaseA.gd")
 	const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTargets.gd")
 
 
@@ -530,7 +530,7 @@ func _on_unit_spawned(unit):
 
 
 func _on_bolster_area_confirmed(
-	start_pos: Vector3, end_pos: Vector3, direction: Vector3, distance: float
+	start_pos: Vector3, _end_pos: Vector3, direction: Vector3, distance: float
 ):
 	var btm = get_parent().find_child("BolsterTargetingMode")
 	var participants: Array = btm.last_bolster_participants if btm != null else []
@@ -540,13 +540,14 @@ func _on_bolster_area_confirmed(
 	var n = participants.size()
 	var perp = direction.cross(Vector3.UP)
 	for i in range(n):
+		var lateral = perp * (float(i) - float(n - 1) * 0.5)
+		var lane_start = start_pos + lateral
 		var unit = participants[i]
 		unit.action_queue.clear()
 		if in_place:
 			unit.action = Actions.Bolstering.new()
 		else:
-			var lateral = perp * (float(i) - float(n - 1) * 0.5)
-			unit.action = Actions.BolsterAdvancing.new(end_pos + lateral)
+			unit.action = Actions.BolsterPhaseA.new(lane_start, direction, distance)
 
 
 func _on_charge_area_confirmed(
