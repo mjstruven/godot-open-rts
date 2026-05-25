@@ -165,9 +165,6 @@ func _finalize(end_pos: Variant):
 	var participants = get_tree().get_nodes_in_group("selected_units").filter(
 		func(u): return u.is_in_group("controlled_units") and u.get("type") == "cavalry" and _is_charge_ready(u)
 	)
-	var cooldown_end_ms = Time.get_ticks_msec() + 60000
-	for unit in participants:
-		unit.set_meta("charge_cooldown_end_ms", cooldown_end_ms)
 	print("[Charge] start=%s end=%s dir=%s length=%.2f participants=%d" % [
 		_start_point, final_end, _locked_direction, clamped_dist, participants.size()
 	])

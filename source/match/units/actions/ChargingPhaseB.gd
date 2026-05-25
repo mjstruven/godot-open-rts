@@ -30,6 +30,8 @@ func _ready():
 	_movement.stop()
 	_unit.add_to_group("charging")
 	_unit.action_queue.clear()
+	if _unit.get("type") == "cavalry":
+		_unit.set_meta("charge_cooldown_end_ms", Time.get_ticks_msec() + 60000)
 	var look_target = _unit.global_position + _direction
 	_unit.look_at(look_target, Vector3.UP)
 	MatchSignals.charge_begun.emit(_unit)
