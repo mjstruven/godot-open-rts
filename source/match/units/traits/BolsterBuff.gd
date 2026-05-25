@@ -15,20 +15,16 @@ func _ready():
 		_original_base_speed = _movement._base_speed
 		_movement._base_speed = _original_base_speed * SPEED_MULTIPLIER
 		_movement.recompute_speed()
-	print("[BolsterBuff] READY: _movement=", _movement != null, " orig_base=", _original_base_speed, " new_base=", _movement._base_speed if _movement != null else -1.0, " speed=", _movement.speed if _movement != null else -1.0)
 	_marker = _create_marker()
 
 
 func _exit_tree():
-	print("[BolsterBuff] EXIT_TREE: _movement_valid=", is_instance_valid(_movement), " _original_base_speed=", _original_base_speed)
 	if is_instance_valid(_unit):
 		_unit.remove_from_group("bolstering")
 		_unit.set_meta("bolster_cooldown_end_ms", Time.get_ticks_msec() + 60000)
 	if is_instance_valid(_movement):
-		print("[BolsterBuff] EXIT_TREE base_BEFORE=", _movement._base_speed, " slow_contributors=", _movement._slow_contributors)
 		_movement._base_speed = _original_base_speed
 		_movement.recompute_speed()
-		print("[BolsterBuff] EXIT_TREE base_AFTER=", _movement._base_speed, " speed_AFTER=", _movement.speed)
 	if is_instance_valid(_marker):
 		_marker.queue_free()
 		_marker = null

@@ -25,7 +25,6 @@ var scattered: bool = false
 var members: Array = []
 
 var _slot_positions: Dictionary = {}
-var _base_speeds: Dictionary = {}
 var _moving: bool = false
 var _wide_issued: bool = false
 var _last_target: Vector3 = Vector3.ZERO
@@ -37,9 +36,6 @@ var _settle_timer: float = 0.0
 func setup(units: Array):
 	members = units.duplicate()
 	for unit in members:
-		var mv = unit.find_child("Movement")
-		if mv != null:
-			_base_speeds[unit] = mv.speed
 		unit.add_to_group("in_formation")
 
 
@@ -48,7 +44,6 @@ func disband():
 		_release_unit(unit)
 	members.clear()
 	_slot_positions.clear()
-	_base_speeds.clear()
 	_moving = false
 
 
@@ -70,7 +65,6 @@ func issue_move(target: Vector3):
 func on_member_died(unit):
 	members.erase(unit)
 	_slot_positions.erase(unit)
-	_base_speeds.erase(unit)
 	if unit.is_in_group("in_formation"):
 		unit.remove_from_group("in_formation")
 	if members.is_empty():
@@ -107,18 +101,19 @@ func _process(delta):
 func _apply_speed_cap():
 	var min_base := INF
 	for unit in members:
-		if is_instance_valid(unit) and unit in _base_speeds and not unit.is_in_group("bolstering"):
-			min_base = minf(min_base, _base_speeds[unit])
+		if not is_instance_valid(unit) or unit.is_in_group("bolstering"):
+			continue
+		var mv = unit.find_child("Movement")
+		if mv != null:
+			min_base = minf(min_base, mv._base_speed)
 	if min_base == INF:
 		return
 	var cap = min_base * (0.9 if scattered else 1.0)
-	print("[FormationGroup] _apply_speed_cap: min_base=", min_base, " cap=", cap)
 	for unit in members:
 		if not is_instance_valid(unit) or unit.is_in_group("bolstering"):
 			continue
 		var mv = unit.find_child("Movement")
 		if mv != null:
-			print("[FormationGroup] applying cap to ", unit.name, ": _base_speeds[unit]=", _base_speeds.get(unit, -1.0), " mv._base_speed=", mv._base_speed, " mv.speed_before=", mv.speed)
 			mv.speed = cap
 
 
@@ -250,8 +245,8 @@ func _release_unit(unit):
 	if not is_instance_valid(unit):
 		return
 	var mv = unit.find_child("Movement")
-	if mv != null and unit in _base_speeds and not unit.is_in_group("bolstering"):
-		mv.speed = _base_speeds[unit]
+	if mv != null and not unit.is_in_group("bolstering"):
+		mv.recompute_speed()
 	if unit.is_in_group("in_formation"):
 		unit.remove_from_group("in_formation")
 
