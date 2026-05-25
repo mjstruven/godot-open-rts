@@ -5,25 +5,24 @@ signal charge_area_confirmed(start_pos: Vector3, end_pos: Vector3, direction: Ve
 const TILE_SIZE = 1.0
 const MIN_LENGTH = 2.0 * TILE_SIZE
 const MAX_LENGTH = 7.0 * TILE_SIZE
-const AREA_WIDTH = 3.0 * TILE_SIZE
-const EDGE_THICKNESS = 0.08
+const LINE_THICKNESS = 0.12
 
 enum _State { INACTIVE, WAITING_START, DRAGGING }
 
 var _state: _State = _State.INACTIVE
 var _start_point: Vector3 = Vector3.ZERO
 var _mesh_instance: MeshInstance3D = null
-var _rect_material: StandardMaterial3D = null
+var _line_material: StandardMaterial3D = null
 var _arrow_image: Image = null
 
 
 func _ready():
 	_arrow_image = _build_arrow_image()
-	_rect_material = StandardMaterial3D.new()
-	_rect_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_rect_material.albedo_color = Color(1.0, 0.85, 0.1, 0.9)
-	_rect_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_rect_material.render_priority = 2
+	_line_material = StandardMaterial3D.new()
+	_line_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_line_material.albedo_color = Color(1.0, 0.85, 0.1, 0.9)
+	_line_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_line_material.render_priority = 2
 
 
 func enter():
@@ -34,19 +33,6 @@ func enter():
 	_state = _State.WAITING_START
 	add_to_group("targeting_mode_active")
 	DisplayServer.cursor_set_custom_image(_arrow_image, DisplayServer.CURSOR_ARROW, Vector2(15, 2))
-
-
-# TEMP DEBUG: Press F8 to enter charge targeting mode for manual testing.
-# Remove this block when the real Charge ability button is wired in Prompt 2.
-func _unhandled_input(event: InputEvent):
-	if (
-		event is InputEventKey
-		and event.pressed
-		and not event.echo
-		and event.keycode == KEY_F8
-	):
-		enter()
-		get_viewport().set_input_as_handled()
 
 
 func _input(event: InputEvent):
@@ -125,41 +111,26 @@ func _update_visualization(mouse_pos: Vector3):
 		return
 	var clamped_length = clampf(raw_length, MIN_LENGTH, MAX_LENGTH)
 	var direction = delta.normalized()
-	var right = direction.cross(Vector3.UP)
-	var half_w = AREA_WIDTH * 0.5
 	var elev = Vector3(0.0, 0.1, 0.0)
-	var origin = _start_point + elev
-	var tip = _start_point + direction * clamped_length + elev
+	var a = _start_point + elev
+	var b = _start_point + direction * clamped_length + elev
 
-	var p0 = origin - right * half_w
-	var p1 = origin + right * half_w
-	var p2 = tip + right * half_w
-	var p3 = tip - right * half_w
-
+	var perp = direction.cross(Vector3.UP) * (LINE_THICKNESS * 0.5)
 	var im = ImmediateMesh.new()
 	im.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
-	_add_edge(im, p0, p1)
-	_add_edge(im, p1, p2)
-	_add_edge(im, p2, p3)
-	_add_edge(im, p3, p0)
-	im.surface_end()
-
-	if _mesh_instance == null:
-		_mesh_instance = MeshInstance3D.new()
-		_mesh_instance.material_override = _rect_material
-		add_child(_mesh_instance)
-	_mesh_instance.mesh = im
-
-
-func _add_edge(im: ImmediateMesh, a: Vector3, b: Vector3):
-	var dir = (b - a).normalized()
-	var perp = dir.cross(Vector3.UP) * (EDGE_THICKNESS * 0.5)
 	im.surface_add_vertex(a - perp)
 	im.surface_add_vertex(a + perp)
 	im.surface_add_vertex(b + perp)
 	im.surface_add_vertex(a - perp)
 	im.surface_add_vertex(b + perp)
 	im.surface_add_vertex(b - perp)
+	im.surface_end()
+
+	if _mesh_instance == null:
+		_mesh_instance = MeshInstance3D.new()
+		_mesh_instance.material_override = _line_material
+		add_child(_mesh_instance)
+	_mesh_instance.mesh = im
 
 
 func _clear_visualization():

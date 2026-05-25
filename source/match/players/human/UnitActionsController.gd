@@ -362,6 +362,10 @@ func _on_combat_command_requested(command: String):
 			_enter_targeting_mode(command)
 		"attack_ground":
 			_enter_targeting_mode(command)
+		"charge":
+			var ctm = get_parent().find_child("ChargeTargetingMode")
+			if ctm != null:
+				ctm.enter()
 
 
 func _apply_stand_ground():
