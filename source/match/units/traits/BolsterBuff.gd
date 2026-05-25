@@ -2,7 +2,7 @@ extends Node
 
 const SPEED_MULTIPLIER = 0.1
 
-var _original_speed: float = 0.0
+var _original_base_speed: float = 0.0
 var _marker: MeshInstance3D = null
 
 @onready var _unit = Utils.NodeEx.find_parent_with_group(self, "units")
@@ -12,8 +12,9 @@ var _marker: MeshInstance3D = null
 func _ready():
 	_unit.add_to_group("bolstering")
 	if _movement != null:
-		_original_speed = _movement.speed
-		_movement.speed = _original_speed * SPEED_MULTIPLIER
+		_original_base_speed = _movement._base_speed
+		_movement._base_speed = _original_base_speed * SPEED_MULTIPLIER
+		_movement.recompute_speed()
 	_marker = _create_marker()
 
 
@@ -21,8 +22,9 @@ func _exit_tree():
 	if is_instance_valid(_unit):
 		_unit.remove_from_group("bolstering")
 		_unit.set_meta("bolster_cooldown_end_ms", Time.get_ticks_msec() + 60000)
-	if is_instance_valid(_movement) and _original_speed > 0.0:
-		_movement.speed = _original_speed
+	if is_instance_valid(_movement):
+		_movement._base_speed = _original_base_speed
+		_movement.recompute_speed()
 	if is_instance_valid(_marker):
 		_marker.queue_free()
 		_marker = null

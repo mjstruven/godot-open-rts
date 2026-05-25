@@ -107,13 +107,13 @@ func _process(delta):
 func _apply_speed_cap():
 	var min_base := INF
 	for unit in members:
-		if is_instance_valid(unit) and unit in _base_speeds:
+		if is_instance_valid(unit) and unit in _base_speeds and not unit.is_in_group("bolstering"):
 			min_base = minf(min_base, _base_speeds[unit])
 	if min_base == INF:
 		return
 	var cap = min_base * (0.9 if scattered else 1.0)
 	for unit in members:
-		if not is_instance_valid(unit):
+		if not is_instance_valid(unit) or unit.is_in_group("bolstering"):
 			continue
 		var mv = unit.find_child("Movement")
 		if mv != null:
@@ -248,7 +248,7 @@ func _release_unit(unit):
 	if not is_instance_valid(unit):
 		return
 	var mv = unit.find_child("Movement")
-	if mv != null and unit in _base_speeds:
+	if mv != null and unit in _base_speeds and not unit.is_in_group("bolstering"):
 		mv.speed = _base_speeds[unit]
 	if unit.is_in_group("in_formation"):
 		unit.remove_from_group("in_formation")

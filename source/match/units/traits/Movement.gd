@@ -209,6 +209,10 @@ func clear_speed_slow(source: String) -> void:
 	speed = _compute_effective_speed()
 
 
+func recompute_speed() -> void:
+	speed = _compute_effective_speed()
+
+
 # Stacking model: ADDITIVE. total_slow = sum of all contributor fractions;
 # final_speed = base × (1 - total_slow), floored at MIN_SPEED_FRACTION × base.
 # To switch to multiplicative (final = base × (1-slowA) × (1-slowB) × ...),
