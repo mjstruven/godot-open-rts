@@ -530,24 +530,32 @@ func _on_unit_spawned(unit):
 
 
 func _on_bolster_area_confirmed(
-	start_pos: Vector3, _end_pos: Vector3, direction: Vector3, distance: float
+	start_pos: Vector3, end_pos: Vector3, _direction: Vector3, distance: float
 ):
 	var btm = get_parent().find_child("BolsterTargetingMode")
 	var participants: Array = btm.last_bolster_participants if btm != null else []
 	if participants.is_empty():
 		return
-	var in_place = distance < 0.5
-	var n = participants.size()
-	var perp = direction.cross(Vector3.UP)
-	for i in range(n):
-		var lateral = perp * (float(i) - float(n - 1) * 0.5)
-		var lane_start = start_pos + lateral
-		var unit = participants[i]
-		unit.action_queue.clear()
-		if in_place:
+	if distance < 0.5:
+		for unit in participants:
+			unit.action_queue.clear()
 			unit.action = Actions.Bolstering.new()
-		else:
-			unit.action = Actions.BolsterPhaseA.new(lane_start, direction, distance)
+		return
+	var center_x := 0.0
+	var center_z := 0.0
+	for unit in participants:
+		center_x += unit.global_position.x
+		center_z += unit.global_position.z
+	var n := participants.size()
+	center_x /= float(n)
+	center_z /= float(n)
+	for unit in participants:
+		var ox: float = unit.global_position.x - center_x
+		var oz: float = unit.global_position.z - center_z
+		var lane_start := Vector3(start_pos.x + ox, 0.0, start_pos.z + oz)
+		var lane_end := Vector3(end_pos.x + ox, 0.0, end_pos.z + oz)
+		unit.action_queue.clear()
+		unit.action = Actions.BolsterPhaseA.new(lane_start, lane_end)
 
 
 func _on_charge_area_confirmed(

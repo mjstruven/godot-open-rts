@@ -4,9 +4,6 @@ const SCAN_INTERVAL = 1.0 / 60.0 * 10.0
 const SPEED_MULTIPLIER = 0.1
 const AttackingWhileInRange = preload("res://source/match/units/actions/AttackingWhileInRange.gd")
 
-var _lane_start: Vector3
-var _direction: Vector3
-var _distance: float
 var _destination: Vector3
 var _original_speed: float = 0.0
 var _scan_timer: Timer = null
@@ -17,14 +14,11 @@ var _marker: MeshInstance3D = null
 @onready var _movement = _unit.find_child("Movement")
 
 
-func _init(lane_start: Vector3, direction: Vector3, distance: float):
-	_lane_start = lane_start
-	_direction = direction
-	_distance = distance
+func _init(destination: Vector3):
+	_destination = destination
 
 
 func _ready():
-	_destination = _lane_start + _direction * _distance
 	_unit.add_to_group("bolstering")
 	_original_speed = _movement.speed
 	_movement.speed = _original_speed * SPEED_MULTIPLIER
