@@ -4,8 +4,8 @@ const Moving = preload("res://source/match/units/actions/Moving.gd")
 
 enum Type { COLUMN, BOX, RANKS }
 
-const SLOT_SPACING = 1.0
-const SLOT_SPACING_SCATTERED = 1.25
+const SLOT_SPACING = 1.5
+const SLOT_SPACING_SCATTERED = 1.75
 const SPEED_CAP_INTERVAL = 0.1
 
 const _LINE_PRIORITY = {
@@ -76,20 +76,34 @@ func on_member_died(unit):
 
 func set_formation_type(t: int):
 	formation_type = t
-	var center = _group_center()
-	print("[FormReform] set_formation_type type=%d anchor=live_center=%s _last_target=%s" % [t, center, _last_target])
-	print("[FormAnchor] source=set_formation_type anchor=live_center value=%s" % center)
+	var anchor: Vector3
+	var anchor_source: String
+	if _last_target != Vector3.ZERO:
+		anchor = _last_target
+		anchor_source = "stored_last_target"
+	else:
+		anchor = _group_center()
+		anchor_source = "live_center_fallback"
+	print("[FormReform] set_formation_type type=%d anchor_source=%s anchor=%s _last_target=%s" % [t, anchor_source, anchor, _last_target])
+	print("[FormAnchor] source=set_formation_type anchor=%s value=%s" % [anchor_source, anchor])
 	_debug_caller = "set_formation_type"
-	_issue_slots(center, _last_facing)
+	_issue_slots(anchor, _last_facing)
 
 
 func set_scattered(v: bool):
 	scattered = v
-	var center = _group_center()
-	print("[FormReform] set_scattered scattered=%s anchor=live_center=%s _last_target=%s" % [v, center, _last_target])
-	print("[FormAnchor] source=set_scattered anchor=live_center value=%s" % center)
+	var anchor: Vector3
+	var anchor_source: String
+	if _last_target != Vector3.ZERO:
+		anchor = _last_target
+		anchor_source = "stored_last_target"
+	else:
+		anchor = _group_center()
+		anchor_source = "live_center_fallback"
+	print("[FormReform] set_scattered scattered=%s anchor_source=%s anchor=%s _last_target=%s" % [v, anchor_source, anchor, _last_target])
+	print("[FormAnchor] source=set_scattered anchor=%s value=%s" % [anchor_source, anchor])
 	_debug_caller = "set_scattered"
-	_issue_slots(center, _last_facing)
+	_issue_slots(anchor, _last_facing)
 
 
 func _process(delta):
