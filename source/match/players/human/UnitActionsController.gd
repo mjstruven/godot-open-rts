@@ -35,10 +35,10 @@ class Actions:
 	const StandingGround = preload("res://source/match/units/actions/StandingGround.gd")
 	const Patrolling = preload("res://source/match/units/actions/Patrolling.gd")
 	const ChargingPhaseA = preload("res://source/match/units/actions/ChargingPhaseA.gd")
-	const Bolstering = preload("res://source/match/units/actions/Bolstering.gd")
-	const BolsterPhaseA = preload("res://source/match/units/actions/BolsterPhaseA.gd")
 	const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTargets.gd")
 
+
+const BolsterBuff = preload("res://source/match/units/traits/BolsterBuff.gd")
 
 var _pending_command: String = ""
 var _crosshair_image: Image = null
@@ -149,9 +149,6 @@ func _ready():
 	var ctm = get_parent().find_child("ChargeTargetingMode")
 	if ctm != null:
 		ctm.charge_area_confirmed.connect(_on_charge_area_confirmed)
-	var btm = get_parent().find_child("BolsterTargetingMode")
-	if btm != null:
-		btm.bolster_area_confirmed.connect(_on_bolster_area_confirmed)
 
 
 func _try_navigating_selected_units_towards_position(target_point):
@@ -377,14 +374,23 @@ func _on_combat_command_requested(command: String):
 			if ctm != null:
 				ctm.enter()
 		"bolster":
-			var btm = get_parent().find_child("BolsterTargetingMode")
-			if btm != null:
-				btm.enter()
+			for unit in get_tree().get_nodes_in_group("selected_units"):
+				if (
+					unit.is_in_group("controlled_units")
+					and unit.get("type") == "infantry"
+					and not unit.is_in_group("bolstering")
+					and _is_bolster_ready(unit)
+				):
+					var buff = BolsterBuff.new()
+					buff.name = "BolsterBuff"
+					unit.add_child(buff)
 		"cancel_bolster":
 			for unit in get_tree().get_nodes_in_group("selected_units"):
 				if unit.is_in_group("controlled_units") and unit.is_in_group("bolstering"):
-					unit.action_queue.clear()
-					unit.action = Actions.WaitingForTargets.new()
+					for child in unit.get_children():
+						if child is BolsterBuff:
+							child.queue_free()
+							break
 
 
 func _apply_stand_ground():
@@ -529,38 +535,11 @@ func _on_unit_spawned(unit):
 		_try_ordering_selected_workers_to_construct_structure(unit)
 
 
-func _on_bolster_area_confirmed(
-	start_pos: Vector3, end_pos: Vector3, _direction: Vector3, distance: float
-):
-	var btm = get_parent().find_child("BolsterTargetingMode")
-	var participants: Array = btm.last_bolster_participants if btm != null else []
-	if participants.is_empty():
-		return
-	if distance < 0.5:
-		for unit in participants:
-			unit.action_queue.clear()
-			unit.action = Actions.Bolstering.new()
-		return
-	var center_x := 0.0
-	var center_z := 0.0
-	for unit in participants:
-		center_x += unit.global_position.x
-		center_z += unit.global_position.z
-	var n := participants.size()
-	center_x /= float(n)
-	center_z /= float(n)
-	for unit in participants:
-		var ox: float = unit.global_position.x - center_x
-		var oz: float = unit.global_position.z - center_z
-		var lane_start := Vector3(start_pos.x + ox, 0.0, start_pos.z + oz)
-		var lane_end := Vector3(end_pos.x + ox, 0.0, end_pos.z + oz)
-		unit.action_queue.clear()
-		unit.action = Actions.BolsterPhaseA.new(lane_start, lane_end)
-	if distance >= 0.5 and btm != null:
-		for unit in btm.last_bolster_cooldown_infantry:
-			if Actions.AttackMoving.is_applicable(unit):
-				unit.action_queue.clear()
-				unit.action = Actions.AttackMoving.new(end_pos)
+func _is_bolster_ready(unit) -> bool:
+	return (
+		not unit.has_meta("bolster_cooldown_end_ms")
+		or Time.get_ticks_msec() >= unit.get_meta("bolster_cooldown_end_ms")
+	)
 
 
 func _on_charge_area_confirmed(
