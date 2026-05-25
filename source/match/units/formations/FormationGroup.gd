@@ -26,6 +26,7 @@ var _slot_positions: Dictionary = {}
 var _last_target: Vector3 = Vector3.ZERO
 var _last_facing: Vector3 = -Vector3.FORWARD
 var _speed_timer: float = 0.0
+var _tick_log_timer: float = 0.0
 
 
 func setup(units: Array):
@@ -49,6 +50,13 @@ func issue_move(target: Vector3):
 	if dir.length() > 0.1:
 		_last_facing = dir.normalized()
 	_issue_slots(target, _last_facing)
+	# DEBUG: confirm slot spread after assignment
+	for unit in _slot_positions:
+		var slot = _slot_positions[unit]
+		print(
+			"[FormMove] unit=%s type=%s slot_pos=%s group_target=%s dist_slot_to_target=%.2f"
+			% [unit.name, unit.get("type"), slot, target, slot.distance_to(target)]
+		)
 
 
 func on_member_died(unit):
@@ -77,6 +85,23 @@ func _process(delta):
 	if _speed_timer >= SPEED_CAP_INTERVAL:
 		_speed_timer = 0.0
 		_apply_speed_cap()
+	# DEBUG: once-per-second action/position tick
+	_tick_log_timer += delta
+	if _tick_log_timer >= 1.0:
+		_tick_log_timer = 0.0
+		for unit in members:
+			if not is_instance_valid(unit):
+				continue
+			var slot = _slot_positions.get(unit)
+			var act_name := "null"
+			if unit.action != null:
+				var sc = unit.action.get_script()
+				act_name = sc.resource_path.get_file() if sc != null else unit.action.get_class()
+			var dist: float = unit.global_position.distance_to(slot) if slot != null else -1.0
+			print(
+				"[FormTick] unit=%s current_action=%s slot_pos=%s actual_pos=%s dist_to_slot=%.2f"
+				% [unit.name, act_name, slot, unit.global_position, dist]
+			)
 
 
 func _apply_speed_cap():
@@ -145,6 +170,8 @@ func _issue_line(units: Array, target: Vector3, facing: Vector3, right: Vector3,
 			pos.y = target.y
 			var unit = sorted[idx]
 			_slot_positions[unit] = pos
+			# DEBUG: confirm per-unit slot assignment
+			print("[FormSlot] unit=%s assigned Moving to %s" % [unit.name, pos])
 			unit.action = Moving.new(pos)
 			idx += 1
 
@@ -195,6 +222,8 @@ func _issue_box(units: Array, target: Vector3, facing: Vector3, right: Vector3, 
 		_slot_positions[leftover_u[i]] = leftover_s[i]
 
 	for unit in _slot_positions:
+		# DEBUG: confirm per-unit slot assignment
+		print("[FormSlot] unit=%s assigned Moving to %s" % [unit.name, _slot_positions[unit]])
 		unit.action = Moving.new(_slot_positions[unit])
 
 
