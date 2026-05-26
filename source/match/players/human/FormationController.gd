@@ -3,6 +3,9 @@ extends Node
 const Moving = preload("res://source/match/units/actions/Moving.gd")
 const Constructing = preload("res://source/match/units/actions/Constructing.gd")
 const FormationGroup = preload("res://source/match/units/formations/FormationGroup.gd")
+const LoadingIntoGarrison = preload("res://source/match/units/actions/LoadingIntoGarrison.gd")
+const LoadingIntoCrew = preload("res://source/match/units/actions/LoadingIntoCrew.gd")
+const ApproachingExternalCrew = preload("res://source/match/units/actions/ApproachingExternalCrew.gd")
 
 const FORMATION_CORE_TYPES = ["cavalry", "flag_commander", "infantry", "archer", "siege", "supply_train"]
 const FORMATION_ELIGIBLE_TYPES = ["cavalry", "flag_commander", "infantry", "archer", "siege", "supply_train", "engineer"]
@@ -82,6 +85,18 @@ func _on_terrain_targeted(position: Vector3):
 		return
 
 	var eligible = _get_eligible_selected_units()
+
+	if eligible.any(
+		func(u):
+			return (
+				u.action is LoadingIntoGarrison
+				or u.action is LoadingIntoCrew
+				or u.action is ApproachingExternalCrew
+			)
+	):
+		_disband()
+		return
+
 	var core = eligible.filter(func(u): return u.type in FORMATION_CORE_TYPES)
 
 	if core.size() < 2:
