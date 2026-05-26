@@ -11,8 +11,8 @@ colors = PackedColorArray(0, 1, 0, 1, 0.292969, 0.292969, 0.292969, 1)
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_p6fyg"]
 resource_local_to_scene = true
 gradient = SubResource("Gradient_gked8")
-width = 200
-height = 20
+width = 80
+height = 8
 
 [node name="HealthBar" type="Node3D"]
 script = ExtResource("1_md17c")

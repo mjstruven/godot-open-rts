@@ -65,7 +65,7 @@ speed = 2.0
 
 [node name="HealthBar" parent="." instance=ExtResource("5_cavhb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.40, 0)
-size = Vector2(160, 10)
+size = Vector2(64, 4)
 
 [node name="Targetability" parent="." instance=ExtResource("6_cavta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)

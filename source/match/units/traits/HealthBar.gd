@@ -1,7 +1,7 @@
 @tool
 extends Node3D
 
-@export var size = Vector2(200, 20):
+@export var size = Vector2(80, 8):
 	set(value):
 		size = value
 		find_child("ActualBar").texture.width = size.x
