@@ -1,6 +1,9 @@
 extends Node
 
 const Moving = preload("res://source/match/units/actions/Moving.gd")
+const LoadingIntoGarrison = preload("res://source/match/units/actions/LoadingIntoGarrison.gd")
+const LoadingIntoCrew = preload("res://source/match/units/actions/LoadingIntoCrew.gd")
+const ApproachingExternalCrew = preload("res://source/match/units/actions/ApproachingExternalCrew.gd")
 
 enum Type { COLUMN, BOX, RANKS }
 
@@ -104,10 +107,14 @@ func _process(delta):
 
 
 func _update_slot_targets():
+	var to_eject: Array = []
 	for unit in _slot_offsets:
 		if not is_instance_valid(unit):
 			continue
 		if unit.is_in_group("garrisoned"):
+			continue
+		if _is_loading(unit):
+			to_eject.append(unit)
 			continue
 		var new_slot = _anchor_pos + _slot_offsets[unit]
 		new_slot.y = _last_target.y
@@ -115,6 +122,8 @@ func _update_slot_targets():
 		if old_slot.distance_to(new_slot) > ANCHOR_MOVE_THRESHOLD:
 			_slot_positions[unit] = new_slot
 			unit.action = Moving.new(new_slot)
+	for unit in to_eject:
+		on_member_died(unit)
 
 
 func _compute_anchor_speed() -> float:
@@ -197,11 +206,12 @@ func _issue_line(units: Array, target: Vector3, facing: Vector3, right: Vector3,
 			)
 			pos.y = target.y
 			var unit = sorted[idx]
-			var offset = pos - target
-			offset.y = 0.0
-			_slot_offsets[unit] = offset
-			_slot_positions[unit] = pos
-			unit.action = Moving.new(pos)
+			if not _is_loading(unit):
+				var offset = pos - target
+				offset.y = 0.0
+				_slot_offsets[unit] = offset
+				_slot_positions[unit] = pos
+				unit.action = Moving.new(pos)
 			idx += 1
 
 
@@ -251,6 +261,8 @@ func _issue_box(units: Array, target: Vector3, facing: Vector3, right: Vector3, 
 		_slot_positions[leftover_u[i]] = leftover_s[i]
 
 	for unit in _slot_positions:
+		if _is_loading(unit):
+			continue
 		var slot = _slot_positions[unit]
 		var offset = slot - target
 		offset.y = 0.0
@@ -272,14 +284,24 @@ func _line_priority(unit) -> int:
 	return _LINE_PRIORITY.get(unit.type, 99)
 
 
+func _is_loading(unit) -> bool:
+	return (
+		unit.action is LoadingIntoGarrison
+		or unit.action is LoadingIntoCrew
+		or unit.action is ApproachingExternalCrew
+	)
+
+
 func _release_unit(unit):
 	if not is_instance_valid(unit):
 		return
+	print("[FOOT] release_unit | %s | action=%s" % [unit.name, str(unit.action)])
 	var mv = unit.find_child("Movement")
 	if mv != null and not unit.is_in_group("bolstering"):
 		mv.recompute_speed()
 	if unit.is_in_group("in_formation"):
 		unit.remove_from_group("in_formation")
+	print("[FOOT] release_unit done | %s | action=%s" % [unit.name, str(unit.action)])
 
 
 func _group_center() -> Vector3:
