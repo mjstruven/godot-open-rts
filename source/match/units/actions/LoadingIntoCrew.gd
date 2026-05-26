@@ -23,7 +23,7 @@ func _ready():
 
 
 func _approach_or_load():
-	var load_dist = _unit.radius + _target.radius + 0.5
+	var load_dist = _unit.radius + _target.radius + Constants.Match.Terrain.Navmesh.MAX_AGENT_RADIUS + 0.2
 	var dist = _unit.global_position_yless.distance_to(_target.global_position_yless)
 	if dist <= load_dist:
 		_load_into_target()
