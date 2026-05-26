@@ -35,7 +35,7 @@ radius = 1.5
 radius = 1.5
 vertices = PackedVector3Array(0, 0, -1.5, 1.06, 0, -1.06, 1.5, 0, 0, 1.06, 0, 1.06, 0, 0, 1.5, -1.06, 0, 1.06, -1.5, 0, 0, -1.06, 0, -1.06)
 affect_navigation_mesh = true
-path_height_offset = 1.7
+path_height_offset = 0.6
 
 [node name="HealthBar" parent="." instance=ExtResource("6_twhb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, 0)
