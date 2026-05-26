@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://towergeom00001"]
+[gd_scene format=3 uid="uid://du1s5sfs0m761"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_twbase"]
 albedo_color = Color(0.52, 0.54, 0.58, 1)
@@ -9,28 +9,78 @@ albedo_color = Color(0.30, 0.32, 0.36, 1)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_twcap"]
 albedo_color = Color(0.40, 0.42, 0.46, 1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_twbase"]
+[sub_resource type="BoxMesh" id="BoxMesh_twfound"]
 material = SubResource("StandardMaterial3D_twbase")
-size = Vector3(0.9, 0.15, 0.9)
+size = Vector3(2.4, 0.3, 2.4)
 
-[sub_resource type="BoxMesh" id="BoxMesh_twshaft"]
+[sub_resource type="BoxMesh" id="BoxMesh_twbody"]
 material = SubResource("StandardMaterial3D_twshaft")
-size = Vector3(0.65, 1.5, 0.65)
+size = Vector3(1.6, 2.8, 1.6)
 
-[sub_resource type="BoxMesh" id="BoxMesh_twcap"]
+[sub_resource type="BoxMesh" id="BoxMesh_twslab"]
 material = SubResource("StandardMaterial3D_twcap")
-size = Vector3(0.75, 0.12, 0.75)
+size = Vector3(2.2, 0.2, 2.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_twmerlon"]
+material = SubResource("StandardMaterial3D_twcap")
+size = Vector3(0.35, 0.4, 0.35)
 
 [node name="Geometry" type="Node3D"]
 
-[node name="Base" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
-mesh = SubResource("BoxMesh_twbase")
+[node name="Foundation" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("BoxMesh_twfound")
 
-[node name="Shaft" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-mesh = SubResource("BoxMesh_twshaft")
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+mesh = SubResource("BoxMesh_twbody")
 
-[node name="Cap" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.71, 0)
-mesh = SubResource("BoxMesh_twcap")
+[node name="RoofSlab" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+mesh = SubResource("BoxMesh_twslab")
+
+[node name="MerlonN" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -0.85)
+mesh = SubResource("BoxMesh_twmerlon")
+
+[node name="MerlonS" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0.85)
+mesh = SubResource("BoxMesh_twmerlon")
+
+[node name="MerlonE" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85, 3.5, 0)
+mesh = SubResource("BoxMesh_twmerlon")
+
+[node name="MerlonW" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.85, 3.5, 0)
+mesh = SubResource("BoxMesh_twmerlon")
+
+[node name="MerlonNE" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85, 3.5, -0.85)
+mesh = SubResource("BoxMesh_twmerlon")
+
+[node name="MerlonNW" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.85, 3.5, -0.85)
+mesh = SubResource("BoxMesh_twmerlon")
+
+[node name="MerlonSE" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85, 3.5, 0.85)
+mesh = SubResource("BoxMesh_twmerlon")
+
+[node name="MerlonSW" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.85, 3.5, 0.85)
+mesh = SubResource("BoxMesh_twmerlon")
+
+[node name="GarrisonSlots" type="Node3D" parent="."]
+
+[node name="GarrisonSlot1" type="Node3D" parent="GarrisonSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, 3.31, -0.35)
+
+[node name="GarrisonSlot2" type="Node3D" parent="GarrisonSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 3.31, -0.35)
+
+[node name="GarrisonSlot3" type="Node3D" parent="GarrisonSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, 3.31, 0.35)
+
+[node name="GarrisonSlot4" type="Node3D" parent="GarrisonSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 3.31, 0.35)
