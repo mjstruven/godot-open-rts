@@ -43,8 +43,9 @@ func set_formation_type(t: int):
 	var _in_form = get_tree().get_nodes_in_group("in_formation")
 	print("[FormBtn] set_formation_type type=%d group_id=%s" % [t, str(_group.get_instance_id()) if _group != null else "null"])
 	print("[FormInGroup] count=%d units=%s" % [_in_form.size(), _in_form.map(func(u): return u.name)])
-	if _group != null:
-		_group.set_formation_type(t)
+	if not _sync_group_to_selection():
+		return
+	_group.set_formation_type(t)
 	MatchSignals.formation_changed.emit()
 
 
@@ -53,8 +54,9 @@ func set_scattered(v: bool):
 	var _in_form = get_tree().get_nodes_in_group("in_formation")
 	print("[FormBtn] set_scattered scattered=%s group_id=%s" % [v, str(_group.get_instance_id()) if _group != null else "null"])
 	print("[FormInGroup] count=%d units=%s" % [_in_form.size(), _in_form.map(func(u): return u.name)])
-	if _group != null:
-		_group.set_scattered(v)
+	if not _sync_group_to_selection():
+		return
+	_group.set_scattered(v)
 	MatchSignals.formation_changed.emit()
 
 
@@ -101,6 +103,24 @@ func _on_unit_died(unit):
 		_disband()
 	else:
 		MatchSignals.formation_changed.emit()
+
+
+func _sync_group_to_selection() -> bool:
+	var eligible = _get_eligible_selected_units()
+	var core = eligible.filter(func(u): return u.type in FORMATION_CORE_TYPES)
+	if core.size() < 2:
+		return false
+	if _group != null:
+		var current = _group.members.filter(func(u): return is_instance_valid(u))
+		if _same_members(current, eligible):
+			return true
+		_disband()
+	_group = FormationGroup.new()
+	add_child(_group)
+	_group.formation_type = _formation_type
+	_group.scattered = _scattered
+	_group.setup(eligible)
+	return true
 
 
 func _disband():
