@@ -30,6 +30,12 @@ func has_active_formation() -> bool:
 	return _group != null and not _group.members.is_empty()
 
 
+func can_form() -> bool:
+	var eligible = _get_eligible_selected_units()
+	var core = eligible.filter(func(u): return u.type in FORMATION_CORE_TYPES)
+	return core.size() >= 2
+
+
 func get_formation_type() -> int:
 	return _group.formation_type if _group != null else _formation_type
 

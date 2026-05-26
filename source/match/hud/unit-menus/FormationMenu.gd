@@ -2,16 +2,41 @@ extends GridContainer
 
 const FormationGroup = preload("res://source/match/units/formations/FormationGroup.gd")
 
+var _formation_button_group: ButtonGroup = null
+
+
+func _ready():
+	_formation_button_group = ButtonGroup.new()
+	_formation_button_group.allow_unpress = false
+	find_child("ColumnButton").button_group = _formation_button_group
+	find_child("RanksButton").button_group = _formation_button_group
+	find_child("BoxButton").button_group = _formation_button_group
+
 
 func update_buttons():
 	var fc = _fc()
 	if fc == null:
 		return
+	var col_btn = find_child("ColumnButton")
+	var rnk_btn = find_child("RanksButton")
+	var box_btn = find_child("BoxButton")
+	var sca_btn = find_child("ScatterButton")
+	var enabled = fc.can_form()
+	col_btn.disabled = not enabled
+	rnk_btn.disabled = not enabled
+	box_btn.disabled = not enabled
+	sca_btn.disabled = not enabled
+	if not enabled:
+		col_btn.set_pressed_no_signal(false)
+		rnk_btn.set_pressed_no_signal(false)
+		box_btn.set_pressed_no_signal(false)
+		sca_btn.set_pressed_no_signal(false)
+		return
 	var ft = fc.get_formation_type()
-	find_child("ColumnButton").set_pressed_no_signal(ft == FormationGroup.Type.COLUMN)
-	find_child("BoxButton").set_pressed_no_signal(ft == FormationGroup.Type.BOX)
-	find_child("RanksButton").set_pressed_no_signal(ft == FormationGroup.Type.RANKS)
-	find_child("ScatterButton").set_pressed_no_signal(fc.get_scattered())
+	col_btn.set_pressed_no_signal(ft == FormationGroup.Type.COLUMN)
+	rnk_btn.set_pressed_no_signal(ft == FormationGroup.Type.RANKS)
+	box_btn.set_pressed_no_signal(ft == FormationGroup.Type.BOX)
+	sca_btn.set_pressed_no_signal(fc.get_scattered())
 
 
 func _on_column_pressed():
