@@ -132,6 +132,7 @@ func _garrison_direct(unit: Node) -> void:
 	unit.set_meta("garrison_of", _tower)
 	_garrisoned.append(unit)
 	_assign_roof_slot(unit)
+	unit.reset_terrain_visual_offset()
 	var sg_applicable = StandingGround.is_applicable(unit)
 	unit.action = StandingGround.new() if sg_applicable else WaitingForTargets.new()
 	_original_type[unit] = "archer"
@@ -142,13 +143,14 @@ func _swap_garrison_infantry(infantry: Node) -> void:
 	var hp_fraction = float(infantry.hp) / float(infantry.hp_max)
 	var archer_hp_max = Constants.Match.Units.DEFAULT_PROPERTIES[ARCHER_PATH]["hp_max"]
 	var archer = ArcherScene.instantiate()
-	MatchSignals.setup_and_spawn_unit.emit(archer, infantry.global_transform, infantry.player)
-	archer.hp = clampi(roundi(hp_fraction * archer_hp_max), 1, archer_hp_max)
 	archer.add_to_group("garrisoned")
 	archer.set_meta("garrison_of", _tower)
+	MatchSignals.setup_and_spawn_unit.emit(archer, infantry.global_transform, infantry.player)
+	archer.hp = clampi(roundi(hp_fraction * archer_hp_max), 1, archer_hp_max)
 	archer.action_queue.clear()
 	_garrisoned.append(archer)
 	_assign_roof_slot(archer)
+	archer.reset_terrain_visual_offset()
 	var sg_applicable = StandingGround.is_applicable(archer)
 	archer.action = StandingGround.new() if sg_applicable else WaitingForTargets.new()
 	_original_type[archer] = "infantry"

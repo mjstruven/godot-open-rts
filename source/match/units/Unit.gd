@@ -103,6 +103,17 @@ func _update_visual_height() -> void:
 			node.position.y = _visual_ui_base_y[i] + offset
 
 
+func reset_terrain_visual_offset() -> void:
+	if _geometry != null:
+		(_geometry as Node3D).position.y = 0.0
+	if _collision_shape != null:
+		_collision_shape.position.y = _cs_base_y
+	for i: int in range(_visual_ui_nodes.size()):
+		var node: Node3D = _visual_ui_nodes[i]
+		if is_instance_valid(node):
+			node.position.y = _visual_ui_base_y[i]
+
+
 func _collect_visual_ui_nodes() -> void:
 	for child in get_children():
 		if child == _geometry:
