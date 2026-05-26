@@ -295,13 +295,11 @@ func _is_loading(unit) -> bool:
 func _release_unit(unit):
 	if not is_instance_valid(unit):
 		return
-	print("[FOOT] release_unit | %s | action=%s" % [unit.name, str(unit.action)])
 	var mv = unit.find_child("Movement")
 	if mv != null and not unit.is_in_group("bolstering"):
 		mv.recompute_speed()
 	if unit.is_in_group("in_formation"):
 		unit.remove_from_group("in_formation")
-	print("[FOOT] release_unit done | %s | action=%s" % [unit.name, str(unit.action)])
 
 
 func _group_center() -> Vector3:
