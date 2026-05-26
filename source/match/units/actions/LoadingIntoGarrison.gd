@@ -46,7 +46,6 @@ func _enter_garrison():
 		return
 	var gm = _target.find_child("GarrisonManager")
 	var can = gm != null and gm.can_accept_unit(_unit)
-	print("[GTrace] _enter_garrison: unit=%s gm=%s can_accept=%s" % [_unit.name, str(gm), str(can)])
 	if can:
 		gm.garrison_unit(_unit)
 	else:

@@ -304,10 +304,6 @@ func _navigate_unit_towards_unit(unit, target_unit):
 	# Garrison: infantry/archer/siege right-clicking their own Tower
 	var garrison_manager = target_unit.find_child("GarrisonManager")
 	if garrison_manager != null:
-		print("[GTrace] Garrison branch: unit=%s target=%s same_player=%s can_accept=%s" % [
-			unit.name, target_unit.name, str(target_unit.player == unit.player),
-			str(garrison_manager.can_accept_unit(unit))
-		])
 		if target_unit.player == unit.player and garrison_manager.can_accept_unit(unit):
 			var tgt = target_unit
 			_set_or_queue_action(
@@ -316,11 +312,6 @@ func _navigate_unit_towards_unit(unit, target_unit):
 				tgt.global_position
 			)
 			return true
-	# [GarrDiag] Step 2: garrison branch would live here — GarrisonManager does not exist
-	if target_unit.is_in_group("towers"):
-		print("[GarrDiag] Garrison branch reached for unit=%s targeting Tower=%s; Tower.find_child(GarrisonManager)=%s" % [
-			unit.name, target_unit.name, target_unit.find_child("GarrisonManager")
-		])
 	if Actions.CollectingResourcesSequentially.is_applicable(unit, target_unit):
 		unit.action_queue.clear()
 		unit.action = Actions.CollectingResourcesSequentially.new(target_unit)
@@ -372,14 +363,10 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		(target_unit.is_in_group("adversary_units") or target_unit.is_in_group("controlled_units"))
 		and Actions.Following.is_applicable(unit)
 	):
-		if target_unit.is_in_group("towers"):
-			print("[GarrDiag] Fell through to Following for unit=%s on Tower — garrison path missing" % unit.name)
 		var tgt = target_unit
 		_set_or_queue_action(unit, func(): unit.action = Actions.Following.new(tgt), tgt.global_position)
 		return true
 	if Actions.MovingToUnit.is_applicable(unit):
-		if target_unit.is_in_group("towers"):
-			print("[GarrDiag] Fell through to MovingToUnit for unit=%s on Tower — garrison path missing" % unit.name)
 		var tgt = target_unit
 		_set_or_queue_action(unit, func(): unit.action = Actions.MovingToUnit.new(tgt), tgt.global_position)
 		return true
@@ -565,12 +552,6 @@ func _apply_attack_ground(position: Vector3):
 
 
 func _on_unit_targeted(unit):
-	if unit.is_in_group("towers"):
-		var sel = get_tree().get_nodes_in_group("selected_units")
-		print("[GarrDiag] unit_targeted on Tower; %d unit(s) selected: %s" % [
-			sel.size(),
-			sel.map(func(u): return u.name)
-		])
 	if _navigate_selected_units_towards_unit(unit):
 		var targetability = unit.find_child("Targetability")
 		if targetability != null:

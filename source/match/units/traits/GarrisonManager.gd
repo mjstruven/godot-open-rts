@@ -66,11 +66,6 @@ func garrison_unit(unit: Node) -> void:
 	unit.hide()
 	_set_interactive(unit, false)
 	print("[Garrison] %s entered tower (total=%d)" % [unit.name, _garrisoned.size()])
-	var _cs = unit.find_child("CollisionShape3D")
-	print("[GTrace] garrison_unit end: unit=%s visible=%s garrisoned=%s coll_disabled=%s" % [
-		unit.name, str(unit.visible), str(unit.is_in_group("garrisoned")),
-		str(_cs != null and _cs.disabled)
-	])
 
 
 func ungarrison_all() -> void:
