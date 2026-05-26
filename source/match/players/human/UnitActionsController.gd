@@ -177,6 +177,7 @@ func _try_navigating_selected_units_towards_position(target_point):
 				and Actions.Moving.is_applicable(unit)
 				and not _is_constructing(unit)
 				and not unit.is_in_group("suppressing")
+				and not unit.is_in_group("garrisoned")
 			)
 	)
 	var air_units_to_move = get_tree().get_nodes_in_group("selected_units").filter(
@@ -489,6 +490,7 @@ func _apply_attack_move(position: Vector3):
 				and sf != "trebuchet.gd"
 				and not _is_constructing(unit)
 				and not unit.is_in_group("suppressing")
+				and not unit.is_in_group("garrisoned")
 			)
 	)
 	var targets = Utils.Match.Unit.Movement.crowd_moved_to_new_pivot(terrain_units, position)
@@ -509,6 +511,7 @@ func _apply_patrol(position: Vector3):
 				and sf != "trebuchet.gd"
 				and not _is_constructing(unit)
 				and not unit.is_in_group("suppressing")
+				and not unit.is_in_group("garrisoned")
 			)
 	)
 	var targets = Utils.Match.Unit.Movement.crowd_moved_to_new_pivot(terrain_units, position)

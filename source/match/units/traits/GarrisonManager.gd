@@ -14,8 +14,10 @@ const MAX_FOOT = 4
 const MAX_SIEGE = 1
 
 const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTargets.gd")
+const StandingGround = preload("res://source/match/units/actions/StandingGround.gd")
 
 var _garrisoned: Array = []
+var _garrisoned_slots: Dictionary = {}
 
 @onready var _tower = get_parent()
 
@@ -44,7 +46,43 @@ func _category(unit) -> String:
 	return ""
 
 
+func _cleanup_dead() -> void:
+	_garrisoned = _garrisoned.filter(func(u): return is_instance_valid(u))
+	for u in _garrisoned_slots.keys().duplicate():
+		if not is_instance_valid(u):
+			_garrisoned_slots.erase(u)
+
+
+func _assign_roof_slot(unit: Node) -> void:
+	_cleanup_dead()
+	var slots_node = _tower.find_child("GarrisonSlots")
+	if slots_node == null:
+		return
+	var cat = _category(unit)
+	if cat == "siege":
+		var total = Vector3.ZERO
+		var count = 0
+		for slot in slots_node.get_children():
+			total += slot.global_position
+			count += 1
+		if count > 0:
+			unit.global_position = total / count
+		_garrisoned_slots[unit] = ""
+	else:
+		var used = _garrisoned_slots.values()
+		for slot in slots_node.get_children():
+			if slot.name not in used:
+				unit.global_position = slot.global_position
+				_garrisoned_slots[unit] = slot.name
+				return
+
+
+func _release_slot(unit: Node) -> void:
+	_garrisoned_slots.erase(unit)
+
+
 func can_accept_unit(unit) -> bool:
+	_cleanup_dead()
 	var cat = _category(unit)
 	if cat == "":
 		return false
@@ -70,8 +108,8 @@ func garrison_unit(unit: Node) -> void:
 	if unit.is_in_group("selected_units"):
 		unit.remove_from_group("selected_units")
 		MatchSignals.unit_deselected.emit(unit)
-	unit.hide()
-	_set_interactive(unit, false)
+	_assign_roof_slot(unit)
+	unit.action = StandingGround.new() if StandingGround.is_applicable(unit) else WaitingForTargets.new()
 	print("[Garrison] %s entered tower (total=%d)" % [unit.name, _garrisoned.size()])
 	garrison_changed.emit()
 
@@ -100,11 +138,13 @@ func kill_all_occupants() -> void:
 		if is_instance_valid(unit):
 			unit.hp = 0
 	_garrisoned.clear()
+	_garrisoned_slots.clear()
 
 
 func _release(unit: Node) -> void:
 	if not is_instance_valid(unit):
 		return
+	_release_slot(unit)
 	unit.remove_from_group("garrisoned")
 	if unit.has_meta("garrison_of"):
 		unit.remove_meta("garrison_of")
