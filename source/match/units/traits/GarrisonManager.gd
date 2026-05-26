@@ -3,6 +3,7 @@ extends Node
 signal garrison_changed
 
 const FOOT_SOLDIER_PATHS = [
+	"res://source/match/units/infantry.tscn",
 	"res://source/match/units/archer.tscn",
 ]
 const SIEGE_PATHS = [
@@ -12,6 +13,7 @@ const SIEGE_PATHS = [
 const MAX_FOOT = 4
 const MAX_SIEGE = 1
 
+const InertAction = preload("res://source/match/units/actions/Action.gd")
 const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTargets.gd")
 const StandingGround = preload("res://source/match/units/actions/StandingGround.gd")
 
@@ -119,8 +121,11 @@ func _garrison_direct(unit: Node) -> void:
 	_garrisoned.append(unit)
 	_assign_roof_slot(unit)
 	unit.reset_terrain_visual_offset()
-	var sg_applicable = StandingGround.is_applicable(unit)
-	unit.action = StandingGround.new() if sg_applicable else WaitingForTargets.new()
+	if unit.type == "infantry":
+		unit.action = InertAction.new()
+	else:
+		var sg_applicable = StandingGround.is_applicable(unit)
+		unit.action = StandingGround.new() if sg_applicable else WaitingForTargets.new()
 	print("[Garrison] %s entered tower (total=%d)" % [unit.name, _garrisoned.size()])
 
 
