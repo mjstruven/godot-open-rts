@@ -143,6 +143,8 @@ class Units:
 		"res://source/match/units/structure-geometries/CommandPostGeometry.tscn",
 		"res://source/match/units/siege_workshop.tscn":
 		"res://source/match/units/structure-geometries/SiegeWorkshopGeometry.tscn",
+		"res://source/match/units/tower.tscn":
+		"res://source/match/units/structure-geometries/TowerGeometry.tscn",
 	}
 	const CONSTRUCTION_COSTS = {
 		"res://source/match/units/grain_mill.tscn": {"wood": 50, "stone": 20},
@@ -154,6 +156,7 @@ class Units:
 		"res://source/match/units/capital.tscn": {"wood": 600, "stone": 400},
 		"res://source/match/units/command_post.tscn": {"wood": 600, "stone": 400},
 		"res://source/match/units/siege_workshop.tscn": {"wood": 400, "stone": 300},
+		"res://source/match/units/tower.tscn": {"stone": 200, "wood": 100},
 	}
 	const DEFAULT_PROPERTIES = {
 		"res://source/match/units/infantry.tscn":
@@ -247,6 +250,7 @@ class Units:
 		"res://source/match/units/civilian.tscn": {"sight_range": 2.0, "hp": 10, "hp_max": 10},
 		"res://source/match/units/siege_workshop.tscn":
 		{"sight_range": 8.0, "hp": 3000, "hp_max": 3000},
+		"res://source/match/units/tower.tscn": {"sight_range": 12.0, "hp": 2000, "hp_max": 2000},
 		"res://source/match/units/battering_ram.tscn":
 		{
 			"sight_range": 6.0,

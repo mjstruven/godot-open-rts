@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://towergeom00001"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_twbase"]
+albedo_color = Color(0.52, 0.54, 0.58, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_twshaft"]
+albedo_color = Color(0.30, 0.32, 0.36, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_twcap"]
+albedo_color = Color(0.40, 0.42, 0.46, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_twbase"]
+material = SubResource("StandardMaterial3D_twbase")
+size = Vector3(0.9, 0.15, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_twshaft"]
+material = SubResource("StandardMaterial3D_twshaft")
+size = Vector3(0.65, 1.5, 0.65)
+
+[sub_resource type="BoxMesh" id="BoxMesh_twcap"]
+material = SubResource("StandardMaterial3D_twcap")
+size = Vector3(0.75, 0.12, 0.75)
+
+[node name="Geometry" type="Node3D"]
+
+[node name="Base" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
+mesh = SubResource("BoxMesh_twbase")
+
+[node name="Shaft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("BoxMesh_twshaft")
+
+[node name="Cap" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.71, 0)
+mesh = SubResource("BoxMesh_twcap")

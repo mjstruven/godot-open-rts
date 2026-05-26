@@ -10,6 +10,7 @@ const ManorUnit = preload("res://source/match/units/manor.tscn")
 const AcademyUnit = preload("res://source/match/units/academy.tscn")
 const CommandPostUnit = preload("res://source/match/units/command_post.tscn")
 const SiegeWorkshopUnit = preload("res://source/match/units/siege_workshop.tscn")
+const TowerUnit = preload("res://source/match/units/tower.tscn")
 
 @onready var _root_grid = find_child("RootGrid")
 @onready var _economic_grid = find_child("EconomicGrid")
@@ -24,6 +25,7 @@ const SiegeWorkshopUnit = preload("res://source/match/units/siege_workshop.tscn"
 @onready var _academy_btn = find_child("PlaceAcademyButton")
 @onready var _command_post_btn = find_child("PlaceCommandPostButton")
 @onready var _siege_workshop_btn = find_child("PlaceSiegeWorkshopButton")
+@onready var _tower_btn = find_child("PlaceTowerButton")
 
 var units: Array = []:
 	set(value):
@@ -53,6 +55,7 @@ func _process(_delta):
 		_refresh_button(_academy_btn, AcademyUnit, player)
 		_refresh_button(_command_post_btn, CommandPostUnit, player)
 		_refresh_button(_siege_workshop_btn, SiegeWorkshopUnit, player)
+		_refresh_button(_tower_btn, TowerUnit, player)
 
 
 func _refresh_button(btn: Button, scene: PackedScene, player):
@@ -142,3 +145,7 @@ func _on_place_command_post_pressed():
 
 func _on_place_siege_workshop_pressed():
 	MatchSignals.place_structure.emit(SiegeWorkshopUnit)
+
+
+func _on_place_tower_pressed():
+	MatchSignals.place_structure.emit(TowerUnit)
