@@ -21,7 +21,8 @@ func update_buttons():
 	var rnk_btn = find_child("RanksButton")
 	var box_btn = find_child("BoxButton")
 	var sca_btn = find_child("ScatterButton")
-	var enabled = fc.can_form()
+	var state = fc.selection_formation_state()
+	var enabled: bool = state["can_form"]
 	col_btn.disabled = not enabled
 	rnk_btn.disabled = not enabled
 	box_btn.disabled = not enabled
@@ -32,11 +33,11 @@ func update_buttons():
 		box_btn.set_pressed_no_signal(false)
 		sca_btn.set_pressed_no_signal(false)
 		return
-	var ft = fc.get_formation_type()
+	var ft: int = state["type"]
 	col_btn.set_pressed_no_signal(ft == FormationGroup.Type.COLUMN)
 	rnk_btn.set_pressed_no_signal(ft == FormationGroup.Type.RANKS)
 	box_btn.set_pressed_no_signal(ft == FormationGroup.Type.BOX)
-	sca_btn.set_pressed_no_signal(fc.get_scattered())
+	sca_btn.set_pressed_no_signal(state["scattered"])
 
 
 func _on_column_pressed():

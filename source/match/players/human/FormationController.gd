@@ -36,6 +36,18 @@ func can_form() -> bool:
 	return core.size() >= 2
 
 
+func selection_formation_state() -> Dictionary:
+	var eligible = _get_eligible_selected_units()
+	var core = eligible.filter(func(u): return u.type in FORMATION_CORE_TYPES)
+	if core.size() < 2:
+		return {"can_form": false}
+	if _group != null:
+		var current = _group.members.filter(func(u): return is_instance_valid(u))
+		if _same_members(current, eligible):
+			return {"can_form": true, "type": _group.formation_type, "scattered": _group.scattered}
+	return {"can_form": true, "type": FormationGroup.Type.COLUMN, "scattered": false}
+
+
 func get_formation_type() -> int:
 	return _group.formation_type if _group != null else _formation_type
 
