@@ -107,6 +107,8 @@ func _update_slot_targets():
 	for unit in _slot_offsets:
 		if not is_instance_valid(unit):
 			continue
+		if unit.is_in_group("garrisoned"):
+			continue
 		var new_slot = _anchor_pos + _slot_offsets[unit]
 		new_slot.y = _last_target.y
 		var old_slot = _slot_positions.get(unit, new_slot + Vector3.ONE * 999.0)
@@ -156,7 +158,7 @@ func _issue_slots(target: Vector3, facing: Vector3):
 	var right = facing.cross(Vector3.UP).normalized()
 	var spacing = SLOT_SPACING_SCATTERED if scattered else SLOT_SPACING
 
-	var valid = members.filter(func(u): return is_instance_valid(u))
+	var valid = members.filter(func(u): return is_instance_valid(u) and not u.is_in_group("garrisoned"))
 	if valid.is_empty():
 		return
 

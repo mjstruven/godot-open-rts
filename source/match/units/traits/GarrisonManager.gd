@@ -157,6 +157,11 @@ func garrison_unit(unit: Node) -> void:
 	if unit.is_in_group("selected_units"):
 		unit.remove_from_group("selected_units")
 		MatchSignals.unit_deselected.emit(unit)
+	if unit.is_in_group("in_formation"):
+		for fc in get_tree().get_nodes_in_group("formation_controller"):
+			if fc._group != null and unit in fc._group.members:
+				fc._group.on_member_died(unit)
+				break
 	_assign_roof_slot(unit)
 	var sg_applicable = StandingGround.is_applicable(unit)
 	unit.action = StandingGround.new() if sg_applicable else WaitingForTargets.new()
