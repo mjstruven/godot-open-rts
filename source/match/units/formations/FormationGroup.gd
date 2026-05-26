@@ -80,14 +80,12 @@ func on_member_died(unit):
 func set_formation_type(t: int):
 	formation_type = t
 	var anchor = _anchor_pos if _anchor_pos != Vector3.ZERO else _group_center()
-	print("[FormApply] set_formation_type id=%d type=%d members=%s" % [get_instance_id(), t, members.map(func(u): return u.name if is_instance_valid(u) else "DEAD")])
 	_issue_slots(anchor, _last_facing)
 
 
 func set_scattered(v: bool):
 	scattered = v
 	var anchor = _anchor_pos if _anchor_pos != Vector3.ZERO else _group_center()
-	print("[FormApply] set_scattered id=%d scattered=%s members=%s" % [get_instance_id(), v, members.map(func(u): return u.name if is_instance_valid(u) else "DEAD")])
 	_issue_slots(anchor, _last_facing)
 
 

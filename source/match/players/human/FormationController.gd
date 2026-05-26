@@ -58,9 +58,6 @@ func get_scattered() -> bool:
 
 func set_formation_type(t: int):
 	_formation_type = t
-	var _in_form = get_tree().get_nodes_in_group("in_formation")
-	print("[FormBtn] set_formation_type type=%d group_id=%s" % [t, str(_group.get_instance_id()) if _group != null else "null"])
-	print("[FormInGroup] count=%d units=%s" % [_in_form.size(), _in_form.map(func(u): return u.name)])
 	if not _sync_group_to_selection():
 		return
 	_group.set_formation_type(t)
@@ -69,9 +66,6 @@ func set_formation_type(t: int):
 
 func set_scattered(v: bool):
 	_scattered = v
-	var _in_form = get_tree().get_nodes_in_group("in_formation")
-	print("[FormBtn] set_scattered scattered=%s group_id=%s" % [v, str(_group.get_instance_id()) if _group != null else "null"])
-	print("[FormInGroup] count=%d units=%s" % [_in_form.size(), _in_form.map(func(u): return u.name)])
 	if not _sync_group_to_selection():
 		return
 	_group.set_scattered(v)
