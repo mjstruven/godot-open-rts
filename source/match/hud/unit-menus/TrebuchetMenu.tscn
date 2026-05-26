@@ -20,10 +20,12 @@ focus_mode = 0
 text = "AG"
 tooltip_text = "Attack Ground — fire at a ground position [E]"
 
-[node name="Pad3" type="Control" parent="."]
+[node name="AbandonButton" type="Button" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-mouse_filter = 2
+focus_mode = 0
+text = "ABN"
+tooltip_text = "Abandon — crew leaves and weapon goes neutral [E]"
 
 [node name="Pad4" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
@@ -92,3 +94,4 @@ mouse_filter = 2
 
 [connection signal="pressed" from="PackStateButton" to="." method="_on_pack_state_pressed"]
 [connection signal="pressed" from="AttackGroundButton" to="." method="_on_attack_ground_pressed"]
+[connection signal="pressed" from="AbandonButton" to="." method="_on_abandon_pressed"]
