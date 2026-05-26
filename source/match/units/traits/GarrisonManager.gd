@@ -121,6 +121,14 @@ func _garrison_direct(unit: Node) -> void:
 	_garrisoned.append(unit)
 	_assign_roof_slot(unit)
 	unit.reset_terrain_visual_offset()
+	var ecm = unit.find_child("ExternalCrewManager")
+	if ecm != null:
+		var engineers = ecm.get_all_engineers()
+		for eng in engineers:
+			if is_instance_valid(eng):
+				eng.add_to_group("garrisoned")
+				eng.reset_terrain_visual_offset()
+		print("[Garrison] %s crew on roof (%d engineers)" % [unit.name, engineers.size()])
 	if unit.type == "infantry":
 		unit.action = InertAction.new()
 	else:
@@ -159,6 +167,11 @@ func kill_all_occupants() -> void:
 func _release(unit: Node) -> void:
 	if not is_instance_valid(unit):
 		return
+	var ecm = unit.find_child("ExternalCrewManager")
+	if ecm != null:
+		for eng in ecm.get_all_engineers():
+			if is_instance_valid(eng):
+				eng.remove_from_group("garrisoned")
 	_release_slot(unit)
 	unit.remove_from_group("garrisoned")
 	if unit.has_meta("garrison_of"):
