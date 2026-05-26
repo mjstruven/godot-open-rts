@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://tgm41mateqo3"]
+[gd_scene load_steps=18 format=3 uid="uid://tgm41mateqo3"]
 
 [ext_resource type="Script" path="res://source/match/hud/AbilitiesPanel.gd" id="1_abpanel"]
 [ext_resource type="PackedScene" uid="uid://engrmenuartww" path="res://source/match/hud/unit-menus/EngineerMenu.tscn" id="2_engmu"]
@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" uid="uid://cmdrmenu00001" path="res://source/match/hud/unit-menus/CommanderAbilitiesMenu.tscn" id="12_cmdrmenu"]
 [ext_resource type="PackedScene" uid="uid://cavalrymenu0001" path="res://source/match/hud/unit-menus/CavalryAbilitiesMenu.tscn" id="13_cavmenu"]
 [ext_resource type="PackedScene" uid="uid://infmenu00001" path="res://source/match/hud/unit-menus/InfantryAbilitiesMenu.tscn" id="14_infmenu"]
+[ext_resource type="PackedScene" uid="uid://twrmenu00001" path="res://source/match/hud/unit-menus/TowerMenu.tscn" id="15_twrmenu"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.12, 0.12, 0.12, 1)
@@ -165,5 +166,9 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="InfantryAbilitiesMenu" parent="MarginContainer" instance=ExtResource("14_infmenu")]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TowerMenu" parent="MarginContainer" instance=ExtResource("15_twrmenu")]
 layout_mode = 2
 mouse_filter = 2

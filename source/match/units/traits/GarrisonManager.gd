@@ -1,5 +1,7 @@
 extends Node
 
+signal garrison_changed
+
 const FOOT_SOLDIER_PATHS = [
 	"res://source/match/units/infantry.tscn",
 	"res://source/match/units/archer.tscn",
@@ -20,6 +22,11 @@ var _garrisoned: Array = []
 
 func garrison_count() -> int:
 	return _garrisoned.size()
+
+
+func get_garrisoned() -> Array:
+	_garrisoned = _garrisoned.filter(func(u): return is_instance_valid(u))
+	return _garrisoned.duplicate()
 
 
 func _scene_path(unit) -> String:
@@ -66,6 +73,15 @@ func garrison_unit(unit: Node) -> void:
 	unit.hide()
 	_set_interactive(unit, false)
 	print("[Garrison] %s entered tower (total=%d)" % [unit.name, _garrisoned.size()])
+	garrison_changed.emit()
+
+
+func ungarrison_unit(unit: Node) -> void:
+	if not unit in _garrisoned:
+		return
+	_garrisoned.erase(unit)
+	_release(unit)
+	garrison_changed.emit()
 
 
 func ungarrison_all() -> void:
@@ -73,6 +89,7 @@ func ungarrison_all() -> void:
 	for unit in _garrisoned.duplicate():
 		_release(unit)
 	_garrisoned.clear()
+	garrison_changed.emit()
 
 
 func kill_all_occupants() -> void:
