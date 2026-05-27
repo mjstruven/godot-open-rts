@@ -184,7 +184,6 @@ func get_occupied_foot_slots() -> Array:
 func ungarrison_unit(unit: Node) -> void:
 	if not unit in _garrisoned:
 		return
-	print("[EJECTTRACE] ungarrison_unit: %s from tower (remaining=%d)" % [unit.name, _garrisoned.size() - 1])
 	_garrisoned.erase(unit)
 	_release(unit)
 	garrison_changed.emit()

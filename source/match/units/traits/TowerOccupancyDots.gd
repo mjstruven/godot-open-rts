@@ -1,9 +1,10 @@
 extends Node3D
 
-const DOT_RADIUS := 0.05
-const DOT_SPACING := 0.18
-# Above the roof slab (y≈3.1–3.3), in the open centre of the battlements, below HealthBar (y=4.0).
-const DOT_HEIGHT := 3.5
+const DOT_RADIUS := 0.08
+const DOT_SPACING := 0.22
+# Mid-stem face (stem body spans y=0.3–3.1). no_depth_test on materials keeps dots
+# visible even though they sit inside the stem geometry when billboarded.
+const DOT_HEIGHT := 1.8
 
 # 3×3 grid indexed row-major (0=top-left, 8=bottom-right).
 # Cross shape  (slots 2,4,5,6,8) → siege footprint: indices 1,3,4,5,7
@@ -29,8 +30,10 @@ func _ready() -> void:
 	top_level = true
 	_mat_empty = StandardMaterial3D.new()
 	_mat_empty.albedo_color = Color(0.3, 0.3, 0.3)
+	_mat_empty.no_depth_test = true
 	_mat_filled = StandardMaterial3D.new()
 	_mat_filled.albedo_color = Color(1.0, 1.0, 1.0)
+	_mat_filled.no_depth_test = true
 	var mesh := SphereMesh.new()
 	mesh.radius = DOT_RADIUS
 	mesh.height = DOT_RADIUS * 2.0

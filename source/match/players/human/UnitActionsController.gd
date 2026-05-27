@@ -281,6 +281,33 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		if dist > unit.attack_range or not Actions.AutoAttacking.is_applicable(unit, target_unit):
 			return false
 		# In range: fall through — ArcherAutoAttacking will activate SuppressedAttacking
+	# External crew (Ballista, Trebuchet) and internal crew (Ram, SiegeTower) — ground only.
+	# Garrisoned siege must be crewed via the Crew Siege button, not right-click.
+	if not target_unit.is_in_group("garrisoned"):
+		var external_crew_mgr = target_unit.find_child("ExternalCrewManager")
+		if external_crew_mgr != null:
+			var can_crew = (
+				target_unit.is_in_group("neutral_siege") or target_unit.player == unit.player
+			)
+			if can_crew and external_crew_mgr.can_accept_unit(unit):
+				var tgt = target_unit
+				_set_or_queue_action(
+					unit,
+					func(): unit.action = Actions.ApproachingExternalCrew.new(tgt),
+					tgt.global_position
+				)
+				return true
+		var crew_manager = target_unit.find_child("CrewManager")
+		if crew_manager != null:
+			var can_crew = (
+				target_unit.is_in_group("neutral_siege") or target_unit.player == unit.player
+			)
+			if can_crew and crew_manager.can_accept_unit(unit):
+				var tgt = target_unit
+				_set_or_queue_action(
+					unit, func(): unit.action = Actions.LoadingIntoCrew.new(tgt), tgt.global_position
+				)
+				return true
 	# Garrison: infantry/archer/siege right-clicking their own Tower
 	var garrison_manager = target_unit.find_child("GarrisonManager")
 	if garrison_manager != null and target_unit.player == unit.player:

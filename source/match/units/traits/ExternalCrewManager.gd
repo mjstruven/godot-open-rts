@@ -66,8 +66,6 @@ func load_unit(unit: Node) -> void:
 	var slot_index = _crew.size()
 	unit.reparent(_unit, false)
 	unit.position = _get_slot_offset(slot_index)
-	print("[STEMTRACE] %s reparented to %s — slot_offset=%s global_pos=%s" % [unit.name, _unit.name, unit.position.snapped(Vector3.ONE * 0.01), unit.global_position.snapped(Vector3.ONE * 0.01)])
-	_stemtrace(unit, 30)
 
 	# _claim_ownership must run before connecting tree_exited or appending to _crew.
 	# If the weapon is neutral, _claim_ownership reparents it, which fires tree_exited on
@@ -198,19 +196,6 @@ func _claim_ownership(new_player: Node) -> void:
 	var match_node = _unit.find_parent("Match")
 	if match_node != null and new_player in match_node.visible_players:
 		_unit.add_to_group("revealed_units")
-
-
-func _stemtrace(unit: Node, frames: int) -> void:
-	for i in frames:
-		await get_tree().process_frame
-		if not is_instance_valid(unit):
-			break
-		print("[STEMTRACE+%d] %s gpos=%s lpos=%s parent=%s" % [
-			i + 1, unit.name,
-			unit.global_position.snapped(Vector3.ONE * 0.01),
-			unit.position.snapped(Vector3.ONE * 0.01),
-			unit.get_parent().name if is_instance_valid(unit.get_parent()) else "null",
-		])
 
 
 func _release_ownership() -> void:
