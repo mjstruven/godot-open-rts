@@ -129,43 +129,12 @@ func _garrison_direct(unit: Node) -> void:
 				eng.add_to_group("garrisoned")
 				eng.reset_terrain_visual_offset()
 		print("[Garrison] %s crew on roof (%d engineers)" % [unit.name, engineers.size()])
-		var cb = _on_garrisoned_crew_changed.bind(unit, ecm)
-		ecm.crew_changed.connect(cb)
-		unit.set_meta("_garrison_crew_cb", cb)
 	if unit.type == "infantry":
 		unit.action = InertAction.new()
 	else:
 		var sg_applicable = StandingGround.is_applicable(unit)
 		unit.action = StandingGround.new() if sg_applicable else WaitingForTargets.new()
 	print("[Garrison] %s entered tower (total=%d)" % [unit.name, _garrisoned.size()])
-
-
-func _on_garrisoned_crew_changed(_new_count: int, weapon: Node, ecm: Node) -> void:
-	if not is_instance_valid(weapon) or not weapon.is_in_group("garrisoned"):
-		return
-	if not is_instance_valid(ecm):
-		return
-	for eng in ecm.get_all_engineers():
-		if is_instance_valid(eng) and not eng.is_in_group("garrisoned"):
-			eng.add_to_group("garrisoned")
-			eng.reset_terrain_visual_offset()
-			eng.global_position = weapon.global_position
-			_deferred_roof_replace(eng, weapon)
-			print("[Garrison] new engineer %s added to roof" % eng.name)
-
-
-func _deferred_roof_replace(eng: Node, weapon: Node) -> void:
-	await get_tree().process_frame
-	await get_tree().process_frame
-	if not is_instance_valid(eng) or not is_instance_valid(weapon):
-		return
-	if not weapon.is_in_group("garrisoned"):
-		return
-	if not eng.is_in_group("garrisoned"):
-		eng.add_to_group("garrisoned")
-	eng.reset_terrain_visual_offset()
-	eng.global_position = weapon.global_position
-	print("[Garrison] engineer %s re-placed on roof after nav alignment" % eng.name)
 
 
 func ungarrison_unit(unit: Node) -> void:
@@ -203,11 +172,6 @@ func _release(unit: Node) -> void:
 		for eng in ecm.get_all_engineers():
 			if is_instance_valid(eng):
 				eng.remove_from_group("garrisoned")
-		if unit.has_meta("_garrison_crew_cb"):
-			var cb = unit.get_meta("_garrison_crew_cb")
-			if is_instance_valid(ecm) and ecm.crew_changed.is_connected(cb):
-				ecm.crew_changed.disconnect(cb)
-			unit.remove_meta("_garrison_crew_cb")
 	_release_slot(unit)
 	unit.remove_from_group("garrisoned")
 	if unit.has_meta("garrison_of"):

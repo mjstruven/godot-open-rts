@@ -315,15 +315,20 @@ func _navigate_unit_towards_unit(unit, target_unit):
 			if not is_instance_valid(occupant):
 				continue
 			var oecm = occupant.find_child("ExternalCrewManager")
-			if oecm != null and oecm.can_accept_unit(unit):
-				var tgt = occupant
-				print("[Garrison] %s routing to crew %s via tower" % [unit.name, occupant.name])
-				_set_or_queue_action(
-					unit,
-					func(): unit.action = Actions.ApproachingExternalCrew.new(tgt),
-					tgt.global_position
-				)
-				return true
+			if oecm != null:
+				if oecm.crew_count() >= 1:
+					MatchSignals.alert_message.emit(unit.player, "Unload Siege to Recrew")
+					return true
+				else:
+					garrison_manager.ungarrison_unit(occupant)
+					var tgt = occupant
+					_set_or_queue_action(
+						unit,
+						func(): unit.action = Actions.ApproachingExternalCrew.new(tgt),
+						tgt.global_position
+					)
+					MatchSignals.alert_message.emit(unit.player, "Siege weapon unloaded — re-crew, then re-garrison")
+					return true
 		if garrison_manager.can_accept_unit(unit):
 			var tgt = target_unit
 			_set_or_queue_action(
