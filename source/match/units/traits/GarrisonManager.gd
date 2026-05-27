@@ -10,7 +10,7 @@ const SIEGE_PATHS = [
 	"res://source/match/units/ballista.tscn",
 	"res://source/match/units/trebuchet.tscn",
 ]
-const MAX_FOOT = 4
+const MAX_FOOT = 9
 const MAX_SIEGE = 1
 
 const InertAction = preload("res://source/match/units/actions/Action.gd")

@@ -21,9 +21,21 @@ size = Vector3(1.6, 2.8, 1.6)
 material = SubResource("StandardMaterial3D_twcap")
 size = Vector3(2.2, 0.2, 2.2)
 
-[sub_resource type="BoxMesh" id="BoxMesh_twmerlon"]
+[sub_resource type="BoxMesh" id="BoxMesh_wall_ns"]
 material = SubResource("StandardMaterial3D_twcap")
-size = Vector3(0.35, 0.4, 0.35)
+size = Vector3(2.2, 0.4, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_ew"]
+material = SubResource("StandardMaterial3D_twcap")
+size = Vector3(0.12, 0.4, 2.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_merlon_ns"]
+material = SubResource("StandardMaterial3D_twcap")
+size = Vector3(0.35, 0.3, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_merlon_ew"]
+material = SubResource("StandardMaterial3D_twcap")
+size = Vector3(0.12, 0.3, 0.35)
 
 [node name="Geometry" type="Node3D"]
 
@@ -39,48 +51,95 @@ mesh = SubResource("BoxMesh_twbody")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
 mesh = SubResource("BoxMesh_twslab")
 
-[node name="MerlonN" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -0.85)
-mesh = SubResource("BoxMesh_twmerlon")
+[node name="WallN" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -1.04)
+mesh = SubResource("BoxMesh_wall_ns")
 
-[node name="MerlonS" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0.85)
-mesh = SubResource("BoxMesh_twmerlon")
+[node name="WallS" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 1.04)
+mesh = SubResource("BoxMesh_wall_ns")
 
-[node name="MerlonE" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85, 3.5, 0)
-mesh = SubResource("BoxMesh_twmerlon")
+[node name="WallE" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.04, 3.5, 0)
+mesh = SubResource("BoxMesh_wall_ew")
 
-[node name="MerlonW" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.85, 3.5, 0)
-mesh = SubResource("BoxMesh_twmerlon")
+[node name="WallW" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.04, 3.5, 0)
+mesh = SubResource("BoxMesh_wall_ew")
 
-[node name="MerlonNE" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85, 3.5, -0.85)
-mesh = SubResource("BoxMesh_twmerlon")
+[node name="MerlonN1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.64, 3.85, -1.04)
+mesh = SubResource("BoxMesh_merlon_ns")
 
-[node name="MerlonNW" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.85, 3.5, -0.85)
-mesh = SubResource("BoxMesh_twmerlon")
+[node name="MerlonN2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, -1.04)
+mesh = SubResource("BoxMesh_merlon_ns")
 
-[node name="MerlonSE" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85, 3.5, 0.85)
-mesh = SubResource("BoxMesh_twmerlon")
+[node name="MerlonN3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.64, 3.85, -1.04)
+mesh = SubResource("BoxMesh_merlon_ns")
 
-[node name="MerlonSW" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.85, 3.5, 0.85)
-mesh = SubResource("BoxMesh_twmerlon")
+[node name="MerlonS1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.64, 3.85, 1.04)
+mesh = SubResource("BoxMesh_merlon_ns")
+
+[node name="MerlonS2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 1.04)
+mesh = SubResource("BoxMesh_merlon_ns")
+
+[node name="MerlonS3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.64, 3.85, 1.04)
+mesh = SubResource("BoxMesh_merlon_ns")
+
+[node name="MerlonE1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.04, 3.85, -0.64)
+mesh = SubResource("BoxMesh_merlon_ew")
+
+[node name="MerlonE2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.04, 3.85, 0)
+mesh = SubResource("BoxMesh_merlon_ew")
+
+[node name="MerlonE3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.04, 3.85, 0.64)
+mesh = SubResource("BoxMesh_merlon_ew")
+
+[node name="MerlonW1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.04, 3.85, -0.64)
+mesh = SubResource("BoxMesh_merlon_ew")
+
+[node name="MerlonW2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.04, 3.85, 0)
+mesh = SubResource("BoxMesh_merlon_ew")
+
+[node name="MerlonW3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.04, 3.85, 0.64)
+mesh = SubResource("BoxMesh_merlon_ew")
 
 [node name="GarrisonSlots" type="Node3D" parent="."]
 
 [node name="GarrisonSlot1" type="Node3D" parent="GarrisonSlots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, 3.31, -0.35)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 3.31, -0.6)
 
 [node name="GarrisonSlot2" type="Node3D" parent="GarrisonSlots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 3.31, -0.35)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.31, -0.6)
 
 [node name="GarrisonSlot3" type="Node3D" parent="GarrisonSlots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, 3.31, 0.35)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 3.31, -0.6)
 
 [node name="GarrisonSlot4" type="Node3D" parent="GarrisonSlots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 3.31, 0.35)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 3.31, 0)
+
+[node name="GarrisonSlot5" type="Node3D" parent="GarrisonSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.31, 0)
+
+[node name="GarrisonSlot6" type="Node3D" parent="GarrisonSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 3.31, 0)
+
+[node name="GarrisonSlot7" type="Node3D" parent="GarrisonSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 3.31, 0.6)
+
+[node name="GarrisonSlot8" type="Node3D" parent="GarrisonSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.31, 0.6)
+
+[node name="GarrisonSlot9" type="Node3D" parent="GarrisonSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 3.31, 0.6)
