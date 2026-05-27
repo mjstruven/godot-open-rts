@@ -178,6 +178,11 @@ func _try_navigating_selected_units_towards_position(target_point):
 				and not _is_constructing(unit)
 				and not unit.is_in_group("suppressing")
 				and not unit.is_in_group("garrisoned")
+				and not (
+					unit.action is Actions.ApproachingExternalCrew
+					or unit.action is Actions.LoadingIntoCrew
+					or unit.action is Actions.LoadingIntoGarrison
+				)
 			)
 	)
 	var air_units_to_move = get_tree().get_nodes_in_group("selected_units").filter(
@@ -305,7 +310,8 @@ func _navigate_unit_towards_unit(unit, target_unit):
 	# Garrison: infantry/archer/siege right-clicking their own Tower
 	var garrison_manager = target_unit.find_child("GarrisonManager")
 	if garrison_manager != null and target_unit.player == unit.player:
-		for occupant in garrison_manager.get_garrisoned():
+		var garrisoned_list = garrison_manager.get_garrisoned()
+		for occupant in garrisoned_list:
 			if not is_instance_valid(occupant):
 				continue
 			var oecm = occupant.find_child("ExternalCrewManager")
