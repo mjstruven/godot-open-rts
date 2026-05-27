@@ -39,7 +39,7 @@ func _on_crew_pressed():
 			continue
 		var min_crew_val = weapon.get("MIN_CREW_TO_FUNCTION")
 		var min_crew: int = min_crew_val if min_crew_val != null else 1
-		var needed := max(0, min_crew - ecm.crew_count())
+		var needed = max(0, min_crew - ecm.crew_count())
 		if needed <= 0:
 			continue
 		var candidates = _find_candidates(weapon, pressing_player, needed)
@@ -78,7 +78,7 @@ func _find_candidates(weapon: Node, pressing_player: Node, needed: int) -> Array
 					candidates.append(occupant)
 	# Ground fallback: non-garrisoned foot within radius.
 	if candidates.size() < needed:
-		var pos := weapon.global_position
+		var pos = weapon.global_position
 		var ground: Array = []
 		for unit in get_tree().get_nodes_in_group("controlled_units"):
 			if not is_instance_valid(unit) or unit.player != pressing_player:
