@@ -281,54 +281,9 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		if dist > unit.attack_range or not Actions.AutoAttacking.is_applicable(unit, target_unit):
 			return false
 		# In range: fall through — ArcherAutoAttacking will activate SuppressedAttacking
-	# External crew loading (Ballista, Trebuchet, etc.)
-	var external_crew_mgr = target_unit.find_child("ExternalCrewManager")
-	if external_crew_mgr != null:
-		var can_crew = (
-			target_unit.is_in_group("neutral_siege") or target_unit.player == unit.player
-		)
-		if can_crew and external_crew_mgr.can_accept_unit(unit):
-			var tgt = target_unit
-			_set_or_queue_action(
-				unit,
-				func(): unit.action = Actions.ApproachingExternalCrew.new(tgt),
-				tgt.global_position
-			)
-			return true
-	# Crew loading: infantry/archer right-clicking a neutral or same-player siege unit
-	var crew_manager = target_unit.find_child("CrewManager")
-	if crew_manager != null:
-		var can_crew = (
-			target_unit.is_in_group("neutral_siege") or target_unit.player == unit.player
-		)
-		if can_crew and crew_manager.can_accept_unit(unit):
-			var tgt = target_unit
-			_set_or_queue_action(
-				unit, func(): unit.action = Actions.LoadingIntoCrew.new(tgt), tgt.global_position
-			)
-			return true
 	# Garrison: infantry/archer/siege right-clicking their own Tower
 	var garrison_manager = target_unit.find_child("GarrisonManager")
 	if garrison_manager != null and target_unit.player == unit.player:
-		var garrisoned_list = garrison_manager.get_garrisoned()
-		for occupant in garrisoned_list:
-			if not is_instance_valid(occupant):
-				continue
-			var oecm = occupant.find_child("ExternalCrewManager")
-			if oecm != null:
-				if oecm.crew_count() >= 1:
-					MatchSignals.alert_message.emit(unit.player, "Unload Siege to Recrew")
-					return true
-				else:
-					garrison_manager.ungarrison_unit(occupant)
-					var tgt = occupant
-					_set_or_queue_action(
-						unit,
-						func(): unit.action = Actions.ApproachingExternalCrew.new(tgt),
-						tgt.global_position
-					)
-					MatchSignals.alert_message.emit(unit.player, "Siege weapon unloaded — re-crew, then re-garrison")
-					return true
 		if garrison_manager.can_accept_unit(unit):
 			var tgt = target_unit
 			_set_or_queue_action(

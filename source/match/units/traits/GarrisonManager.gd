@@ -167,9 +167,24 @@ func get_foot_count() -> int:
 	return _garrisoned.filter(func(u): return _category(u) == "foot").size()
 
 
+func get_occupied_foot_slots() -> Array:
+	_cleanup_dead()
+	var result := []
+	for unit in _garrisoned_slots.keys():
+		if not is_instance_valid(unit):
+			continue
+		if _category(unit) != "foot":
+			continue
+		var slot = _garrisoned_slots[unit]
+		if slot != "" and slot not in result:
+			result.append(slot)
+	return result
+
+
 func ungarrison_unit(unit: Node) -> void:
 	if not unit in _garrisoned:
 		return
+	print("[EJECTTRACE] ungarrison_unit: %s from tower (remaining=%d)" % [unit.name, _garrisoned.size() - 1])
 	_garrisoned.erase(unit)
 	_release(unit)
 	garrison_changed.emit()

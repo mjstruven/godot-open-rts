@@ -44,6 +44,7 @@ func _load_into_target():
 	if not is_instance_valid(_target):
 		queue_free()
 		return
+	print("[STEMTRACE] _load_into_target: foot=%s weapon=%s weapon_gpos=%s foot_gpos=%s" % [_unit.name, _target.name, _target.global_position.snapped(Vector3.ONE * 0.01), _unit.global_position.snapped(Vector3.ONE * 0.01)])
 	var crew_mgr = _target.find_child("ExternalCrewManager")
 	if crew_mgr != null and crew_mgr.can_accept_unit(_unit):
 		crew_mgr.load_unit(_unit)
