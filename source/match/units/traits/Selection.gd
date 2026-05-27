@@ -126,6 +126,16 @@ func _on_focus_changed(focused_units: Array):
 
 func _on_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if _unit.is_in_group("in_crew"):
+			select()
+			# Crew units are view-only. If the parent siege weapon's Area3D also overlaps
+			# this click, its input_event will fire too and select the weapon — prevent that.
+			var p = _unit.get_parent()
+			if is_instance_valid(p) and p.is_in_group("siege_units"):
+				var w_sel = p.find_child("Selection")
+				if w_sel != null:
+					w_sel.call_deferred("deselect")
+			return
 		if _unit.is_in_group("adversary_units"):
 			if Input.is_action_pressed("shift_selecting"):
 				return
