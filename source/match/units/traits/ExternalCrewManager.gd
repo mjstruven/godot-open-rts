@@ -60,6 +60,7 @@ func load_unit(unit: Node) -> void:
 	var movement = unit.find_child("Movement")
 	if movement != null:
 		movement.stop()
+		movement.avoidance_enabled = false
 
 	# Rigidly attach: reparent to siege weapon so the unit moves with it automatically.
 	var slot_index = _crew.size()
@@ -136,6 +137,9 @@ func _unlock_crew_unit(entry: Dictionary) -> void:
 	var angle = randf() * TAU
 	unit.global_position = _unit.global_position + Vector3(cos(angle), 0.0, sin(angle)) * r
 	unit.action_queue.clear()
+	var mv = unit.find_child("Movement")
+	if mv != null:
+		mv.avoidance_enabled = true
 	unit.action = null
 	print("[Crew] %s unlocked from %s" % [unit.name, _unit.name])
 
