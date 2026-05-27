@@ -128,18 +128,38 @@ func _unlock_crew_unit(entry: Dictionary) -> void:
 	unit.reparent(new_parent, true)
 	# Restore group membership and player control.
 	unit.remove_from_group("in_crew")
+	unit.remove_from_group("garrisoned")
 	if is_instance_valid(original_player) and original_player is Human:
 		unit.add_to_group("controlled_units")
 	elif is_instance_valid(original_player):
 		unit.add_to_group("adversary_units")
-	# Place near the weapon.
-	var r = (_unit.radius if _unit.radius != null else 1.0) + 1.5
-	var angle = randf() * TAU
-	unit.global_position = _unit.global_position + Vector3(cos(angle), 0.0, sin(angle)) * r
 	unit.action_queue.clear()
 	var mv = unit.find_child("Movement")
 	if mv != null:
 		mv.avoidance_enabled = true
+
+	# If the weapon is garrisoned in a tower, route unlocked crew into a free foot
+	# slot or elevator them to the ground. The weapon itself stays garrisoned.
+	if _unit.is_in_group("garrisoned") and _unit.has_meta("garrison_of"):
+		var tower = _unit.get_meta("garrison_of")
+		if is_instance_valid(tower):
+			var gm = tower.find_child("GarrisonManager")
+			if gm != null and gm.can_accept_unit(unit):
+				gm.garrison_unit(unit)
+				print("[Crew] %s routed to tower foot slot" % unit.name)
+				return
+			# No free foot slot — elevator to ground around tower base.
+			var r = (tower.radius if tower.radius != null else 1.5) + 1.5
+			var angle = randf() * TAU
+			unit.global_position = tower.global_position + Vector3(cos(angle), 0.0, sin(angle)) * r
+			unit.action = null
+			print("[Crew] %s elevated to ground (tower full)" % unit.name)
+			return
+
+	# Default: place on the ground near the weapon.
+	var r = (_unit.radius if _unit.radius != null else 1.0) + 1.5
+	var angle = randf() * TAU
+	unit.global_position = _unit.global_position + Vector3(cos(angle), 0.0, sin(angle)) * r
 	unit.action = null
 	print("[Crew] %s unlocked from %s" % [unit.name, _unit.name])
 
