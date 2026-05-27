@@ -150,7 +150,22 @@ func _on_garrisoned_crew_changed(_new_count: int, weapon: Node, ecm: Node) -> vo
 			eng.add_to_group("garrisoned")
 			eng.reset_terrain_visual_offset()
 			eng.global_position = weapon.global_position
+			_deferred_roof_replace(eng, weapon)
 			print("[Garrison] new engineer %s added to roof" % eng.name)
+
+
+func _deferred_roof_replace(eng: Node, weapon: Node) -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if not is_instance_valid(eng) or not is_instance_valid(weapon):
+		return
+	if not weapon.is_in_group("garrisoned"):
+		return
+	if not eng.is_in_group("garrisoned"):
+		eng.add_to_group("garrisoned")
+	eng.reset_terrain_visual_offset()
+	eng.global_position = weapon.global_position
+	print("[Garrison] engineer %s re-placed on roof after nav alignment" % eng.name)
 
 
 func ungarrison_unit(unit: Node) -> void:
