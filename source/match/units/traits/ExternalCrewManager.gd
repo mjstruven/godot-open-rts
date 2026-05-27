@@ -11,7 +11,8 @@ const CREWABLE_SCENE_PATHS = [
 ]
 const Human = preload("res://source/match/players/human/Human.gd")
 
-# Each entry: { engineer: Node, original_scene: String, original_player: Node, on_died: Callable }
+# Each entry: { engineer: Node, original_player: Node, on_died: Callable }
+# "engineer" key kept for API compatibility — now holds the locked infantry/archer unit.
 var _crew: Array = []
 
 @onready var _unit = get_parent()
@@ -37,87 +38,75 @@ func can_accept_unit(unit) -> bool:
 func load_unit(unit: Node) -> void:
 	if not can_accept_unit(unit):
 		return
-	var original_scene = unit.get_script().resource_path.replace(".gd", ".tscn")
 	var original_player = unit.player
-	var spawn_pos = unit.global_position
 
 	if unit.is_in_group("selected_units"):
 		unit.remove_from_group("selected_units")
 		MatchSignals.unit_deselected.emit(unit)
-	unit.queue_free()
 
-	var SiegeEngineerScene = load("res://source/match/units/siege_engineer.tscn")
-	var engineer = SiegeEngineerScene.instantiate()
-	MatchSignals.setup_and_spawn_unit.emit(engineer, Transform3D(Basis.IDENTITY, spawn_pos), original_player)
+	if unit.is_in_group("in_formation"):
+		for fc in get_tree().get_nodes_in_group("formation_controller"):
+			if fc._group != null and unit in fc._group.members:
+				fc._group.on_member_died(unit)
+				break
 
-	# Rigidly attach: reparent engineer to siege unit so it moves with it automatically.
+	# Lock the unit in place: freeze actions and remove from player control.
+	unit.action_queue.clear()
+	unit.action = null
+	unit.remove_from_group("controlled_units")
+	unit.remove_from_group("adversary_units")
+	unit.add_to_group("in_crew")
+	var movement = unit.find_child("Movement")
+	if movement != null:
+		movement.stop()
+
+	# Rigidly attach: reparent to siege weapon so the unit moves with it automatically.
 	var slot_index = _crew.size()
-	engineer.reparent(_unit, false)
-	engineer.position = _get_slot_offset(slot_index)
-	_set_unit_interactive(engineer, false)
+	unit.reparent(_unit, false)
+	unit.position = _get_slot_offset(slot_index)
 
 	# _claim_ownership must run before connecting tree_exited or appending to _crew.
-	# If Ballista is neutral, _claim_ownership reparents the Ballista, which fires tree_exited on
-	# all its children (including this engineer). With no connection established yet, the signal
-	# fires harmlessly. If the connect+append were first, _on_engineer_died would fire mid-claim
-	# and silently drop the entry from _crew, leaving an untracked ghost engineer.
+	# If the weapon is neutral, _claim_ownership reparents it, which fires tree_exited on
+	# all children (including this crew unit). With no connection yet, that fires harmlessly.
 	_claim_ownership(original_player)
 
-	# Set meta after _claim_ownership so engineer.player resolves through the Ballista to the
-	# real player node, not the neutral container. _ready() has already run (triggered
-	# synchronously by setup_and_spawn_unit above), so _setup_color() is not affected.
-	engineer.set_meta("crew_siege_unit", _unit)
+	unit.set_meta("crew_siege_unit", _unit)
 
-	var on_died_callable = _on_engineer_died.bind(engineer)
-	engineer.tree_exited.connect(on_died_callable)
+	var on_died_callable = _on_engineer_died.bind(unit)
+	unit.tree_exited.connect(on_died_callable)
 	_crew.append({
-		"engineer": engineer,
-		"original_scene": original_scene,
+		"engineer": unit,
 		"original_player": original_player,
 		"on_died": on_died_callable,
 	})
 	crew_changed.emit(_crew.size())
+	print("[Crew] %s locked to %s (slot %d, total=%d)" % [unit.name, _unit.name, slot_index, _crew.size()])
 
 
 func abandon() -> void:
 	var to_restore = _crew.filter(func(e): return is_instance_valid(e.get("engineer")))
 	_crew.clear()
 
-	# Detach engineers from all game systems before releasing Ballista ownership.
-	# Order matters: _sync_unit reads engineer.player via crew_siege_unit meta, so meta must be
-	# stripped and engineers removed from "units" before the Ballista becomes neutral.
+	# Disconnect callbacks and unlock crew BEFORE releasing weapon ownership,
+	# so crew nodes leave the weapon's subtree before it becomes neutral.
 	for entry in to_restore:
-		var engineer = entry.get("engineer")
-		if not is_instance_valid(engineer):
+		var unit = entry.get("engineer")
+		if not is_instance_valid(unit):
 			continue
 		var callable = entry.get("on_died")
-		if callable and engineer.tree_exited.is_connected(callable):
-			engineer.tree_exited.disconnect(callable)
-		if engineer.has_meta("crew_siege_unit"):
-			engineer.remove_meta("crew_siege_unit")
-		engineer.remove_from_group("units")
+		if callable and unit.tree_exited.is_connected(callable):
+			unit.tree_exited.disconnect(callable)
+		if unit.has_meta("crew_siege_unit"):
+			unit.remove_meta("crew_siege_unit")
+		_unlock_crew_unit(entry)
 
 	_release_ownership()
-
-	for entry in to_restore:
-		_restore_crew_unit(entry)
-
 	crew_changed.emit(0)
+	print("[Crew] %s abandoned — %d crew unlocked" % [_unit.name, to_restore.size()])
 
 
 func get_all_engineers() -> Array:
 	return _crew.map(func(e): return e.get("engineer")).filter(func(e): return is_instance_valid(e))
-
-
-func _set_unit_interactive(unit: Node, interactive: bool) -> void:
-	var cs = unit.find_child("CollisionShape3D")
-	if cs != null:
-		cs.disabled = not interactive
-	var targetability = unit.find_child("Targetability")
-	if targetability != null:
-		var ts = targetability.find_child("CollisionShape3D")
-		if ts != null:
-			ts.disabled = not interactive
 
 
 func _get_slot_offset(slot_index: int) -> Vector3:
@@ -127,26 +116,27 @@ func _get_slot_offset(slot_index: int) -> Vector3:
 	return Vector3(cos(angle) * slot_radius, 0.0, sin(angle) * slot_radius)
 
 
-func _restore_crew_unit(entry: Dictionary) -> void:
-	var engineer = entry.get("engineer")
-	if is_instance_valid(engineer):
-		engineer.queue_free()
-	var original_scene_path: String = entry.get("original_scene", "")
+func _unlock_crew_unit(entry: Dictionary) -> void:
+	var unit = entry.get("engineer")
+	if not is_instance_valid(unit):
+		return
 	var original_player = entry.get("original_player")
-	if original_scene_path.is_empty() or not is_instance_valid(original_player):
-		return
-	var original_scene = load(original_scene_path)
-	if original_scene == null:
-		return
-	var restored = original_scene.instantiate()
+	# Reparent back to player hierarchy, preserving world position.
+	var new_parent = original_player if is_instance_valid(original_player) else _unit.get_parent()
+	unit.reparent(new_parent, true)
+	# Restore group membership and player control.
+	unit.remove_from_group("in_crew")
+	if is_instance_valid(original_player) and original_player is Human:
+		unit.add_to_group("controlled_units")
+	elif is_instance_valid(original_player):
+		unit.add_to_group("adversary_units")
+	# Place near the weapon.
 	var r = (_unit.radius if _unit.radius != null else 1.0) + 1.5
 	var angle = randf() * TAU
-	var offset = Vector3(cos(angle), 0.0, sin(angle)) * r
-	MatchSignals.setup_and_spawn_unit.emit(
-		restored,
-		Transform3D(Basis.IDENTITY, _unit.global_position + offset),
-		original_player
-	)
+	unit.global_position = _unit.global_position + Vector3(cos(angle), 0.0, sin(angle)) * r
+	unit.action_queue.clear()
+	unit.action = null
+	print("[Crew] %s unlocked from %s" % [unit.name, _unit.name])
 
 
 func _on_engineer_died(engineer: Node) -> void:
