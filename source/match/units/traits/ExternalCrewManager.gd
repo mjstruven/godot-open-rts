@@ -138,22 +138,15 @@ func _unlock_crew_unit(entry: Dictionary) -> void:
 	if mv != null:
 		mv.avoidance_enabled = true
 
-	# If the weapon is garrisoned in a tower, route unlocked crew into a free foot
-	# slot or elevator them to the ground. The weapon itself stays garrisoned.
+	# If the weapon is garrisoned in a tower, elevator crew to ground around tower base.
 	if _unit.is_in_group("garrisoned") and _unit.has_meta("garrison_of"):
 		var tower = _unit.get_meta("garrison_of")
 		if is_instance_valid(tower):
-			var gm = tower.find_child("GarrisonManager")
-			if gm != null and gm.can_accept_unit(unit):
-				gm.garrison_unit(unit)
-				print("[Crew] %s routed to tower foot slot" % unit.name)
-				return
-			# No free foot slot — elevator to ground around tower base.
 			var r = (tower.radius if tower.radius != null else 1.5) + 1.5
 			var angle = randf() * TAU
 			unit.global_position = tower.global_position + Vector3(cos(angle), 0.0, sin(angle)) * r
 			unit.action = null
-			print("[Crew] %s elevated to ground (tower full)" % unit.name)
+			print("[Crew] %s elevated to ground (tower-garrisoned weapon)" % unit.name)
 			return
 
 	# Default: place on the ground near the weapon.

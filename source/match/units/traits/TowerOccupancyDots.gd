@@ -6,12 +6,6 @@ const DOT_SPACING := 0.22
 # visible even though they sit inside the stem geometry when billboarded.
 const DOT_HEIGHT := 1.8
 
-# 3×3 grid indexed row-major (0=top-left, 8=bottom-right).
-# Cross shape (slots 2,4,5,6,8) → siege footprint: dot indices 1,3,4,5,7
-const SIEGE_INDICES := [1, 3, 4, 5, 7]
-
-# Full 9-slot → dot index mapping. When siege is present only corners are used
-# for foot; when no siege foot can occupy any slot, so all 9 must be mapped.
 const SLOT_TO_INDEX := {
 	"GarrisonSlot1": 0,
 	"GarrisonSlot2": 1,
@@ -81,15 +75,9 @@ func _refresh() -> void:
 			has_siege = gm.has_siege()
 			occupied_foot_slots = gm.get_occupied_foot_slots()
 	if has_siege:
-		# Siege occupies the 5 cross slots — all cross dots lit.
-		for i in SIEGE_INDICES:
-			_dots[i].material_override = _mat_filled
-		# When siege is present foot is restricted to corner slots only.
-		for slot_name in ["GarrisonSlot1", "GarrisonSlot3", "GarrisonSlot7", "GarrisonSlot9"]:
-			_dots[SLOT_TO_INDEX[slot_name]].material_override = \
-				_mat_filled if slot_name in occupied_foot_slots else _mat_empty
+		for dot in _dots:
+			dot.material_override = _mat_filled
 	else:
-		# No siege: foot may occupy any slot; each dot reflects its slot's occupancy.
 		for slot_name in SLOT_TO_INDEX.keys():
 			_dots[SLOT_TO_INDEX[slot_name]].material_override = \
 				_mat_filled if slot_name in occupied_foot_slots else _mat_empty

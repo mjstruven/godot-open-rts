@@ -12,11 +12,6 @@ const SIEGE_PATHS = [
 ]
 const MAX_FOOT = 9
 const MAX_SIEGE = 1
-const MAX_FOOT_WITH_SIEGE = 4
-
-# Siege weapon occupies the cross-shaped centre 5 slots; foot use the 4 corners.
-const SIEGE_FOOT_SLOTS = ["GarrisonSlot2", "GarrisonSlot4", "GarrisonSlot5", "GarrisonSlot6", "GarrisonSlot8"]
-const FOOT_ONLY_SLOTS = ["GarrisonSlot1", "GarrisonSlot3", "GarrisonSlot7", "GarrisonSlot9"]
 
 const InertAction = preload("res://source/match/units/actions/Action.gd")
 const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTargets.gd")
@@ -66,23 +61,18 @@ func _assign_roof_slot(unit: Node) -> void:
 		return
 	var cat = _category(unit)
 	if cat == "siege":
-		# Place at centroid of the 5 siege-footprint slots (cross shape).
 		var total = Vector3.ZERO
 		var count = 0
 		for slot in slots_node.get_children():
-			if slot.name in SIEGE_FOOT_SLOTS:
-				total += slot.global_position
-				count += 1
+			total += slot.global_position
+			count += 1
 		if count > 0:
 			unit.global_position = total / count
 		_garrisoned_slots[unit] = ""
 	else:
-		var has_siege = _garrisoned.any(func(u): return _category(u) == "siege")
 		var used = _garrisoned_slots.values()
 		for slot in slots_node.get_children():
 			if slot.name in used:
-				continue
-			if has_siege and slot.name not in FOOT_ONLY_SLOTS:
 				continue
 			unit.global_position = slot.global_position
 			_garrisoned_slots[unit] = slot.name
@@ -104,12 +94,12 @@ func can_accept_unit(unit) -> bool:
 	var foot_count = _garrisoned.filter(func(u): return _category(u) == "foot").size()
 	if cat == "foot":
 		if has_siege:
-			return foot_count < MAX_FOOT_WITH_SIEGE
+			return false
 		return foot_count < MAX_FOOT
 	if cat == "siege":
-		if has_siege:
+		if not _garrisoned.is_empty():
 			return false
-		return foot_count <= MAX_FOOT_WITH_SIEGE
+		return true
 	return false
 
 
