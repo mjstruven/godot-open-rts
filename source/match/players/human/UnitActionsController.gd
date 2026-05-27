@@ -178,11 +178,6 @@ func _try_navigating_selected_units_towards_position(target_point):
 				and not _is_constructing(unit)
 				and not unit.is_in_group("suppressing")
 				and not unit.is_in_group("garrisoned")
-				and not (
-					unit.action is Actions.ApproachingExternalCrew
-					or unit.action is Actions.LoadingIntoCrew
-					or unit.action is Actions.LoadingIntoGarrison
-				)
 			)
 	)
 	var air_units_to_move = get_tree().get_nodes_in_group("selected_units").filter(

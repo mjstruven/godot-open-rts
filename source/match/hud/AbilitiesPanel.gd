@@ -131,20 +131,14 @@ func _press_button(btn: Button) -> void:
 
 
 func _on_unit_focus_changed(focused_units: Array):
-	print("[NEUTRALMENU] focus_changed: %d units" % focused_units.size())
-	for u in focused_units:
-		print("[NEUTRALMENU]   focus: %s groups=%s" % [u.name, ", ".join(u.get_groups())])
 	_hide_all_menus()
 	_try_showing_ability_menu(focused_units)
 
 
 func _on_unit_inspect_changed(focused_units: Array):
-	print("[NEUTRALMENU] inspect_changed: %d units" % focused_units.size())
 	if focused_units.is_empty():
 		return
-	var is_neutral = focused_units[0].is_in_group("neutral_siege")
-	print("[NEUTRALMENU]   first=%s neutral_siege=%s" % [focused_units[0].name, str(is_neutral)])
-	if not is_neutral:
+	if not focused_units[0].is_in_group("neutral_siege"):
 		return
 	_hide_all_menus()
 	_try_showing_ability_menu(focused_units)
@@ -172,7 +166,6 @@ func _try_showing_ability_menu(focused_units: Array):
 	if focused_units.is_empty():
 		return
 	var first = focused_units[0]
-	print("[NEUTRALMENU] _try_showing: first=%s type=%s neutral=%s" % [first.name, str(first.get("type")), str(first.is_in_group("neutral_siege"))])
 	if first is Academy:
 		_academy_menu.units = focused_units
 		_academy_menu.show()

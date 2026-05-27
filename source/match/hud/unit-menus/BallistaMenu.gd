@@ -12,6 +12,21 @@ const _CREW_RADIUS = 10.0
 var units = []:
 	set(value):
 		units = value
+		if is_node_ready():
+			_refresh_neutral_state()
+
+
+func _process(_delta):
+	if not visible:
+		return
+	_refresh_neutral_state()
+
+
+func _refresh_neutral_state() -> void:
+	var is_neutral = not units.is_empty() and is_instance_valid(units[0]) and units[0].is_in_group("neutral_siege")
+	for child in get_children():
+		if child is Button and child.name != "CrewButton":
+			child.disabled = is_neutral
 
 
 func _on_attack_ground_pressed():

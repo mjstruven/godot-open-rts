@@ -172,12 +172,8 @@ func _emit_focus():
 	var controlled = _selected_units.filter(
 		func(u): return is_instance_valid(u) and u.type == ft and u.is_in_group("controlled_units")
 	)
-	print("[NEUTRALMENU] emit_focus type=%s controlled=%d" % [ft, controlled.size()])
 	MatchSignals.unit_focus_changed.emit(controlled)
 	var all_focused = _selected_units.filter(
 		func(u): return is_instance_valid(u) and u.type == ft
 	)
-	print("[NEUTRALMENU] emit_inspect type=%s all_focused=%d" % [ft, all_focused.size()])
-	for u in all_focused:
-		print("[NEUTRALMENU]   inspect: %s groups=%s" % [u.name, ", ".join(u.get_groups())])
 	MatchSignals.unit_inspect_changed.emit(all_focused)

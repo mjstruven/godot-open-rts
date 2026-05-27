@@ -66,6 +66,7 @@ func load_unit(unit: Node) -> void:
 	var slot_index = _crew.size()
 	unit.reparent(_unit, false)
 	unit.position = _get_slot_offset(slot_index)
+	unit.reset_terrain_visual_offset()
 
 	# _claim_ownership must run before connecting tree_exited or appending to _crew.
 	# If the weapon is neutral, _claim_ownership reparents it, which fires tree_exited on

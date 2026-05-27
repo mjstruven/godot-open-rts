@@ -86,6 +86,8 @@ func _process(_delta: float) -> void:
 func _update_visual_height() -> void:
 	if is_in_group("garrisoned"):
 		return
+	if is_in_group("in_crew"):
+		return
 	if _tvs == null:
 		_tvs = get_tree().get_first_node_in_group("terrain_visual_system")
 	if _tvs == null or _geometry == null:
