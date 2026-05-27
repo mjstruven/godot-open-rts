@@ -31,11 +31,20 @@ func _attack_or_move_closer():
 	if dist < BALLISTA_MIN_RANGE:
 		queue_free()
 		return
-	_sub_action = (
-		BallistaAttackingWhileInRange.new(_target_unit)
-		if _target_in_range()
-		else FollowingToReachDistance.new(_target_unit, _unit.attack_range * 0.9)
-	)
-	_sub_action.tree_exited.connect(_on_sub_action_finished)
-	add_child(_sub_action)
-	_unit.action_updated.emit()
+	if _target_in_range():
+		_sub_action = BallistaAttackingWhileInRange.new(_target_unit)
+		_sub_action.tree_exited.connect(_on_sub_action_finished)
+		add_child(_sub_action)
+		_unit.action_updated.emit()
+	else:
+		# Target out of range — hold position and re-check rather than chasing.
+		var t = Timer.new()
+		t.wait_time = 0.15
+		t.one_shot = true
+		t.timeout.connect(func():
+			t.queue_free()
+			if is_inside_tree():
+				_attack_or_move_closer()
+		)
+		add_child(t)
+		t.start()

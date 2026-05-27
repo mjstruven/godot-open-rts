@@ -3,10 +3,6 @@ extends "res://source/match/units/actions/Action.gd"
 const TrebuchetAttackingWhileInRange = preload(
 	"res://source/match/units/actions/TrebuchetAttackingWhileInRange.gd"
 )
-const FollowingToReachDistance = preload(
-	"res://source/match/units/actions/FollowingToReachDistance.gd"
-)
-
 const TREB_MIN_RANGE = 7.0
 const POLL_INTERVAL = 0.15
 
@@ -80,12 +76,6 @@ func _advance():
 		_unit.action_updated.emit()
 	elif in_range and pack_state == "PACKED":
 		_unit.set_pack_target(1.0)
-	elif not in_range and pack_state == "PACKED":
-		_poll_timer.stop()
-		_sub_action = FollowingToReachDistance.new(_target_unit, _unit.attack_range * 0.9)
-		_sub_action.tree_exited.connect(_on_sub_action_finished)
-		add_child(_sub_action)
-		_unit.action_updated.emit()
 	elif not in_range and pack_state == "UNPACKED":
 		_unit.set_pack_target(0.0)
 	# else TRANSITIONING — keep polling

@@ -11,5 +11,5 @@ func _ready():
 
 
 func _on_action_changed(new_action):
-	if new_action == null:
+	if new_action == null and not is_in_group("in_crew"):
 		action = WaitingForTargets.new()

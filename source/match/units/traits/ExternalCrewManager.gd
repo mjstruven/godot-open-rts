@@ -50,12 +50,13 @@ func load_unit(unit: Node) -> void:
 				fc._group.on_member_died(unit)
 				break
 
-	# Lock the unit in place: freeze actions and remove from player control.
+	# Lock the unit in place: group/control state must be set BEFORE action=null so that
+	# infantry/archer _on_action_changed(null) sees "in_crew" and skips auto-reinit.
 	unit.action_queue.clear()
-	unit.action = null
 	unit.remove_from_group("controlled_units")
 	unit.remove_from_group("adversary_units")
 	unit.add_to_group("in_crew")
+	unit.action = null
 	var movement = unit.find_child("Movement")
 	if movement != null:
 		movement.stop()
