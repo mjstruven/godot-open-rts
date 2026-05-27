@@ -47,7 +47,9 @@ func _get_controlled_units_from_navigation_domain_within_topdown_polygon_2d(
 		if unit is Structure:
 			continue
 		if unit.is_in_group("siege_units"):
-			continue
+			var ecm = unit.find_child("ExternalCrewManager")
+			if ecm == null or ecm.crew_count() == 0:
+				continue
 		var unit_position_2d: Vector2
 		if is_terrain:
 			var geometry: Node3D = unit.find_child("Geometry") as Node3D
