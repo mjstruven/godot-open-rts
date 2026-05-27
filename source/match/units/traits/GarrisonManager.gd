@@ -152,6 +152,21 @@ func _garrison_direct(unit: Node) -> void:
 	print("[Garrison] %s entered tower (total=%d)" % [unit.name, _garrisoned.size()])
 
 
+func has_foot() -> bool:
+	_cleanup_dead()
+	return _garrisoned.any(func(u): return _category(u) == "foot")
+
+
+func has_siege() -> bool:
+	_cleanup_dead()
+	return _garrisoned.any(func(u): return _category(u) == "siege")
+
+
+func get_foot_count() -> int:
+	_cleanup_dead()
+	return _garrisoned.filter(func(u): return _category(u) == "foot").size()
+
+
 func ungarrison_unit(unit: Node) -> void:
 	if not unit in _garrisoned:
 		return
@@ -165,6 +180,24 @@ func ungarrison_all() -> void:
 	for unit in _garrisoned.duplicate():
 		_release(unit)
 	_garrisoned.clear()
+	garrison_changed.emit()
+
+
+func ungarrison_foot_only() -> void:
+	_garrisoned = _garrisoned.filter(func(u): return is_instance_valid(u))
+	for unit in _garrisoned.duplicate():
+		if _category(unit) == "foot":
+			_release(unit)
+			_garrisoned.erase(unit)
+	garrison_changed.emit()
+
+
+func ungarrison_siege_only() -> void:
+	_garrisoned = _garrisoned.filter(func(u): return is_instance_valid(u))
+	for unit in _garrisoned.duplicate():
+		if _category(unit) == "siege":
+			_release(unit)
+			_garrisoned.erase(unit)
 	garrison_changed.emit()
 
 

@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://c3ssj2p6voauk" path="res://source/match/units/traits/HealthBar.tscn" id="6_twhb"]
 [ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="7_twta"]
 [ext_resource type="Script" path="res://source/match/units/traits/GarrisonManager.gd" id="8_twgm"]
+[ext_resource type="Script" path="res://source/match/units/traits/TowerOccupancyDots.gd" id="9_twod"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_twcol"]
 height = 3.4
@@ -48,5 +49,8 @@ radius = 1.5
 
 [node name="GarrisonManager" type="Node" parent="."]
 script = ExtResource("8_twgm")
+
+[node name="TowerOccupancyDots" type="Node3D" parent="."]
+script = ExtResource("9_twod")
 
 [editable path="Geometry"]

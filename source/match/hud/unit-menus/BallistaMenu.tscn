@@ -6,6 +6,13 @@
 columns = 4
 script = ExtResource("1_balmenu")
 
+[node name="CrewButton" type="Button" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+text = "CREW"
+tooltip_text = "Crew — send nearby foot soldiers to man this weapon [Q]"
+
 [node name="AttackGroundButton" type="Button" parent="."]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
@@ -19,11 +26,6 @@ layout_mode = 2
 focus_mode = 0
 text = "ABN"
 tooltip_text = "Abandon — crew leaves and weapon goes neutral [W]"
-
-[node name="Pad3" type="Control" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
 
 [node name="Pad4" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
@@ -90,5 +92,6 @@ custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 mouse_filter = 2
 
+[connection signal="pressed" from="CrewButton" to="." method="_on_crew_pressed"]
 [connection signal="pressed" from="AttackGroundButton" to="." method="_on_attack_ground_pressed"]
 [connection signal="pressed" from="AbandonButton" to="." method="_on_abandon_pressed"]
