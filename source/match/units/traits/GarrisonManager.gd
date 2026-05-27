@@ -149,6 +149,7 @@ func _on_garrisoned_crew_changed(_new_count: int, weapon: Node, ecm: Node) -> vo
 		if is_instance_valid(eng) and not eng.is_in_group("garrisoned"):
 			eng.add_to_group("garrisoned")
 			eng.reset_terrain_visual_offset()
+			eng.global_position = weapon.global_position
 			print("[Garrison] new engineer %s added to roof" % eng.name)
 
 
