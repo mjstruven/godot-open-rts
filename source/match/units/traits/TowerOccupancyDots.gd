@@ -7,15 +7,20 @@ const DOT_SPACING := 0.22
 const DOT_HEIGHT := 1.8
 
 # 3×3 grid indexed row-major (0=top-left, 8=bottom-right).
-# Cross shape  (slots 2,4,5,6,8) → siege footprint: indices 1,3,4,5,7
-# Corner shape (slots 1,3,7,9)   → foot slots:      indices 0,2,6,8
+# Cross shape (slots 2,4,5,6,8) → siege footprint: dot indices 1,3,4,5,7
 const SIEGE_INDICES := [1, 3, 4, 5, 7]
 
-# Maps garrison slot name → dot grid index (corners only).
+# Full 9-slot → dot index mapping. When siege is present only corners are used
+# for foot; when no siege foot can occupy any slot, so all 9 must be mapped.
 const SLOT_TO_INDEX := {
 	"GarrisonSlot1": 0,
+	"GarrisonSlot2": 1,
 	"GarrisonSlot3": 2,
+	"GarrisonSlot4": 3,
+	"GarrisonSlot5": 4,
+	"GarrisonSlot6": 5,
 	"GarrisonSlot7": 6,
+	"GarrisonSlot8": 7,
 	"GarrisonSlot9": 8,
 }
 
@@ -75,10 +80,16 @@ func _refresh() -> void:
 		if gm != null:
 			has_siege = gm.has_siege()
 			occupied_foot_slots = gm.get_occupied_foot_slots()
-	# Cross dots: all lit when siege present.
-	for i in SIEGE_INDICES:
-		_dots[i].material_override = _mat_filled if has_siege else _mat_empty
-	# Corner dots: lit per slot occupancy.
-	for slot_name in SLOT_TO_INDEX.keys():
-		var idx: int = SLOT_TO_INDEX[slot_name]
-		_dots[idx].material_override = _mat_filled if slot_name in occupied_foot_slots else _mat_empty
+	if has_siege:
+		# Siege occupies the 5 cross slots — all cross dots lit.
+		for i in SIEGE_INDICES:
+			_dots[i].material_override = _mat_filled
+		# When siege is present foot is restricted to corner slots only.
+		for slot_name in ["GarrisonSlot1", "GarrisonSlot3", "GarrisonSlot7", "GarrisonSlot9"]:
+			_dots[SLOT_TO_INDEX[slot_name]].material_override = \
+				_mat_filled if slot_name in occupied_foot_slots else _mat_empty
+	else:
+		# No siege: foot may occupy any slot; each dot reflects its slot's occupancy.
+		for slot_name in SLOT_TO_INDEX.keys():
+			_dots[SLOT_TO_INDEX[slot_name]].material_override = \
+				_mat_filled if slot_name in occupied_foot_slots else _mat_empty

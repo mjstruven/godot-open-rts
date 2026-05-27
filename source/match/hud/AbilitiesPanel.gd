@@ -37,6 +37,7 @@ const _ABILITY_LABELS = ["Q", "W", "E", "R", "A", "S", "D", "F", "Z", "X", "C", 
 
 func _ready():
 	MatchSignals.unit_focus_changed.connect(_on_unit_focus_changed)
+	MatchSignals.unit_inspect_changed.connect(_on_unit_inspect_changed)
 	_hide_all_menus()
 	_stamp_ability_labels()
 
@@ -130,6 +131,15 @@ func _press_button(btn: Button) -> void:
 
 
 func _on_unit_focus_changed(focused_units: Array):
+	_hide_all_menus()
+	_try_showing_ability_menu(focused_units)
+
+
+func _on_unit_inspect_changed(focused_units: Array):
+	if focused_units.is_empty():
+		return
+	if not focused_units[0].is_in_group("neutral_siege"):
+		return
 	_hide_all_menus()
 	_try_showing_ability_menu(focused_units)
 
