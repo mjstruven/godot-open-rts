@@ -49,13 +49,16 @@ func _unhandled_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
 		get_viewport().set_input_as_handled()
 		_rotate_by(ROTATION_STEP)
+		_update_ghost_color()
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
 		get_viewport().set_input_as_handled()
 		_rotate_by(-ROTATION_STEP)
+		_update_ghost_color()
 		return
 	if event.is_action_pressed("rotate_structure"):
 		_rotate_by(ROTATION_STEP)
+		_update_ghost_color()
 		return
 	if event is InputEventMouseMotion:
 		get_viewport().set_input_as_handled()
@@ -160,7 +163,7 @@ func _update_ghost_color():
 		if is_valid
 		else preload(BLUEPRINT_INVALID_PATH)
 	)
-	for child in _ghost.find_children("*"):
+	for child in _ghost.find_children("*", "", true, false):
 		if "material_override" in child:
 			child.material_override = mat
 
