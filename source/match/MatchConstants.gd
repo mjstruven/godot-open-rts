@@ -157,6 +157,8 @@ class Units:
 		"res://source/match/units/command_post.tscn": {"wood": 600, "stone": 400},
 		"res://source/match/units/siege_workshop.tscn": {"wood": 400, "stone": 300},
 		"res://source/match/units/tower.tscn": {"stone": 200, "wood": 100},
+		"res://source/match/units/wall_tower.tscn": {"stone": 50},
+		"res://source/match/units/wall_section.tscn": {"stone": 50},
 	}
 	const DEFAULT_PROPERTIES = {
 		"res://source/match/units/infantry.tscn":
@@ -251,6 +253,8 @@ class Units:
 		"res://source/match/units/siege_workshop.tscn":
 		{"sight_range": 8.0, "hp": 3000, "hp_max": 3000},
 		"res://source/match/units/tower.tscn": {"sight_range": 12.0, "hp": 2000, "hp_max": 2000},
+		"res://source/match/units/wall_tower.tscn": {"sight_range": 12.0, "hp": 2000, "hp_max": 2000},
+		"res://source/match/units/wall_section.tscn": {"sight_range": 5.0, "hp": 600, "hp_max": 600},
 		"res://source/match/units/battering_ram.tscn":
 		{
 			"sight_range": 6.0,

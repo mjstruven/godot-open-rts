@@ -261,10 +261,8 @@ tooltip_text = "Watch Tower - Stone:200, Wood:100"
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
-disabled = true
-modulate = Color(0.5, 0.5, 0.5, 1)
 text = "WALL"
-tooltip_text = "— coming soon"
+tooltip_text = "Wall Segment - Stone:150"
 
 [node name="PlaceLookoutButton" type="Button" parent="MilitaryGrid"]
 custom_minimum_size = Vector2(48, 48)
@@ -442,5 +440,6 @@ tooltip_text = "Back"
 [connection signal="pressed" from="MilitaryGrid/PlaceCommandPostButton" to="." method="_on_place_command_post_pressed"]
 [connection signal="pressed" from="MilitaryGrid/PlaceSiegeWorkshopButton" to="." method="_on_place_siege_workshop_pressed"]
 [connection signal="pressed" from="MilitaryGrid/PlaceTowerButton" to="." method="_on_place_tower_pressed"]
+[connection signal="pressed" from="MilitaryGrid/PlaceWallButton" to="." method="_on_place_wall_segment_pressed"]
 [connection signal="pressed" from="MilitaryGrid/MilitaryBackButton" to="." method="_on_military_back_pressed"]
 [connection signal="pressed" from="FortGrid/FortBackButton" to="." method="_on_fort_back_pressed"]

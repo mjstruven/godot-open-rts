@@ -48,6 +48,12 @@ func _unhandled_input(event):
 		_handle_lmb_down_event(event)
 	if event.is_action_pressed("rotate_structure"):
 		_try_rotating_blueprint_by(ROTATION_BY_KEY_STEP)
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+		get_viewport().set_input_as_handled()
+		_try_rotating_blueprint_by(ROTATION_BY_KEY_STEP)
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+		get_viewport().set_input_as_handled()
+		_try_rotating_blueprint_by(-ROTATION_BY_KEY_STEP)
 	if (
 		event is InputEventMouseButton
 		and event.button_index == MOUSE_BUTTON_LEFT

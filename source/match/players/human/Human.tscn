@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dh8dedilkhuoy"]
+[gd_scene load_steps=11 format=3 uid="uid://dh8dedilkhuoy"]
 
 [ext_resource type="Script" path="res://source/match/players/human/Human.gd" id="1_7iu1j"]
 [ext_resource type="Script" path="res://source/match/players/human/UnitActionsController.gd" id="1_m624e"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://source/match/players/human/WaypointPathRenderer.gd" id="7_wpr01"]
 [ext_resource type="Script" path="res://source/match/players/human/ChargeTargetingMode.gd" id="8_ctm01"]
 [ext_resource type="Script" path="res://source/match/players/human/ChargeHornController.gd" id="9_chc01"]
+[ext_resource type="Script" path="res://source/match/players/human/WallSegmentPlacementHandler.gd" id="10_wsph"]
 [node name="Human" type="Node3D"]
 script = ExtResource("1_7iu1j")
 color = Color(0.4, 0.694118, 1, 1)
@@ -43,4 +44,7 @@ script = ExtResource("8_ctm01")
 script = ExtResource("9_chc01")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="ChargeHornController"]
+
+[node name="WallSegmentPlacementHandler" type="Node3D" parent="."]
+script = ExtResource("10_wsph")
 

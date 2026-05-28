@@ -26,6 +26,9 @@ const TowerUnit = preload("res://source/match/units/tower.tscn")
 @onready var _command_post_btn = find_child("PlaceCommandPostButton")
 @onready var _siege_workshop_btn = find_child("PlaceSiegeWorkshopButton")
 @onready var _tower_btn = find_child("PlaceTowerButton")
+@onready var _wall_btn = find_child("PlaceWallButton")
+
+const WALL_SEGMENT_COST = {"stone": 150}
 
 var units: Array = []:
 	set(value):
@@ -56,6 +59,7 @@ func _process(_delta):
 		_refresh_button(_command_post_btn, CommandPostUnit, player)
 		_refresh_button(_siege_workshop_btn, SiegeWorkshopUnit, player)
 		_refresh_button(_tower_btn, TowerUnit, player)
+		_wall_btn.modulate = Color.WHITE if player.has_resources(WALL_SEGMENT_COST) else Color(1, 0.3, 0.3, 1)
 
 
 func _refresh_button(btn: Button, scene: PackedScene, player):
@@ -149,3 +153,7 @@ func _on_place_siege_workshop_pressed():
 
 func _on_place_tower_pressed():
 	MatchSignals.place_structure.emit(TowerUnit)
+
+
+func _on_place_wall_segment_pressed():
+	MatchSignals.place_wall_segment.emit()

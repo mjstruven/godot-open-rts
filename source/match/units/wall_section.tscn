@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://dwallsecunit1"]
+
+[ext_resource type="Script" path="res://source/match/units/wall_section.gd" id="1_wsscr"]
+[ext_resource type="PackedScene" path="res://source/match/units/structure-geometries/WallSectionGeometry.tscn" id="2_wsgeo"]
+[ext_resource type="PackedScene" uid="uid://cgsi062w5fjia" path="res://source/match/units/traits/Highlight.tscn" id="3_wshi"]
+[ext_resource type="PackedScene" uid="uid://3c1h14nqdumt" path="res://source/match/units/traits/Selection.tscn" id="4_wsse"]
+[ext_resource type="PackedScene" uid="uid://d4cwip5hpxlmo" path="res://source/match/units/traits/MovementObstacle.tscn" id="5_wsmo"]
+[ext_resource type="PackedScene" uid="uid://c3ssj2p6voauk" path="res://source/match/units/traits/HealthBar.tscn" id="6_wshb"]
+[ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="7_wsta"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wsbox"]
+size = Vector3(3.0, 1.75, 1.6)
+
+[node name="WallSection" type="Area3D"]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_wsscr")
+
+[node name="Geometry" parent="." instance=ExtResource("2_wsgeo")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
+shape = SubResource("BoxShape3D_wsbox")
+
+[node name="Highlight" parent="." instance=ExtResource("3_wshi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 1.5
+
+[node name="Selection" parent="." instance=ExtResource("4_wsse")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 1.5
+
+[node name="MovementObstacle" parent="." instance=ExtResource("5_wsmo")]
+radius = 1.5
+vertices = PackedVector3Array(-1.5, 0, -0.8, 1.5, 0, -0.8, 1.5, 0, 0.8, -1.5, 0, 0.8)
+affect_navigation_mesh = true
+path_height_offset = 0.6
+
+[node name="HealthBar" parent="." instance=ExtResource("6_wshb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
+size = Vector2(64, 3)
+
+[node name="Targetability" parent="." instance=ExtResource("7_wsta")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 1.5
+
+[editable path="Geometry"]
