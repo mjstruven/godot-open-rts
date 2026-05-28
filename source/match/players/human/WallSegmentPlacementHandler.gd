@@ -20,12 +20,18 @@ const BLUEPRINT_INVALID_PATH = "res://source/match/resources/materials/blueprint
 
 var _ghost: Node3D = null
 var _rotation_deg: float = 0.0
+var _nav_map_rid: RID
 
 @onready var _player = get_parent()
 @onready var _match = find_parent("Match")
 
 
 func _ready():
+	_nav_map_rid = (
+		find_parent("Match")
+		. navigation
+		. get_navigation_map_rid_by_domain(Constants.Match.Navigation.Domain.TERRAIN)
+	)
 	MatchSignals.place_wall_segment.connect(_on_wall_segment_placement_request)
 
 
@@ -164,11 +170,39 @@ func _is_placement_valid() -> bool:
 		return false
 	if not _player.has_resources(WALL_SEGMENT_COST):
 		return false
-	if not Geometry2D.is_point_in_polygon(
-		Vector2(_ghost.global_position.x, _ghost.global_position.z),
-		_match.map.get_topdown_polygon_2d()
-	):
-		return false
+	var origin = _ghost.global_position
+	var basis = _ghost.global_transform.basis
+	var tower_pos = origin
+	var left_pos = origin + basis * Vector3(-WALL_OFFSET, 0, 0)
+	var right_pos = origin + basis * Vector3(WALL_OFFSET, 0, 0)
+
+	var ghost_left_end = origin + basis * Vector3(-OUTER_END_OFFSET, 0, 0)
+	var ghost_right_end = origin + basis * Vector3(OUTER_END_OFFSET, 0, 0)
+	var snap_partners := []
+	for ws in get_tree().get_nodes_in_group("walls"):
+		var wall_end = ws.global_transform * Vector3(-1.5, 0, 0)
+		var wall_end_xz = Vector3(wall_end.x, 0, wall_end.z)
+		if (
+			wall_end_xz.distance_to(Vector3(ghost_left_end.x, 0, ghost_left_end.z)) < SNAP_RANGE
+			or wall_end_xz.distance_to(Vector3(ghost_right_end.x, 0, ghost_right_end.z)) < SNAP_RANGE
+		):
+			snap_partners.append(ws)
+
+	var all_units = (
+		get_tree().get_nodes_in_group("units")
+		+ get_tree().get_nodes_in_group("resource_units")
+	)
+	var candidates = all_units.filter(func(u): return u not in snap_partners)
+
+	var map_poly = _match.map.get_topdown_polygon_2d()
+	for pos in [tower_pos, left_pos, right_pos]:
+		if not Geometry2D.is_point_in_polygon(Vector2(pos.x, pos.z), map_poly):
+			return false
+		var result = Utils.Match.Unit.Placement.validate_agent_placement_position(
+			pos, 1.5, candidates, _nav_map_rid
+		)
+		if result != Utils.Match.Unit.Placement.VALID:
+			return false
 	return true
 
 
