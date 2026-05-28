@@ -10,8 +10,8 @@ const WallSectionUnit = preload("res://source/match/units/wall_section.tscn")
 const WallTowerUnit = preload("res://source/match/units/wall_tower.tscn")
 
 const WALL_SEGMENT_COST = {"stone": 150}
-const ROTATION_STEP = 90.0
-const WALL_OFFSET = 2.75
+const ROTATION_STEP = 45.0
+const WALL_OFFSET = 2.3
 
 const BLUEPRINT_VALID_PATH = "res://source/match/resources/materials/blueprint_valid.material.tres"
 const BLUEPRINT_INVALID_PATH = "res://source/match/resources/materials/blueprint_invalid.material.tres"

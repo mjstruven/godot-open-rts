@@ -111,6 +111,8 @@ func _calculate_screen_move_vector() -> Vector2:
 func _try_handling_zoom(event: InputEvent):
 	if not event is InputEventMouseButton or not event.is_pressed():
 		return
+	if get_tree().get_nodes_in_group("placement_active").size() > 0:
+		return
 	if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 		_zoom_in()
 	elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
