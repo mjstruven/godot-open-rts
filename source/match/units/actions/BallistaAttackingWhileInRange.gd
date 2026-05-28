@@ -166,7 +166,10 @@ static func _apply_damage(
 			var t2 = clamp(ap2.dot(ab2) / ab2_sq, 0.0, 1.0)
 			ld = px2.distance_to(ax2 + ab2 * t2)
 		if ld <= l_width:
-			u.hp -= int(l_dmg * 0.1) if u.is_in_group("bolstering") else l_dmg
+			var ldmg_eff = int(l_dmg * 0.1) if u.is_in_group("bolstering") else l_dmg
+			if u.is_in_group("garrisoned"):
+				ldmg_eff = int(ldmg_eff * 0.5)
+			u.hp -= ldmg_eff
 
 	for u in tree.get_nodes_in_group("units"):
 		if not is_instance_valid(u) or u == src_unit:
@@ -177,4 +180,7 @@ static func _apply_damage(
 			continue
 		var d2d = Vector2(u.global_position.x, u.global_position.z).distance_to(bx2)
 		if d2d <= a_radius:
-			u.hp -= int(a_dmg * 0.1) if u.is_in_group("bolstering") else a_dmg
+			var admg_eff = int(a_dmg * 0.1) if u.is_in_group("bolstering") else a_dmg
+			if u.is_in_group("garrisoned"):
+				admg_eff = int(admg_eff * 0.5)
+			u.hp -= admg_eff

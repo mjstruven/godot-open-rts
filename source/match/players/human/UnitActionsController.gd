@@ -307,6 +307,9 @@ func _navigate_unit_towards_unit(unit, target_unit):
 	var garrison_manager = target_unit.find_child("GarrisonManager")
 	if garrison_manager != null and target_unit.player == unit.player:
 		var unit_is_siege = unit.is_in_group("siege_units")
+		if not unit_is_siege and unit.type == "cavalry":
+			MatchSignals.alert_message.emit(get_parent(), "Cavalry cannot garrison towers")
+			return true
 		if not unit_is_siege and garrison_manager.has_siege():
 			MatchSignals.alert_message.emit(get_parent(), "Tower contains a siege weapon")
 			return true

@@ -12,18 +12,24 @@ const FollowingToReachDistanceLocal = preload(
 )
 
 const MIN_RANGE = 1.0
+const TOWER_MIN_RANGE = 2.0
 
 
 func _attack_or_move_closer():
+	var eff_min = TOWER_MIN_RANGE if _unit.is_in_group("garrisoned") else MIN_RANGE
 	var dist = _unit.global_position_yless.distance_to(_target_unit.global_position_yless)
-	if dist < MIN_RANGE:
-		_sub_action = MinRangeWaiter.new(_target_unit, MIN_RANGE)
+	if dist < eff_min:
+		_sub_action = MinRangeWaiter.new(_target_unit, eff_min)
 	elif dist <= _unit.attack_range and _unit.is_in_group("suppress_armed"):
 		_sub_action = SuppressedAttacking.new(_target_unit)
 	elif dist <= _unit.attack_range:
 		_sub_action = ArcherAttackingWhileInRange.new(_target_unit)
 	else:
-		if _unit.is_in_group("suppress_armed") or _unit.is_in_group("suppressing"):
+		if (
+			_unit.is_in_group("suppress_armed")
+			or _unit.is_in_group("suppressing")
+			or _unit.is_in_group("garrisoned")
+		):
 			queue_free()
 			return
 		_sub_action = FollowingToReachDistanceLocal.new(_target_unit, _unit.attack_range)

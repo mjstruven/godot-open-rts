@@ -1,6 +1,9 @@
 extends "res://source/match/units/Unit.gd"
 
 const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTargets.gd")
+const InfantryWaitingForTargetsInTower = preload(
+	"res://source/match/units/actions/InfantryWaitingForTargetsInTower.gd"
+)
 
 
 func _ready():
@@ -12,4 +15,7 @@ func _ready():
 
 func _on_action_changed(new_action):
 	if new_action == null and not is_in_group("in_crew"):
-		action = WaitingForTargets.new()
+		if is_in_group("garrisoned"):
+			action = InfantryWaitingForTargetsInTower.new()
+		else:
+			action = WaitingForTargets.new()

@@ -176,6 +176,8 @@ func _fire_arrow():
 				})
 			if closest.is_in_group("bolstering"):
 				effective_damage = int(effective_damage * 0.1)
+			if closest.is_in_group("garrisoned"):
+				effective_damage = int(effective_damage * 0.5)
 			closest.hp -= effective_damage
 			GameLogger.debug(GameLogger.Category.COMBAT, "Arrow impact", {
 				"landing_point": str(lp),
@@ -215,8 +217,9 @@ func _get_scatter_radius(distance: float) -> float:
 
 
 func _teardown_if_out_of_range() -> bool:
+	var eff_min = 2.0 if _unit.is_in_group("garrisoned") else MIN_RANGE
 	var dist = _unit.global_position_yless.distance_to(_target_unit.global_position_yless)
-	if dist > _unit.attack_range or dist < MIN_RANGE:
+	if dist > _unit.attack_range or dist < eff_min:
 		queue_free()
 		return true
 	return false
