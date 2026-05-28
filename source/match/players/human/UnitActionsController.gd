@@ -333,6 +333,20 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		unit.action_queue.clear()
 		unit.action = Actions.CollectingResourcesSequentially.new(target_unit)
 		return true
+	if target_unit.is_in_group("walls"):
+		var sf = unit.get_script().resource_path.get_file() if unit.get_script() else ""
+		var is_ranged = (
+			sf == "archer.gd"
+			or sf == "trebuchet.gd"
+			or (unit.find_child("ExternalCrewManager") != null and sf != "trebuchet.gd")
+		)
+		if is_ranged:
+			MatchSignals.alert_message.emit(unit.player, "Walls can't be damaged")
+		else:
+			MatchSignals.alert_message.emit(unit.player, "Units cannot damage walls")
+			var tgt = target_unit
+			_set_or_queue_action(unit, func(): unit.action = Actions.MovingToUnit.new(tgt), tgt.global_position)
+		return true
 	if Actions.AutoAttacking.is_applicable(unit, target_unit):
 		var tgt = target_unit
 		var unit_script_file = (

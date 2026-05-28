@@ -47,6 +47,7 @@ func _enemies_in_range() -> Array:
 			return (
 				u.player != _unit.player
 				and not u.is_in_group("neutral_siege")
+				and not u.is_in_group("walls")
 				and u.movement_domain in _unit.attack_domains
 				and _unit.global_position_yless.distance_to(u.global_position_yless)
 					<= _unit.attack_range

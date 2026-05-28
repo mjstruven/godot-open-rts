@@ -17,6 +17,8 @@ func _get_units_to_attack():
 				return false
 			if u.is_in_group("neutral_siege"):
 				return false
+			if u.is_in_group("walls"):
+				return false
 			if u.has_meta("crew_siege_unit") and u.get_meta("crew_siege_unit") == _unit:
 				return false
 			if u.movement_domain not in _unit.attack_domains:

@@ -32,6 +32,7 @@ func _get_units_to_attack():
 			return (
 				unit.player != _unit.player
 				and not unit.is_in_group("neutral_siege")
+				and not unit.is_in_group("walls")
 				and unit.movement_domain in _unit.attack_domains
 				and (
 					_unit.global_position_yless.distance_to(unit.global_position_yless)
