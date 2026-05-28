@@ -29,13 +29,27 @@ size = Vector3(3.4, 0.35, 0.12)
 material = SubResource("StandardMaterial3D_wscap")
 size = Vector3(0.35, 0.25, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_wsendwall"]
-material = SubResource("StandardMaterial3D_wscap")
-size = Vector3(0.12, 0.35, 2.0)
+[sub_resource type="CylinderMesh" id="CylinderMesh_wscapbody"]
+material = SubResource("StandardMaterial3D_wsbody")
+top_radius = 0.8
+bottom_radius = 0.8
+height = 1.75
 
-[sub_resource type="BoxMesh" id="BoxMesh_wsendmerlon"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_wscapslab"]
 material = SubResource("StandardMaterial3D_wscap")
-size = Vector3(0.12, 0.25, 0.35)
+top_radius = 1.0
+bottom_radius = 1.0
+height = 0.2
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wscapbatt"]
+material = SubResource("StandardMaterial3D_wscap")
+top_radius = 1.0
+bottom_radius = 1.0
+height = 0.35
+
+[sub_resource type="BoxMesh" id="BoxMesh_wscapmerlon"]
+material = SubResource("StandardMaterial3D_wscap")
+size = Vector3(0.3, 0.25, 0.3)
 
 [node name="Geometry" type="Node3D"]
 
@@ -93,18 +107,34 @@ mesh = SubResource("BoxMesh_wsmerlon")
 
 [node name="OuterCap" type="Node3D" parent="."]
 
-[node name="EndWall" type="MeshInstance3D" parent="OuterCap"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.56, 2.125, 0)
-mesh = SubResource("BoxMesh_wsendwall")
+[node name="CapBody" type="MeshInstance3D" parent="OuterCap"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.875, 0)
+mesh = SubResource("CylinderMesh_wscapbody")
 
-[node name="EndMerlon1" type="MeshInstance3D" parent="OuterCap"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.56, 2.425, -0.6)
-mesh = SubResource("BoxMesh_wsendmerlon")
+[node name="CapSlab" type="MeshInstance3D" parent="OuterCap"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.85, 0)
+mesh = SubResource("CylinderMesh_wscapslab")
 
-[node name="EndMerlon2" type="MeshInstance3D" parent="OuterCap"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.56, 2.425, 0)
-mesh = SubResource("BoxMesh_wsendmerlon")
+[node name="CapBattlement" type="MeshInstance3D" parent="OuterCap"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 2.125, 0)
+mesh = SubResource("CylinderMesh_wscapbatt")
 
-[node name="EndMerlon3" type="MeshInstance3D" parent="OuterCap"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.56, 2.425, 0.6)
-mesh = SubResource("BoxMesh_wsendmerlon")
+[node name="CapMerlon1" type="MeshInstance3D" parent="OuterCap"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 2.425, 1.0)
+mesh = SubResource("BoxMesh_wscapmerlon")
+
+[node name="CapMerlon2" type="MeshInstance3D" parent="OuterCap"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.207, 2.425, 0.707)
+mesh = SubResource("BoxMesh_wscapmerlon")
+
+[node name="CapMerlon3" type="MeshInstance3D" parent="OuterCap"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2.425, 0)
+mesh = SubResource("BoxMesh_wscapmerlon")
+
+[node name="CapMerlon4" type="MeshInstance3D" parent="OuterCap"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.207, 2.425, -0.707)
+mesh = SubResource("BoxMesh_wscapmerlon")
+
+[node name="CapMerlon5" type="MeshInstance3D" parent="OuterCap"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 2.425, -1.0)
+mesh = SubResource("BoxMesh_wscapmerlon")

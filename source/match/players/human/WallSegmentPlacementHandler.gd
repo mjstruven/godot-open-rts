@@ -12,6 +12,8 @@ const WallTowerUnit = preload("res://source/match/units/wall_tower.tscn")
 const WALL_SEGMENT_COST = {"stone": 150}
 const ROTATION_STEP = 45.0
 const WALL_OFFSET = 2.3
+const SNAP_RANGE = 4.0
+const OUTER_END_OFFSET = WALL_OFFSET + 1.5
 
 const BLUEPRINT_VALID_PATH = "res://source/match/resources/materials/blueprint_valid.material.tres"
 const BLUEPRINT_INVALID_PATH = "res://source/match/resources/materials/blueprint_invalid.material.tres"
@@ -98,7 +100,44 @@ func _update_ghost_position():
 	var visual_y: float = 0.0
 	if tvs != null and tvs.height_ready:
 		visual_y = tvs.get_visual_height_at(mouse_pos_3d)
-	_ghost.global_position = Vector3(mouse_pos_3d.x, visual_y, mouse_pos_3d.z)
+	var free_pos = Vector3(mouse_pos_3d.x, visual_y, mouse_pos_3d.z)
+	var snapped = _try_snap_to_wall_end(free_pos, visual_y)
+	_ghost.global_position = snapped if snapped != null else free_pos
+
+
+func _try_snap_to_wall_end(free_pos: Vector3, visual_y: float) -> Variant:
+	var ghost_basis = _ghost.global_transform.basis
+	var left_end_xz = Vector3(
+		(free_pos + ghost_basis * Vector3(-OUTER_END_OFFSET, 0, 0)).x,
+		0,
+		(free_pos + ghost_basis * Vector3(-OUTER_END_OFFSET, 0, 0)).z
+	)
+	var right_end_xz = Vector3(
+		(free_pos + ghost_basis * Vector3(OUTER_END_OFFSET, 0, 0)).x,
+		0,
+		(free_pos + ghost_basis * Vector3(OUTER_END_OFFSET, 0, 0)).z
+	)
+
+	var best_dist = SNAP_RANGE
+	var best_pos = null
+
+	for ws in get_tree().get_nodes_in_group("walls"):
+		var wall_end = ws.global_transform * Vector3(-1.5, 0, 0)
+		var wall_end_xz = Vector3(wall_end.x, 0, wall_end.z)
+
+		var dist_left = wall_end_xz.distance_to(left_end_xz)
+		if dist_left < best_dist:
+			best_dist = dist_left
+			var p = wall_end_xz + ghost_basis * Vector3(OUTER_END_OFFSET, 0, 0)
+			best_pos = Vector3(p.x, visual_y, p.z)
+
+		var dist_right = wall_end_xz.distance_to(right_end_xz)
+		if dist_right < best_dist:
+			best_dist = dist_right
+			var p = wall_end_xz + ghost_basis * Vector3(-OUTER_END_OFFSET, 0, 0)
+			best_pos = Vector3(p.x, visual_y, p.z)
+
+	return best_pos
 
 
 func _rotate_by(degrees: float):
