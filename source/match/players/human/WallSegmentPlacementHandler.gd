@@ -10,7 +10,7 @@ const WallSectionUnit = preload("res://source/match/units/wall_section.tscn")
 const WallTowerUnit = preload("res://source/match/units/wall_tower.tscn")
 
 const WALL_SEGMENT_COST = {"stone": 150}
-const ROTATION_STEP = 45.0
+const ROTATION_STEP = 22.5
 const WALL_OFFSET = 2.3
 const SNAP_RANGE = 4.0
 const OUTER_END_OFFSET = WALL_OFFSET + 1.5
@@ -187,17 +187,48 @@ func _spawn_segment():
 	origin.y = 0.0
 	var basis = _ghost.global_transform.basis
 
+	var left_end_xz = Vector3(
+		(origin + basis * Vector3(-OUTER_END_OFFSET, 0, 0)).x,
+		0,
+		(origin + basis * Vector3(-OUTER_END_OFFSET, 0, 0)).z
+	)
+	var right_end_xz = Vector3(
+		(origin + basis * Vector3(OUTER_END_OFFSET, 0, 0)).x,
+		0,
+		(origin + basis * Vector3(OUTER_END_OFFSET, 0, 0)).z
+	)
+	var left_neighbor = _find_wall_end_near(left_end_xz)
+	var right_neighbor = _find_wall_end_near(right_end_xz)
+
 	var tower = WallTowerUnit.instantiate()
 	MatchSignals.setup_and_spawn_unit.emit(tower, Transform3D(basis, origin), _player)
 
 	var left_offset = basis * Vector3(-WALL_OFFSET, 0, 0)
 	var left = WallSectionUnit.instantiate()
+	left.outer_end_capped = left_neighbor == null
 	MatchSignals.setup_and_spawn_unit.emit(left, Transform3D(basis, origin + left_offset), _player)
 
 	var right_offset = basis * Vector3(WALL_OFFSET, 0, 0)
 	var right_basis = basis.rotated(Vector3.UP, PI)
 	var right = WallSectionUnit.instantiate()
+	right.outer_end_capped = right_neighbor == null
 	MatchSignals.setup_and_spawn_unit.emit(right, Transform3D(right_basis, origin + right_offset), _player)
+
+	if left_neighbor != null:
+		left_neighbor.outer_end_capped = false
+		left_neighbor._update_cap_visibility()
+	if right_neighbor != null:
+		right_neighbor.outer_end_capped = false
+		right_neighbor._update_cap_visibility()
+
+
+func _find_wall_end_near(pos_xz: Vector3) -> Variant:
+	for ws in get_tree().get_nodes_in_group("walls"):
+		var wall_end = ws.global_transform * Vector3(-1.5, 0, 0)
+		var wall_end_xz = Vector3(wall_end.x, 0, wall_end.z)
+		if wall_end_xz.distance_to(pos_xz) < SNAP_RANGE:
+			return ws
+	return null
 
 
 func _cancel():
