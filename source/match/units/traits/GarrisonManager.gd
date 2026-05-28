@@ -238,10 +238,21 @@ func _release(unit: Node) -> void:
 	unit.action_queue.clear()
 	unit.show()
 	_set_interactive(unit, true)
-	var angle = randf() * TAU
-	var offset = Vector3(cos(angle), 0.0, sin(angle)) * (_tower.radius + 1.5)
-	unit.global_position = _tower.global_position + offset
-	unit.action = WaitingForTargets.new()
+	var rp = _tower.find_child("RallyPoint")
+	if rp != null and rp.global_position != _tower.global_position:
+		var raw_dir = Vector3(
+			rp.global_position.x - _tower.global_position.x,
+			0.0,
+			rp.global_position.z - _tower.global_position.z
+		)
+		var dir = raw_dir.normalized() if raw_dir.length_squared() > 0.001 else Vector3(1, 0, 0)
+		unit.global_position = _tower.global_position + dir * (_tower.radius + 1.5)
+		MatchSignals.navigate_unit_to_rally_point.emit(unit, rp)
+	else:
+		var angle = randf() * TAU
+		var offset = Vector3(cos(angle), 0.0, sin(angle)) * (_tower.radius + 1.5)
+		unit.global_position = _tower.global_position + offset
+		unit.action = WaitingForTargets.new()
 	print("[Garrison] %s exited tower" % unit.name)
 
 

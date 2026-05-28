@@ -292,7 +292,7 @@ class Units:
 			"sight_range": 25.0,
 			"hp": 700,
 			"hp_max": 700,
-			"attack_damage": 80,
+			"attack_damage": 250,
 			"attack_interval": 10.0,
 			"attack_range": 30.0,
 			"attack_domains": [Navigation.Domain.TERRAIN],
