@@ -136,7 +136,8 @@ func is_revealing():
 
 func _set_hp(value):
 	if is_in_group("walls") and hp != null and value < hp:
-		return
+		if not has_method("is_under_construction") or not call("is_under_construction"):
+			return
 	var old_hp = hp
 	hp = max(0, value)
 	if old_hp != null and hp < old_hp:
