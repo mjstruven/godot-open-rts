@@ -334,19 +334,20 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		unit.action = Actions.CollectingResourcesSequentially.new(target_unit)
 		return true
 	if target_unit.is_in_group("walls"):
-		var sf = unit.get_script().resource_path.get_file() if unit.get_script() else ""
-		var is_ranged = (
-			sf == "archer.gd"
-			or sf == "trebuchet.gd"
-			or (unit.find_child("ExternalCrewManager") != null and sf != "trebuchet.gd")
-		)
-		if is_ranged:
-			MatchSignals.alert_message.emit(unit.player, "Walls can't be damaged")
-		else:
-			MatchSignals.alert_message.emit(unit.player, "Units cannot damage walls")
-			var tgt = target_unit
-			_set_or_queue_action(unit, func(): unit.action = Actions.MovingToUnit.new(tgt), tgt.global_position)
-		return true
+		if not (unit.is_in_group("builders") and target_unit is Structure and not target_unit.is_constructed()):
+			var sf = unit.get_script().resource_path.get_file() if unit.get_script() else ""
+			var is_ranged = (
+				sf == "archer.gd"
+				or sf == "trebuchet.gd"
+				or (unit.find_child("ExternalCrewManager") != null and sf != "trebuchet.gd")
+			)
+			if is_ranged:
+				MatchSignals.alert_message.emit(unit.player, "Walls can't be damaged")
+			else:
+				MatchSignals.alert_message.emit(unit.player, "Units cannot damage walls")
+				var tgt = target_unit
+				_set_or_queue_action(unit, func(): unit.action = Actions.MovingToUnit.new(tgt), tgt.global_position)
+			return true
 	if Actions.AutoAttacking.is_applicable(unit, target_unit):
 		var tgt = target_unit
 		var unit_script_file = (
@@ -620,10 +621,37 @@ func _on_unit_targeted(unit):
 
 
 func _on_unit_spawned(unit):
+	if unit.has_meta("wall_segment_id"):
+		return
 	if Input.is_key_pressed(KEY_SHIFT):
 		_try_queuing_selected_workers_to_construct_structure(unit)
 	else:
 		_try_ordering_selected_workers_to_construct_structure(unit)
+
+
+func _assign_builders_to_wall_segment(pieces: Array):
+	var builders = get_tree().get_nodes_in_group("selected_units").filter(
+		func(u):
+			return u.is_in_group("controlled_units") and u.is_in_group("builders") and u.player == get_parent()
+	)
+	if builders.is_empty():
+		return
+	var valid_pieces = pieces.filter(func(p): return is_instance_valid(p) and p.is_inside_tree())
+	if valid_pieces.is_empty():
+		return
+	for builder in builders:
+		var sorted = valid_pieces.duplicate()
+		sorted.sort_custom(
+			func(a, b):
+				return (
+					builder.global_position_yless.distance_to(a.global_position_yless)
+					< builder.global_position_yless.distance_to(b.global_position_yless)
+				)
+		)
+		builder.action_queue.clear()
+		builder.action = Actions.Constructing.new(sorted[0])
+		for i in range(1, sorted.size()):
+			builder.action.enqueue(sorted[i])
 
 
 func _is_bolster_ready(unit) -> bool:

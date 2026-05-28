@@ -223,18 +223,26 @@ func _spawn_segment():
 	var origin = _ghost.global_position
 	origin.y = 0.0
 	var basis = _ghost.global_transform.basis
+	var segment_id = Time.get_ticks_msec()
 
 	var tower = WallTowerUnit.instantiate()
+	tower.set_meta("wall_segment_id", segment_id)
 	MatchSignals.setup_and_spawn_unit.emit(tower, Transform3D(basis, origin), _player)
 
 	var left_offset = basis * Vector3(-WALL_OFFSET, 0, 0)
 	var left = WallSectionUnit.instantiate()
+	left.set_meta("wall_segment_id", segment_id)
 	MatchSignals.setup_and_spawn_unit.emit(left, Transform3D(basis, origin + left_offset), _player)
 
 	var right_offset = basis * Vector3(WALL_OFFSET, 0, 0)
 	var right_basis = basis.rotated(Vector3.UP, PI)
 	var right = WallSectionUnit.instantiate()
+	right.set_meta("wall_segment_id", segment_id)
 	MatchSignals.setup_and_spawn_unit.emit(right, Transform3D(right_basis, origin + right_offset), _player)
+
+	var uac = _player.find_child("UnitActionsController")
+	if uac != null:
+		uac._assign_builders_to_wall_segment([tower, left, right])
 
 
 func _cancel():
