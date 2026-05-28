@@ -43,6 +43,7 @@ class Actions:
 
 
 const BolsterBuff = preload("res://source/match/units/traits/BolsterBuff.gd")
+const WallTowerUnit = preload("res://source/match/units/wall_tower.tscn")
 
 var _pending_command: String = ""
 var _crosshair_image: Image = null
@@ -569,7 +570,35 @@ func _apply_attack_ground(position: Vector3):
 			)
 
 
+func _try_rebuild_tower_stub(stub: Node) -> bool:
+	var player = get_parent()
+	if stub.player != player:
+		return false
+	var builders = get_tree().get_nodes_in_group("selected_units").filter(
+		func(u): return u.is_in_group("controlled_units") and u.is_in_group("builders")
+	)
+	if builders.is_empty():
+		return false
+	var rebuild_cost = Constants.Match.Units.CONSTRUCTION_COSTS[
+		"res://source/match/units/wall_tower.tscn"
+	]
+	if not player.has_resources(rebuild_cost):
+		MatchSignals.not_enough_resources_for_construction.emit(player)
+		return true
+	player.subtract_resources(rebuild_cost)
+	var stub_transform = stub.global_transform
+	stub_transform.origin.y = 0.0
+	stub.queue_free()
+	MatchSignals.setup_and_spawn_unit.emit(WallTowerUnit.instantiate(), stub_transform, player)
+	return true
+
+
 func _on_unit_targeted(unit):
+	if unit.is_in_group("wall_tower_stubs") and _try_rebuild_tower_stub(unit):
+		var targetability = unit.find_child("Targetability")
+		if targetability != null:
+			targetability.animate()
+		return
 	if _navigate_selected_units_towards_unit(unit):
 		var targetability = unit.find_child("Targetability")
 		if targetability != null:

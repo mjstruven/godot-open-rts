@@ -1,5 +1,7 @@
 extends "res://source/match/units/tower.gd"
 
+const WallSectionUnit = preload("res://source/match/units/wall_section.tscn")
+
 
 func _ready():
 	await super()
@@ -7,15 +9,14 @@ func _ready():
 
 
 func _handle_unit_death():
-	var match_node = find_parent("Match")
-	if match_node != null:
-		var rubble = MeshInstance3D.new()
-		var box = BoxMesh.new()
-		box.size = Vector3(1.6, 1.75, 1.6)
-		rubble.mesh = box
-		var mat = StandardMaterial3D.new()
-		mat.albedo_color = Color(0.35, 0.33, 0.30)
-		rubble.material_override = mat
-		match_node.add_child(rubble)
-		rubble.global_position = Vector3(global_position.x, 0.875, global_position.z)
+	var stub = WallSectionUnit.instantiate()
+	stub.outer_end_capped = false
+	stub.add_to_group("wall_tower_stubs")
+	var t = global_transform
+	t.origin.y = 0.0
+	var tower_player = player
+	MatchSignals.setup_and_spawn_unit.emit(stub, t, tower_player, false)
+	var dark_mat = StandardMaterial3D.new()
+	dark_mat.albedo_color = Color(0.15, 0.13, 0.11)
+	stub._change_geometry_material(dark_mat)
 	super()
