@@ -33,8 +33,6 @@ func _get_units_to_attack():
 				and origin.distance_to(unit.global_position_yless) <= MAX_RANGE
 			)
 	)
-	if not candidates.is_empty():
-		print("[TOWERATK] InfantryWFTInTower scan: %d candidates (range=%.1f)" % [candidates.size(), MAX_RANGE])
 	return candidates
 
 

@@ -29,7 +29,6 @@ func _attack_or_move_closer():
 	elif dist <= _unit.attack_range and _unit.is_in_group("suppress_armed"):
 		_sub_action = SuppressedAttacking.new(_target_unit)
 	elif dist <= _unit.attack_range:
-		print("[TOWERATK] ArcherAutoAtt → attacking %s dist=%.1f" % [_target_unit.name, dist])
 		_sub_action = ArcherAttackingWhileInRange.new(_target_unit)
 	else:
 		if (
@@ -37,7 +36,6 @@ func _attack_or_move_closer():
 			or _unit.is_in_group("suppressing")
 			or _unit.is_in_group("garrisoned")
 		):
-			print("[TOWERATK] ArcherAutoAtt out-of-range garrisoned, freeing dist=%.1f range=%.1f" % [dist, _unit.attack_range])
 			queue_free()
 			return
 		_sub_action = FollowingToReachDistanceLocal.new(_target_unit, _unit.attack_range)

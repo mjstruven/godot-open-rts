@@ -23,8 +23,6 @@ func _get_units_to_attack():
 				and origin.distance_to(unit.global_position_yless) <= _unit.sight_range
 			)
 	)
-	if not candidates.is_empty():
-		print("[TOWERATK] ArcherWFT scan: %d candidates (sight=%.1f garrisoned=%s)" % [candidates.size(), _unit.sight_range, str(_unit.is_in_group("garrisoned"))])
 	return candidates
 
 

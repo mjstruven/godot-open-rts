@@ -141,10 +141,8 @@ func _garrison_direct(unit: Node) -> void:
 		print("[Garrison] %s crew on roof (%d engineers)" % [unit.name, engineers.size()])
 	if unit.type == "infantry":
 		unit.action = InfantryWaitingForTargetsInTower.new()
-		print("[TOWERATK] garrison_direct %s → InfantryWaitingForTargetsInTower" % unit.name)
 	elif unit.type == "archer":
 		unit.action = ArcherWaitingForTargets.new()
-		print("[TOWERATK] garrison_direct %s → ArcherWaitingForTargets" % unit.name)
 	else:
 		var sg_applicable = StandingGround.is_applicable(unit)
 		unit.action = StandingGround.new() if sg_applicable else WaitingForTargets.new()

@@ -174,7 +174,6 @@ func _teardown_if_out_of_range() -> bool:
 		queue_free()
 		return true
 	var dist = _get_origin_yless().distance_to(_target_unit.global_position_yless)
-	print("[TOWERATK] InfantryThrow teardown check: dist=%.2f (min=%.1f max=%.1f)" % [dist, MIN_RANGE, MAX_RANGE])
 	if dist > MAX_RANGE or dist < MIN_RANGE:
 		queue_free()
 		return true

@@ -14,7 +14,6 @@ func _ready():
 
 
 func _on_action_changed(new_action):
-	print("[TOWERATK] infantry._on_action_changed new=%s garrisoned=%s" % [str(new_action), str(is_in_group("garrisoned"))])
 	if new_action == null and not is_in_group("in_crew"):
 		if is_in_group("garrisoned"):
 			action = InfantryWaitingForTargetsInTower.new()
