@@ -85,6 +85,7 @@ func _input(event):
 				"patrol":
 					_apply_patrol(pos)
 				"attack_ground":
+					print("[ATKGND] LMB click received — ground pos=", pos)
 					var space_state = get_viewport().get_world_3d().direct_space_state
 					var ray_from = camera.project_ray_origin(event.position)
 					var ray_query = PhysicsRayQueryParameters3D.create(
@@ -94,12 +95,18 @@ func _input(event):
 					ray_query.collide_with_bodies = false
 					var ray_result = space_state.intersect_ray(ray_query)
 					var hit_unit = ray_result.get("collider") if not ray_result.is_empty() else null
+					if hit_unit != null:
+						print("[ATKGND] Unit raycast hit: '", hit_unit.name, "' groups=", hit_unit.get_groups(), " is_in_group(units)=", hit_unit.is_in_group("units"))
+					else:
+						print("[ATKGND] Unit raycast hit: none")
 					if hit_unit != null and hit_unit.is_in_group("units"):
+						print("[ATKGND] BRANCH: unit under cursor — routing to _navigate_selected_units_towards_unit (attack_ground BYPASSED)")
 						if _navigate_selected_units_towards_unit(hit_unit):
 							var targetability = hit_unit.find_child("Targetability")
 							if targetability != null:
 								targetability.animate()
 					else:
+						print("[ATKGND] BRANCH: no unit under cursor — calling _apply_attack_ground")
 						_apply_attack_ground(pos)
 		get_viewport().set_input_as_handled()
 	elif event.button_index == MOUSE_BUTTON_RIGHT:
@@ -429,6 +436,7 @@ func _on_combat_command_requested(command: String):
 		"attack_move", "patrol":
 			_enter_targeting_mode(command)
 		"attack_ground":
+			print("[ATKGND] Targeting mode entered — _pending_command='attack_ground'")
 			_enter_targeting_mode(command)
 		"charge":
 			var ctm = get_parent().find_child("ChargeTargetingMode")
@@ -552,33 +560,42 @@ func _apply_patrol(position: Vector3):
 
 
 func _apply_attack_ground(position: Vector3):
+	print("[ATKGND] _apply_attack_ground called — position=", position)
 	for unit in get_tree().get_nodes_in_group("selected_units"):
 		if not unit.is_in_group("controlled_units"):
+			print("[ATKGND]   ", unit.name, " — SKIP: not in controlled_units")
 			continue
 		var ecm = unit.find_child("ExternalCrewManager")
 		if ecm == null or ecm.crew_count() < 2:
+			print("[ATKGND]   ", unit.name, " — SKIP: ecm=", ecm != null, " crew_count=", ecm.crew_count() if ecm != null else 0)
 			continue
 		if unit.attack_range == null:
+			print("[ATKGND]   ", unit.name, " — SKIP: attack_range is null")
 			continue
 		var min_range: float = unit.get_meta("attack_min_range", 0.0)
 		var dist = unit.global_position_yless.distance_to(Vector3(position.x, 0.0, position.z))
 		if dist < min_range:
+			print("[ATKGND]   ", unit.name, " — SKIP: too close (dist=", dist, " min_range=", min_range, ")")
 			if is_instance_valid(unit.player):
 				MatchSignals.alert_message.emit(unit.player, "The target is too close")
 			continue
 		if dist > unit.attack_range:
+			print("[ATKGND]   ", unit.name, " — SKIP: out of range (dist=", dist, " attack_range=", unit.attack_range, ")")
 			continue
 		var tgt_pos = position
 		var unit_script_file = unit.get_script().resource_path.get_file() if unit.get_script() else ""
 		if unit_script_file == "trebuchet.gd":
 			if unit.get_pack_state() != "UNPACKED":
+				print("[ATKGND]   ", unit.name, " — SKIP: trebuchet not unpacked (state=", unit.get_pack_state(), ")")
 				if is_instance_valid(unit.player):
 					MatchSignals.alert_message.emit(unit.player, "Unpack trebuchet before firing")
 				continue
+			print("[ATKGND]   ", unit.name, " — FIRE TrebuchetAttackGround at ", tgt_pos)
 			_set_or_queue_action(
 				unit, func(): unit.action = Actions.TrebuchetAttackGround.new(tgt_pos), tgt_pos
 			)
 		else:
+			print("[ATKGND]   ", unit.name, " — FIRE BallistaAttackGround at ", tgt_pos)
 			_set_or_queue_action(
 				unit, func(): unit.action = Actions.BallistaAttackGround.new(tgt_pos), tgt_pos
 			)
