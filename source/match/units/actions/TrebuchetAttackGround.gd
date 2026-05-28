@@ -44,6 +44,8 @@ func _exit_tree():
 
 func _begin_shot_cycle():
 	_pick_scatter_pos()
+	var wp = _unit.global_position
+	_unit.target_rotation_y = atan2(wp.x - _target_pos.x, wp.z - _target_pos.z)
 	_create_indicator(INDICATOR_GREY)
 	_schedule_shot()
 

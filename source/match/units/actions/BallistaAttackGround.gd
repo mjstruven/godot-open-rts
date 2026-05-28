@@ -23,6 +23,8 @@ func _ready():
 	if ecm == null or ecm.crew_count() < 2:
 		queue_free()
 		return
+	var wp = _unit.global_position
+	_unit.target_rotation_y = atan2(wp.x - _target_pos.x, wp.z - _target_pos.z)
 	var now = Time.get_ticks_msec()
 	var next = _unit.get_meta("next_attack_availability_time", now)
 	if next > now:

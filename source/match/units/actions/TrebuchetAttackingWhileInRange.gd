@@ -40,6 +40,9 @@ func _exit_tree():
 
 func _begin_shot_cycle():
 	_pick_scatter_pos()
+	var wp = _unit.global_position
+	var tp = _target_unit.global_position
+	_unit.target_rotation_y = atan2(wp.x - tp.x, wp.z - tp.z)
 	_create_indicator(INDICATOR_GREY)
 	_schedule_shot()
 
@@ -228,6 +231,9 @@ static func _apply_aoe_damage(
 ) -> void:
 	if not is_instance_valid(src_unit):
 		return
+	var host_tower = null
+	if src_unit.is_in_group("garrisoned") and src_unit.has_meta("garrison_of"):
+		host_tower = src_unit.get_meta("garrison_of")
 	var ip = Vector2(impact_pos.x, impact_pos.z)
 	for u in tree.get_nodes_in_group("units"):
 		if not is_instance_valid(u):
@@ -235,6 +241,8 @@ static func _apply_aoe_damage(
 		if u == src_unit:
 			continue
 		if u.has_meta("crew_siege_unit") and u.get_meta("crew_siege_unit") == src_unit:
+			continue
+		if is_instance_valid(host_tower) and u == host_tower:
 			continue
 		var up = Vector2(u.global_position.x, u.global_position.z)
 		if up.distance_to(ip) <= AOE_RADIUS:

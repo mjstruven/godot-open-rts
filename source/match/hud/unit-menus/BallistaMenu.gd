@@ -57,8 +57,8 @@ func _on_crew_pressed():
 		if needed <= 0:
 			continue
 		var candidates = _find_candidates(weapon, pressing_player, needed)
-		if candidates.size() < needed:
-			MatchSignals.alert_message.emit(pressing_player, "Not enough nearby units to crew")
+		if candidates.is_empty():
+			MatchSignals.alert_message.emit(pressing_player, "No nearby units to crew")
 			continue
 		for foot in candidates:
 			foot.action = ApproachingExternalCrew.new(weapon)

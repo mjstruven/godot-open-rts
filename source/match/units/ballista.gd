@@ -16,10 +16,13 @@ const BallistaAttackGround = preload(
 const Circle3D = preload("res://source/generic-scenes-and-nodes/3d/Circle3D.gd")
 
 var _range_circles: Array = []
+var target_rotation_y: float = 0.0
+@export var rotation_speed: float = PI
 
 
 func _ready():
 	await super()
+	target_rotation_y = rotation.y
 	add_to_group("siege_units")
 	add_to_group("neutral_siege")
 	var mv = find_child("Movement")
@@ -35,6 +38,12 @@ func _ready():
 	selected.connect(_show_range_circles)
 	deselected.connect(_hide_range_circles)
 	MatchSignals.unit_focus_changed.connect(_on_focus_changed)
+
+
+func _process(delta: float) -> void:
+	super(delta)
+	var diff = wrapf(target_rotation_y - rotation.y, -PI, PI)
+	rotation.y += clamp(diff, -rotation_speed * delta, rotation_speed * delta)
 
 
 func _on_focus_changed(focused_units: Array):

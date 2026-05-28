@@ -22,6 +22,8 @@ const Circle3D = preload("res://source/generic-scenes-and-nodes/3d/Circle3D.gd")
 var _pack_progress: float = 0.0
 var _pack_target: float = 0.0
 var _range_circles: Array = []
+var target_rotation_y: float = 0.0
+@export var rotation_speed: float = PI
 
 @onready var _charge_bar_sprite = find_child("ChargeBarSprite")
 @onready var _mast_mesh = find_child("Mast")
@@ -31,6 +33,7 @@ var _range_circles: Array = []
 
 func _ready():
 	await super()
+	target_rotation_y = rotation.y
 	add_to_group("siege_units")
 	add_to_group("neutral_siege")
 	var mv = find_child("Movement")
@@ -50,6 +53,8 @@ func _ready():
 
 func _process(delta: float) -> void:
 	super(delta)
+	var diff = wrapf(target_rotation_y - rotation.y, -PI, PI)
+	rotation.y += clamp(diff, -rotation_speed * delta, rotation_speed * delta)
 	if _pack_progress == _pack_target:
 		return
 	var prev := _pack_progress

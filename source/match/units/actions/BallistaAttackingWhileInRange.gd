@@ -34,7 +34,7 @@ func _ready():
 
 func _physics_process(_delta):
 	if _unit_movement_trait == null:
-		_rotate_unit_towards_target()
+		_update_target_rotation()
 
 
 func _setup_one_shot_timer():
@@ -51,11 +51,10 @@ func _setup_range_check_timer():
 	_range_check_timer.start(RANGE_CHECK_INTERVAL)
 
 
-func _rotate_unit_towards_target():
-	_unit.global_transform = _unit.global_transform.looking_at(
-		Vector3(_target_unit.global_position.x, _unit.global_position.y, _target_unit.global_position.z),
-		Vector3(0, 1, 0)
-	)
+func _update_target_rotation():
+	var wp = _unit.global_position
+	var tp = _target_unit.global_position
+	_unit.target_rotation_y = atan2(wp.x - tp.x, wp.z - tp.z)
 
 
 func _schedule_shot():
@@ -128,7 +127,7 @@ func _on_passive_movement_started():
 
 
 func _on_passive_movement_finished():
-	_rotate_unit_towards_target()
+	_update_target_rotation()
 	_schedule_shot()
 
 
@@ -146,11 +145,16 @@ static func _apply_damage(
 	var bx2 = Vector2(lp.x, lp.z)
 	var ab2 = bx2 - ax2
 	var ab2_sq: float = ab2.length_squared()
+	var host_tower = null
+	if is_instance_valid(src_unit) and src_unit.is_in_group("garrisoned") and src_unit.has_meta("garrison_of"):
+		host_tower = src_unit.get_meta("garrison_of")
 
 	for u in tree.get_nodes_in_group("units"):
 		if not is_instance_valid(u) or u == src_unit:
 			continue
 		if u.has_meta("crew_siege_unit") and u.get_meta("crew_siege_unit") == src_unit:
+			continue
+		if is_instance_valid(host_tower) and u == host_tower:
 			continue
 		# Line pierce
 		var px2 = Vector2(u.global_position.x, u.global_position.z)
@@ -168,6 +172,8 @@ static func _apply_damage(
 		if not is_instance_valid(u) or u == src_unit:
 			continue
 		if u.has_meta("crew_siege_unit") and u.get_meta("crew_siege_unit") == src_unit:
+			continue
+		if is_instance_valid(host_tower) and u == host_tower:
 			continue
 		var d2d = Vector2(u.global_position.x, u.global_position.z).distance_to(bx2)
 		if d2d <= a_radius:
