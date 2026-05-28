@@ -25,5 +25,6 @@ func _process(delta: float) -> void:
 
 
 func _on_action_changed(new_action):
+	print("[TOWERATK] archer._on_action_changed new=%s garrisoned=%s" % [str(new_action), str(is_in_group("garrisoned"))])
 	if new_action == null and not is_in_group("in_crew"):
 		action = ArcherWaitingForTargets.new()

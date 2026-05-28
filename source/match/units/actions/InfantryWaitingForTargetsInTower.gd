@@ -13,16 +13,29 @@ func _ready():
 	super()
 
 
+func _get_origin_yless() -> Vector3:
+	if _unit.has_meta("garrison_of"):
+		return _unit.get_meta("garrison_of").global_position_yless
+	return _unit.global_position_yless
+
+
 func _get_units_to_attack():
-	return get_tree().get_nodes_in_group("units").filter(
+	var origin = _get_origin_yless()
+	var candidates = get_tree().get_nodes_in_group("units").filter(
 		func(unit):
 			return (
 				unit.player != _unit.player
 				and not unit.is_in_group("neutral_siege")
-				and unit.movement_domain in _unit.attack_domains
-				and _unit.global_position_yless.distance_to(unit.global_position_yless) <= MAX_RANGE
+				and (
+					unit.movement_domain in _unit.attack_domains
+					or unit.is_in_group("structures")
+				)
+				and origin.distance_to(unit.global_position_yless) <= MAX_RANGE
 			)
 	)
+	if not candidates.is_empty():
+		print("[TOWERATK] InfantryWFTInTower scan: %d candidates (range=%.1f)" % [candidates.size(), MAX_RANGE])
+	return candidates
 
 
 func _attack_unit(unit):

@@ -13,9 +13,14 @@ const SIEGE_PATHS = [
 const MAX_FOOT = 9
 const MAX_SIEGE = 1
 
-const InertAction = preload("res://source/match/units/actions/Action.gd")
 const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTargets.gd")
 const StandingGround = preload("res://source/match/units/actions/StandingGround.gd")
+const ArcherWaitingForTargets = preload(
+	"res://source/match/units/actions/ArcherWaitingForTargets.gd"
+)
+const InfantryWaitingForTargetsInTower = preload(
+	"res://source/match/units/actions/InfantryWaitingForTargetsInTower.gd"
+)
 
 var _garrisoned: Array = []
 var _garrisoned_slots: Dictionary = {}
@@ -135,7 +140,11 @@ func _garrison_direct(unit: Node) -> void:
 				eng.reset_terrain_visual_offset()
 		print("[Garrison] %s crew on roof (%d engineers)" % [unit.name, engineers.size()])
 	if unit.type == "infantry":
-		unit.action = InertAction.new()
+		unit.action = InfantryWaitingForTargetsInTower.new()
+		print("[TOWERATK] garrison_direct %s → InfantryWaitingForTargetsInTower" % unit.name)
+	elif unit.type == "archer":
+		unit.action = ArcherWaitingForTargets.new()
+		print("[TOWERATK] garrison_direct %s → ArcherWaitingForTargets" % unit.name)
 	else:
 		var sg_applicable = StandingGround.is_applicable(unit)
 		unit.action = StandingGround.new() if sg_applicable else WaitingForTargets.new()

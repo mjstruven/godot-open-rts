@@ -216,9 +216,15 @@ func _get_scatter_radius(distance: float) -> float:
 		return SCATTER_RADIUS_LARGE
 
 
+func _get_origin_yless() -> Vector3:
+	if _unit.is_in_group("garrisoned") and _unit.has_meta("garrison_of"):
+		return _unit.get_meta("garrison_of").global_position_yless
+	return _unit.global_position_yless
+
+
 func _teardown_if_out_of_range() -> bool:
 	var eff_min = 2.0 if _unit.is_in_group("garrisoned") else MIN_RANGE
-	var dist = _unit.global_position_yless.distance_to(_target_unit.global_position_yless)
+	var dist = _get_origin_yless().distance_to(_target_unit.global_position_yless)
 	if dist > _unit.attack_range or dist < eff_min:
 		queue_free()
 		return true

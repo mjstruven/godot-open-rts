@@ -163,11 +163,18 @@ func _get_scatter_radius(distance: float) -> float:
 		return SCATTER_RADIUS_LARGE
 
 
+func _get_origin_yless() -> Vector3:
+	if _unit.has_meta("garrison_of"):
+		return _unit.get_meta("garrison_of").global_position_yless
+	return _unit.global_position_yless
+
+
 func _teardown_if_out_of_range() -> bool:
 	if not _unit.is_in_group("garrisoned"):
 		queue_free()
 		return true
-	var dist = _unit.global_position_yless.distance_to(_target_unit.global_position_yless)
+	var dist = _get_origin_yless().distance_to(_target_unit.global_position_yless)
+	print("[TOWERATK] InfantryThrow teardown check: dist=%.2f (min=%.1f max=%.1f)" % [dist, MIN_RANGE, MAX_RANGE])
 	if dist > MAX_RANGE or dist < MIN_RANGE:
 		queue_free()
 		return true

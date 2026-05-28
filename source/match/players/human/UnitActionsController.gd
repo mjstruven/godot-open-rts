@@ -37,6 +37,9 @@ class Actions:
 	const ChargingPhaseA = preload("res://source/match/units/actions/ChargingPhaseA.gd")
 	const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTargets.gd")
 	const LoadingIntoGarrison = preload("res://source/match/units/actions/LoadingIntoGarrison.gd")
+	const InfantryThrowingRockWhileInRange = preload(
+		"res://source/match/units/actions/InfantryThrowingRockWhileInRange.gd"
+	)
 
 
 const BolsterBuff = preload("res://source/match/units/traits/BolsterBuff.gd")
@@ -262,6 +265,22 @@ func _navigate_unit_towards_unit(unit, target_unit):
 	if unit.is_in_group("in_crew"):
 		return false
 	if unit.is_in_group("garrisoned"):
+		if "player" in target_unit and target_unit.player != unit.player:
+			var unit_type = unit.get("type")
+			if unit_type == "archer":
+				var tgt = target_unit
+				_set_or_queue_action(
+					unit, func(): unit.action = Actions.ArcherAutoAttacking.new(tgt), tgt.global_position
+				)
+				return true
+			elif unit_type == "infantry":
+				var tgt = target_unit
+				_set_or_queue_action(
+					unit,
+					func(): unit.action = Actions.InfantryThrowingRockWhileInRange.new(tgt),
+					tgt.global_position
+				)
+				return true
 		return false
 	if unit.is_in_group("suppressing"):
 		var dist = unit.global_position_yless.distance_to(target_unit.global_position_yless)
