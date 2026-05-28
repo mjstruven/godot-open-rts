@@ -125,10 +125,16 @@ func garrison_unit(unit: Node) -> void:
 	garrison_changed.emit()
 
 
+func _emit_garrison_changed() -> void:
+	garrison_changed.emit()
+
+
 func _garrison_direct(unit: Node) -> void:
 	unit.add_to_group("garrisoned")
 	unit.set_meta("garrison_of", _tower)
 	_garrisoned.append(unit)
+	if not unit.tree_exited.is_connected(_emit_garrison_changed):
+		unit.tree_exited.connect(_emit_garrison_changed)
 	_assign_roof_slot(unit)
 	unit.reset_terrain_visual_offset()
 	var ecm = unit.find_child("ExternalCrewManager")
@@ -226,6 +232,8 @@ func kill_all_occupants() -> void:
 func _release(unit: Node) -> void:
 	if not is_instance_valid(unit):
 		return
+	if unit.tree_exited.is_connected(_emit_garrison_changed):
+		unit.tree_exited.disconnect(_emit_garrison_changed)
 	var ecm = unit.find_child("ExternalCrewManager")
 	if ecm != null:
 		for eng in ecm.get_all_engineers():
