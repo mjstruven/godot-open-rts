@@ -10,22 +10,8 @@ script = ExtResource("1_twrmenu")
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
-text = "ALL"
-tooltip_text = "Eject all garrisoned units [Q]"
-
-[node name="UngarrisonFootButton" type="Button" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-focus_mode = 0
-text = "FOOT"
-tooltip_text = "Eject foot soldiers [W]"
-
-[node name="UngarrisonSiegeButton" type="Button" parent="."]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-focus_mode = 0
-text = "SGE"
-tooltip_text = "Eject siege weapon [E]"
+text = "EXIT"
+tooltip_text = "Eject all occupants [Q]"
 
 [node name="Pad4" type="Control" parent="."]
 custom_minimum_size = Vector2(48, 48)
@@ -93,5 +79,3 @@ layout_mode = 2
 mouse_filter = 2
 
 [connection signal="pressed" from="UngarrisonAllButton" to="." method="_on_ungarrison_all_pressed"]
-[connection signal="pressed" from="UngarrisonFootButton" to="." method="_on_ungarrison_foot_pressed"]
-[connection signal="pressed" from="UngarrisonSiegeButton" to="." method="_on_ungarrison_siege_pressed"]

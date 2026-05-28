@@ -3,6 +3,7 @@ extends GridContainer
 const Human = preload("res://source/match/players/human/Human.gd")
 const ApproachingExternalCrew = preload("res://source/match/units/actions/ApproachingExternalCrew.gd")
 
+const MAX_CREW := 4
 const _CREWABLE = [
 	"res://source/match/units/infantry.tscn",
 	"res://source/match/units/archer.tscn",
@@ -86,9 +87,7 @@ func _on_crew_pressed():
 		var ecm = weapon.find_child("ExternalCrewManager")
 		if ecm == null:
 			continue
-		var min_crew_val = weapon.get("MIN_CREW_TO_FUNCTION")
-		var min_crew: int = min_crew_val if min_crew_val != null else 1
-		var needed = max(0, min_crew - ecm.crew_count())
+		var needed = max(0, MAX_CREW - ecm.crew_count())
 		if needed <= 0:
 			continue
 		var candidates = _find_candidates(weapon, pressing_player, needed)

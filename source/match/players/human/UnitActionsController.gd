@@ -306,6 +306,13 @@ func _navigate_unit_towards_unit(unit, target_unit):
 	# Garrison: infantry/archer/siege right-clicking their own Tower
 	var garrison_manager = target_unit.find_child("GarrisonManager")
 	if garrison_manager != null and target_unit.player == unit.player:
+		var unit_is_siege = unit.is_in_group("siege_units")
+		if not unit_is_siege and garrison_manager.has_siege():
+			MatchSignals.alert_message.emit(get_parent(), "Tower contains a siege weapon")
+			return true
+		if unit_is_siege and garrison_manager.get_foot_count() > 0:
+			MatchSignals.alert_message.emit(get_parent(), "Tower contains foot soldiers")
+			return true
 		if garrison_manager.can_accept_unit(unit):
 			var tgt = target_unit
 			_set_or_queue_action(
