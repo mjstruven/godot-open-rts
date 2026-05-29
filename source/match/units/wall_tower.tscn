@@ -15,6 +15,32 @@
 height = 3.4
 radius = 1.5
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_towerwalkwaynav"]
+size = Vector3(1.6, 0.1, 1.6)
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_towerwalkway"]
+geometry_parsed_geometry_type = 1
+geometry_collision_mask = 128
+geometry_source_geometry_mode = 1
+geometry_source_group_name = &"wall_top_nav_input"
+cell_size = 0.2
+cell_height = 0.2
+agent_height = 1.8
+agent_radius = 0.4
+agent_max_climb = 0.0
+
+[sub_resource type="GDScript" id="GDScript_twbody"]
+script/source = "extends StaticBody3D
+func _ready():
+	add_to_group(\"wall_top_nav_input\")
+"
+
+[sub_resource type="GDScript" id="GDScript_twregion"]
+script/source = "extends NavigationRegion3D
+func _ready():
+	bake_navigation_mesh()
+"
+
 [node name="WallTower" type="Area3D"]
 collision_layer = 2
 collision_mask = 0
@@ -55,5 +81,18 @@ script = ExtResource("8_wtgm")
 script = ExtResource("9_wtod")
 
 [node name="RallyPoint" parent="." instance=ExtResource("10_wtrp")]
+
+[node name="TowerWallWalkwayBody" type="StaticBody3D" parent="."]
+collision_layer = 128
+collision_mask = 0
+position = Vector3(0, 2.0, 0)
+script = SubResource("GDScript_twbody")
+
+[node name="TowerWalkwayShape" type="CollisionShape3D" parent="TowerWallWalkwayBody"]
+shape = SubResource("BoxShape3D_towerwalkwaynav")
+
+[node name="TowerWallWalkwayRegion" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavigationMesh_towerwalkway")
+script = SubResource("GDScript_twregion")
 
 [editable path="Geometry"]
