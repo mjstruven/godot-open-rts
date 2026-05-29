@@ -198,7 +198,9 @@ func _try_navigating_selected_units_towards_position(target_point):
 
 
 func _try_exiting_wall_garrisoned_units(position: Vector3):
+	print("[RT-EXIT] scanning selected units for wall garrison exit")
 	for unit in get_tree().get_nodes_in_group("selected_units"):
+		print("[RT-EXIT]   unit=", unit.name, " controlled=", unit.is_in_group("controlled_units"), " garrisoned=", unit.is_in_group("garrisoned"), " has_garrison_of=", unit.has_meta("garrison_of"))
 		if not unit.is_in_group("controlled_units"):
 			continue
 		if not unit.is_in_group("garrisoned") or not unit.has_meta("garrison_of"):
@@ -266,12 +268,15 @@ func _navigate_selected_units_towards_unit(target_unit):
 
 
 func _navigate_unit_towards_unit(unit, target_unit):
+	print("[RT-UNIT] unit=", unit.name, " target=", target_unit.name, " target_groups=", target_unit.get_groups(), " unit_groups=", unit.get_groups(), " has_garrison_of=", unit.has_meta("garrison_of"))
 	if unit.is_in_group("in_crew"):
 		return false
 	if unit.is_in_group("garrisoned"):
+		print("[RT-GARR] entered garrisoned block, has_garrison_of=", unit.has_meta("garrison_of"))
 		# Wall-to-wall movement: garrisoned wall unit clicking another constructed wall.
 		if unit.has_meta("garrison_of"):
 			var garrison_src = unit.get_meta("garrison_of")
+			print("[RT-GARR]   garrison_src=", garrison_src.name if is_instance_valid(garrison_src) else "invalid", " src_in_walls=", garrison_src.is_in_group("walls") if is_instance_valid(garrison_src) else false, " target_in_walls=", target_unit.is_in_group("walls"), " target_is_Structure=", target_unit is Structure, " target_constructed=", target_unit.is_constructed() if target_unit is Structure else false)
 			if (
 				is_instance_valid(garrison_src)
 				and garrison_src.is_in_group("walls")
@@ -285,6 +290,7 @@ func _navigate_unit_towards_unit(unit, target_unit):
 				)
 				return true
 		if "player" in target_unit and target_unit.player != unit.player:
+			print("[RT-GARR]   attack-from-garrison branch matched, unit_type=", unit.get("type"))
 			var unit_type = unit.get("type")
 			if unit_type == "archer":
 				var tgt = target_unit
@@ -522,6 +528,7 @@ func _apply_stand_ground():
 
 
 func _on_terrain_targeted(position):
+	print("[RT-POS] terrain_targeted pos=", position, " selected=", get_tree().get_nodes_in_group("selected_units").map(func(u): return u.name))
 	if _pending_command == "attack_move":
 		_exit_targeting_mode()
 		_apply_attack_move(position)
