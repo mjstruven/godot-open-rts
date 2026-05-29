@@ -91,6 +91,8 @@ func garrison_unit(unit: Node) -> void:
 				fc._group.on_member_died(unit)
 				break
 	_garrison_direct(unit)
+	var _geo = unit.find_child("Geometry")
+	print("[WGM-GARRISON] unit=", unit.name, " pos=", unit.global_position, " geo_y=", _geo.position.y if _geo else "no_geo", " in_group=", unit.is_in_group("garrisoned"))
 	garrison_changed.emit()
 
 
@@ -106,6 +108,9 @@ func _garrison_direct(unit: Node) -> void:
 		unit.tree_exited.connect(_emit_garrison_changed)
 	_assign_wall_slot(unit)
 	unit.reset_terrain_visual_offset()
+	var mv = unit.find_child("Movement")
+	if mv != null:
+		mv.avoidance_enabled = false
 	if unit.type == "infantry":
 		unit.action = InfantryWaitingForTargetsInTower.new()
 	elif unit.type == "archer":
@@ -175,6 +180,9 @@ func _release(unit: Node) -> void:
 	unit.remove_from_group("garrisoned")
 	if unit.has_meta("garrison_of"):
 		unit.remove_meta("garrison_of")
+	var mv = unit.find_child("Movement")
+	if mv != null:
+		mv.avoidance_enabled = true
 	unit.action_queue.clear()
 	unit.show()
 	_set_interactive(unit, true)
