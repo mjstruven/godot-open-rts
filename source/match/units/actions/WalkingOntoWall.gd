@@ -149,14 +149,16 @@ func _on_approach_finished():
 		queue_free()
 		return
 	print("[WALKING-ONTO-WALL] elevator unit=", _unit.name, " tower=", _entry_tower.name)
+	# Add "on_wall" BEFORE teleport so _update_visual_height early-returns and doesn't fight the position.
+	_unit.add_to_group("on_wall")
+	_entered_wall = true
 	var walkway_pos: Vector3 = _entry_tower.global_transform * Vector3(0.0, WALKWAY_Y, 0.0)
 	_unit.global_position = walkway_pos
 	_unit.reset_terrain_visual_offset()
-	_unit.add_to_group("on_wall")
-	_entered_wall = true
 	var mv = _unit.find_child("Movement")
 	if mv != null:
 		mv.avoidance_enabled = true
+	print("[WALKING-ONTO-WALL] post_teleport unit=", _unit.name, " pos=", _unit.global_position, " in_on_wall=", _unit.is_in_group("on_wall"))
 	_start_wall_walk()
 
 
@@ -165,8 +167,8 @@ func _start_wall_walk():
 		print("[WALKING-ONTO-WALL] queue_free: target_wall_section invalid in _start_wall_walk unit=", _unit.name)
 		queue_free()
 		return
-	print("[WALKING-ONTO-WALL] wall_walk unit=", _unit.name, " target=", _target_wall_section.name)
 	var target_pos: Vector3 = _target_wall_section.global_transform * Vector3(0.0, WALKWAY_Y, 0.0)
+	print("[WALKING-ONTO-WALL] wall_walk unit=", _unit.name, " target=", _target_wall_section.name, " unit_pos=", _unit.global_position, " target_pos=", target_pos)
 	_sub_action = Moving.new(target_pos)
 	_sub_action.tree_exited.connect(_on_wall_walk_finished)
 	add_child(_sub_action)
