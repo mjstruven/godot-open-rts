@@ -37,9 +37,7 @@ class Actions:
 	const ChargingPhaseA = preload("res://source/match/units/actions/ChargingPhaseA.gd")
 	const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTargets.gd")
 	const LoadingIntoGarrison = preload("res://source/match/units/actions/LoadingIntoGarrison.gd")
-	const LoadingIntoWallSection = preload(
-		"res://source/match/units/actions/LoadingIntoWallSection.gd"
-	)
+	const WalkingOntoWall = preload("res://source/match/units/actions/WalkingOntoWall.gd")
 	const ExitingWallSection = preload("res://source/match/units/actions/ExitingWallSection.gd")
 	const MovingOnWall = preload("res://source/match/units/actions/MovingOnWall.gd")
 	const InfantryThrowingRockWhileInRange = preload(
@@ -172,6 +170,7 @@ func _try_navigating_selected_units_towards_position(target_point):
 				and not _is_constructing(unit)
 				and not unit.is_in_group("suppressing")
 				and not unit.is_in_group("garrisoned")
+				and not unit.is_in_group("on_wall")
 			)
 	)
 	var air_units_to_move = get_tree().get_nodes_in_group("selected_units").filter(
@@ -212,7 +211,7 @@ func _find_wall_at_xz(world_pos: Vector3) -> Node:
 	return best_wall
 
 
-func _try_exiting_wall_garrisoned_units(position: Vector3):
+func _try_exiting_wall_garrisoned_units(position: Vector3, wall_at_click):
 	for unit in get_tree().get_nodes_in_group("selected_units"):
 		if not unit.is_in_group("controlled_units"):
 			continue
@@ -221,13 +220,48 @@ func _try_exiting_wall_garrisoned_units(position: Vector3):
 		var garrison_target = unit.get_meta("garrison_of")
 		if not is_instance_valid(garrison_target) or not garrison_target.is_in_group("walls"):
 			continue
-		var target_wall = _find_wall_at_xz(position)
-		if target_wall != null:
-			var tgt = target_wall
+		if wall_at_click != null:
+			var tgt = wall_at_click
 			_set_or_queue_action(unit, func(): unit.action = Actions.MovingOnWall.new(tgt), tgt.global_position)
 		else:
 			var dest = position
 			_set_or_queue_action(unit, func(): unit.action = Actions.ExitingWallSection.new(dest), dest)
+
+
+func _try_moving_on_wall_units(position: Vector3, wall_at_click):
+	if wall_at_click == null:
+		return
+	for unit in get_tree().get_nodes_in_group("selected_units"):
+		if not unit.is_in_group("controlled_units") or not unit.is_in_group("on_wall"):
+			continue
+		var w = wall_at_click
+		var local_click: Vector3 = w.global_transform.affine_inverse() * position
+		var clamped_x := clampf(local_click.x, -1.4, 1.4)
+		var wall_top: Vector3 = w.global_transform * Vector3(clamped_x, 1.95, 0.0)
+		var tgt_pos = wall_top
+		_set_or_queue_action(unit, func(): unit.action = Actions.Moving.new(tgt_pos), tgt_pos)
+
+
+func _try_walking_ground_units_onto_wall(position: Vector3, wall_at_click):
+	if wall_at_click == null:
+		return
+	for unit in get_tree().get_nodes_in_group("selected_units"):
+		if not unit.is_in_group("controlled_units"):
+			continue
+		if unit.is_in_group("garrisoned") or unit.is_in_group("on_wall"):
+			continue
+		if unit.is_in_group("builders") or unit.is_in_group("siege_units"):
+			continue
+		if unit.get("type") == "cavalry":
+			continue
+		var unit_type = unit.get("type")
+		if unit_type != "infantry" and unit_type != "archer":
+			continue
+		if unit.player != wall_at_click.player:
+			continue
+		var tgt = wall_at_click
+		var pos = position
+		_set_or_queue_action(unit, func(): unit.action = Actions.WalkingOntoWall.new(tgt, pos), tgt.global_position)
 
 
 func _try_setting_rally_points(target_point: Vector3):
@@ -288,6 +322,13 @@ func _navigate_selected_units_towards_unit(target_unit):
 func _navigate_unit_towards_unit(unit, target_unit):
 	if unit.is_in_group("in_crew"):
 		return false
+	if unit.is_in_group("on_wall"):
+		if target_unit.is_in_group("walls") and target_unit is Structure and target_unit.is_constructed():
+			var wall_top: Vector3 = target_unit.global_transform * Vector3(0.0, 1.95, 0.0)
+			var tgt_pos = wall_top
+			_set_or_queue_action(unit, func(): unit.action = Actions.Moving.new(tgt_pos), tgt_pos)
+			return true
+		# Non-wall targets: fall through to normal routing (attack, follow, etc.)
 	if unit.is_in_group("garrisoned"):
 		# Wall-to-wall movement: garrisoned wall unit clicking another constructed wall.
 		if unit.has_meta("garrison_of"):
@@ -386,10 +427,10 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		unit.action_queue.clear()
 		unit.action = Actions.CollectingResourcesSequentially.new(target_unit)
 		return true
-	# Wall garrison: foot soldiers entering a constructed wall section.
+	# Wall walk: foot soldiers stepping onto a constructed wall section.
 	if target_unit.is_in_group("walls") and target_unit is Structure and target_unit.is_constructed():
 		if unit.is_in_group("builders"):
-			MatchSignals.alert_message.emit(get_parent(), "Engineers cannot garrison walls")
+			MatchSignals.alert_message.emit(get_parent(), "Engineers cannot walk on walls")
 			return true
 		if unit.get("type") == "cavalry":
 			return true
@@ -401,11 +442,11 @@ func _navigate_unit_towards_unit(unit, target_unit):
 				var tgt = target_unit
 				_set_or_queue_action(
 					unit,
-					func(): unit.action = Actions.LoadingIntoWallSection.new(tgt),
+					func(): unit.action = Actions.WalkingOntoWall.new(tgt, tgt.global_position),
 					tgt.global_position
 				)
 			else:
-				MatchSignals.alert_message.emit(get_parent(), "Cannot garrison enemy walls")
+				MatchSignals.alert_message.emit(get_parent(), "Cannot walk on enemy walls")
 			return true
 		return false
 	if target_unit.is_in_group("walls"):
@@ -554,8 +595,11 @@ func _on_terrain_targeted(position):
 		_exit_targeting_mode()
 		_apply_attack_ground(position)
 		return
-	_try_exiting_wall_garrisoned_units(position)
+	var wall_at_click = _find_wall_at_xz(position)
+	_try_exiting_wall_garrisoned_units(position, wall_at_click)
+	_try_moving_on_wall_units(position, wall_at_click)
 	_try_navigating_selected_units_towards_position(position)
+	_try_walking_ground_units_onto_wall(position, wall_at_click)
 	_try_setting_rally_points(position)
 
 
@@ -598,6 +642,7 @@ func _apply_attack_move(position: Vector3):
 				and not _is_constructing(unit)
 				and not unit.is_in_group("suppressing")
 				and not unit.is_in_group("garrisoned")
+				and not unit.is_in_group("on_wall")
 			)
 	)
 	var targets = Utils.Match.Unit.Movement.crowd_moved_to_new_pivot(terrain_units, position)
@@ -619,6 +664,7 @@ func _apply_patrol(position: Vector3):
 				and not _is_constructing(unit)
 				and not unit.is_in_group("suppressing")
 				and not unit.is_in_group("garrisoned")
+				and not unit.is_in_group("on_wall")
 			)
 	)
 	var targets = Utils.Match.Unit.Movement.crowd_moved_to_new_pivot(terrain_units, position)
