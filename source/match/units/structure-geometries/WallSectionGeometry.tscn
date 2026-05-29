@@ -51,10 +51,6 @@ height = 0.35
 material = SubResource("StandardMaterial3D_wscap")
 size = Vector3(0.3, 0.25, 0.3)
 
-[sub_resource type="BoxMesh" id="BoxMesh_stair"]
-material = SubResource("StandardMaterial3D_wsbody")
-size = Vector3(1.0, 0.5, 0.3)
-
 [node name="Geometry" type="Node3D"]
 
 [node name="Foundation" type="MeshInstance3D" parent="."]
@@ -131,39 +127,3 @@ mesh = SubResource("BoxMesh_wscapmerlon")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 2.425, -1.0)
 mesh = SubResource("BoxMesh_wscapmerlon")
 
-[node name="StairsInner" type="Node3D" parent="."]
-
-[node name="StepI1" type="MeshInstance3D" parent="StairsInner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 1.85)
-mesh = SubResource("BoxMesh_stair")
-
-[node name="StepI2" type="MeshInstance3D" parent="StairsInner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 1.55)
-mesh = SubResource("BoxMesh_stair")
-
-[node name="StepI3" type="MeshInstance3D" parent="StairsInner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 1.25)
-mesh = SubResource("BoxMesh_stair")
-
-[node name="StepI4" type="MeshInstance3D" parent="StairsInner"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0.95)
-mesh = SubResource("BoxMesh_stair")
-
-[node name="StairsOuter" type="Node3D" parent="."]
-visible = false
-
-[node name="StepO1" type="MeshInstance3D" parent="StairsOuter"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -1.85)
-mesh = SubResource("BoxMesh_stair")
-
-[node name="StepO2" type="MeshInstance3D" parent="StairsOuter"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -1.55)
-mesh = SubResource("BoxMesh_stair")
-
-[node name="StepO3" type="MeshInstance3D" parent="StairsOuter"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, -1.25)
-mesh = SubResource("BoxMesh_stair")
-
-[node name="StepO4" type="MeshInstance3D" parent="StairsOuter"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, -0.95)
-mesh = SubResource("BoxMesh_stair")
