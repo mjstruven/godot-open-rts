@@ -14,18 +14,19 @@ func _ready():
 		nav_body.add_to_group("wall_top_nav_input")
 	var nav_region = find_child("WallTopNavRegion")
 	if nav_region != null:
+		nav_region.navigation_mesh = nav_region.navigation_mesh.duplicate()
 		nav_region.bake_navigation_mesh()
 
 
 func _update_cap_visibility():
-	var cap = find_child("OuterCap")
+	var cap = find_child("OuterCap", true, false)
 	if cap:
 		cap.visible = outer_end_capped
 
 
 func _update_stair_visibility():
-	var inner = find_child("StairsInner")
-	var outer_stair = find_child("StairsOuter")
+	var inner = find_child("StairsInner", true, false)
+	var outer_stair = find_child("StairsOuter", true, false)
 	if inner:
 		inner.visible = stair_side == 0
 	if outer_stair:
