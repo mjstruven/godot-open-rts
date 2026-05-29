@@ -267,7 +267,7 @@ func _try_queuing_selected_workers_to_construct_structure(potential_structure):
 		_try_ordering_selected_workers_to_construct_structure(structure)
 
 
-func _navigate_selected_units_towards_unit(target_unit):
+func _navigate_selected_units_towards_unit(target_unit, hit_position: Vector3 = Vector3(0.0, INF, 0.0)):
 	var at_least_one_unit_navigated = false
 	var emitted_needs_crew := false
 	for unit in get_tree().get_nodes_in_group("selected_units"):
@@ -278,12 +278,12 @@ func _navigate_selected_units_towards_unit(target_unit):
 			continue
 		if _is_constructing(unit) and not Actions.Constructing.is_applicable(unit, target_unit):
 			continue
-		if _navigate_unit_towards_unit(unit, target_unit):
+		if _navigate_unit_towards_unit(unit, target_unit, hit_position):
 			at_least_one_unit_navigated = true
 	return at_least_one_unit_navigated
 
 
-func _navigate_unit_towards_unit(unit, target_unit):
+func _navigate_unit_towards_unit(unit, target_unit, hit_position: Vector3 = Vector3(0.0, INF, 0.0)):
 	if unit.is_in_group("in_crew"):
 		return false
 	if unit.is_in_group("garrisoned"):
@@ -359,6 +359,13 @@ func _navigate_unit_towards_unit(unit, target_unit):
 					unit, func(): unit.action = Actions.LoadingIntoCrew.new(tgt), tgt.global_position
 				)
 				return true
+	# Wall tower: dispatch by hit Y-coordinate (lower = walkway access, upper = tower garrison).
+	if target_unit.is_in_group("wall_towers") and target_unit.player == unit.player:
+		if hit_position.y < 2.5:
+			print("[WALL-TOWER-LOWER] hit_position=", hit_position, " unit=", unit.name)
+			MatchSignals.alert_message.emit(get_parent(), "Use a wall tower to access walls (NEW-1 stub — full behavior coming)")
+			return true
+		# Upper half (Y >= 2.5): fall through to tower garrison below.
 	# Garrison: infantry/archer/siege right-clicking their own Tower
 	var garrison_manager = target_unit.find_child("GarrisonManager")
 	if garrison_manager != null and target_unit.player == unit.player:
@@ -673,13 +680,13 @@ func _try_rebuild_tower_stub(stub: Node) -> bool:
 	return true
 
 
-func _on_unit_targeted(unit):
+func _on_unit_targeted(unit, hit_position: Vector3 = Vector3(0.0, INF, 0.0)):
 	if unit.is_in_group("wall_tower_stubs") and _try_rebuild_tower_stub(unit):
 		var targetability = unit.find_child("Targetability")
 		if targetability != null:
 			targetability.animate()
 		return
-	if _navigate_selected_units_towards_unit(unit):
+	if _navigate_selected_units_towards_unit(unit, hit_position):
 		var targetability = unit.find_child("Targetability")
 		if targetability != null:
 			targetability.animate()
