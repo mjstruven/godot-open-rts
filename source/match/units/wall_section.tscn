@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" uid="uid://d4cwip5hpxlmo" path="res://source/match/units/traits/MovementObstacle.tscn" id="5_wsmo"]
 [ext_resource type="PackedScene" uid="uid://c3ssj2p6voauk" path="res://source/match/units/traits/HealthBar.tscn" id="6_wshb"]
 [ext_resource type="PackedScene" uid="uid://d4cm4yhtf11ur" path="res://source/match/units/traits/Targetability.tscn" id="7_wsta"]
+[ext_resource type="Script" path="res://source/match/units/traits/WallGarrisonManager.gd" id="8_wsgm"]
+[ext_resource type="Script" path="res://source/match/units/traits/WallOccupancyDots.gd" id="9_wsod"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wsbox"]
 size = Vector3(3.0, 1.75, 1.6)
@@ -68,6 +70,12 @@ shape = SubResource("BoxShape3D_walltopnav")
 
 [node name="WallTopNavRegion" type="NavigationRegion3D" parent="."]
 navigation_mesh = SubResource("NavigationMesh_walltop")
+
+[node name="WallGarrisonManager" type="Node" parent="."]
+script = ExtResource("8_wsgm")
+
+[node name="WallOccupancyDots" type="Node3D" parent="."]
+script = ExtResource("9_wsod")
 
 [node name="WallGarrisonSlots" type="Node3D" parent="."]
 

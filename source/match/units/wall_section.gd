@@ -17,6 +17,13 @@ func _ready():
 		nav_region.bake_navigation_mesh()
 
 
+func _handle_unit_death():
+	var wgm = find_child("WallGarrisonManager")
+	if wgm != null:
+		wgm.kill_all_occupants()
+	super()
+
+
 func _update_cap_visibility():
 	var cap = find_child("OuterCap", true, false)
 	if cap:
