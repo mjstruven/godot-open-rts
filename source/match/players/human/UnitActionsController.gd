@@ -37,6 +37,11 @@ class Actions:
 	const ChargingPhaseA = preload("res://source/match/units/actions/ChargingPhaseA.gd")
 	const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTargets.gd")
 	const LoadingIntoGarrison = preload("res://source/match/units/actions/LoadingIntoGarrison.gd")
+	const LoadingIntoWallSection = preload(
+		"res://source/match/units/actions/LoadingIntoWallSection.gd"
+	)
+	const ExitingWallSection = preload("res://source/match/units/actions/ExitingWallSection.gd")
+	const MovingOnWall = preload("res://source/match/units/actions/MovingOnWall.gd")
 	const InfantryThrowingRockWhileInRange = preload(
 		"res://source/match/units/actions/InfantryThrowingRockWhileInRange.gd"
 	)
@@ -192,6 +197,19 @@ func _try_navigating_selected_units_towards_position(target_point):
 	_emit_needs_crew_if_uncrewed_siege_selected()
 
 
+func _try_exiting_wall_garrisoned_units(position: Vector3):
+	for unit in get_tree().get_nodes_in_group("selected_units"):
+		if not unit.is_in_group("controlled_units"):
+			continue
+		if not unit.is_in_group("garrisoned") or not unit.has_meta("garrison_of"):
+			continue
+		var garrison_target = unit.get_meta("garrison_of")
+		if not is_instance_valid(garrison_target) or not garrison_target.is_in_group("walls"):
+			continue
+		var dest = position
+		_set_or_queue_action(unit, func(): unit.action = Actions.ExitingWallSection.new(dest), dest)
+
+
 func _try_setting_rally_points(target_point: Vector3):
 	var controlled_structures = get_tree().get_nodes_in_group("selected_units").filter(
 		func(unit):
@@ -251,6 +269,21 @@ func _navigate_unit_towards_unit(unit, target_unit):
 	if unit.is_in_group("in_crew"):
 		return false
 	if unit.is_in_group("garrisoned"):
+		# Wall-to-wall movement: garrisoned wall unit clicking another constructed wall.
+		if unit.has_meta("garrison_of"):
+			var garrison_src = unit.get_meta("garrison_of")
+			if (
+				is_instance_valid(garrison_src)
+				and garrison_src.is_in_group("walls")
+				and target_unit.is_in_group("walls")
+				and target_unit is Structure
+				and target_unit.is_constructed()
+			):
+				var tgt = target_unit
+				_set_or_queue_action(
+					unit, func(): unit.action = Actions.MovingOnWall.new(tgt), tgt.global_position
+				)
+				return true
 		if "player" in target_unit and target_unit.player != unit.player:
 			var unit_type = unit.get("type")
 			if unit_type == "archer":
@@ -333,6 +366,28 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		unit.action_queue.clear()
 		unit.action = Actions.CollectingResourcesSequentially.new(target_unit)
 		return true
+	# Wall garrison: foot soldiers entering a constructed wall section.
+	if target_unit.is_in_group("walls") and target_unit is Structure and target_unit.is_constructed():
+		if unit.is_in_group("builders"):
+			MatchSignals.alert_message.emit(get_parent(), "Engineers cannot garrison walls")
+			return true
+		if unit.get("type") == "cavalry":
+			return true
+		if unit.is_in_group("siege_units"):
+			return true
+		var unit_type = unit.get("type")
+		if unit_type == "infantry" or unit_type == "archer":
+			if unit.player == target_unit.player:
+				var tgt = target_unit
+				_set_or_queue_action(
+					unit,
+					func(): unit.action = Actions.LoadingIntoWallSection.new(tgt),
+					tgt.global_position
+				)
+			else:
+				MatchSignals.alert_message.emit(get_parent(), "Cannot garrison enemy walls")
+			return true
+		return false
 	if target_unit.is_in_group("walls"):
 		if not (unit.is_in_group("builders") and target_unit is Structure and not target_unit.is_constructed()):
 			var sf = unit.get_script().resource_path.get_file() if unit.get_script() else ""
@@ -479,6 +534,7 @@ func _on_terrain_targeted(position):
 		_exit_targeting_mode()
 		_apply_attack_ground(position)
 		return
+	_try_exiting_wall_garrisoned_units(position)
 	_try_navigating_selected_units_towards_position(position)
 	_try_setting_rally_points(position)
 

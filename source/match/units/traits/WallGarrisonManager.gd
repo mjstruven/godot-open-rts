@@ -158,6 +158,14 @@ func is_contested() -> bool:
 	return false
 
 
+func _on_contest_started() -> void:
+	pass
+
+
+func _on_contest_ended() -> void:
+	pass
+
+
 func _release(unit: Node) -> void:
 	if not is_instance_valid(unit):
 		return

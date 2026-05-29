@@ -51,6 +51,21 @@ height = 0.35
 material = SubResource("StandardMaterial3D_wscap")
 size = Vector3(0.3, 0.25, 0.3)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flagsurface"]
+albedo_color = Color(0.99, 0.81, 0.48, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_flagpole"]
+material = SubResource("StandardMaterial3D_wscap")
+top_radius = 0.04
+bottom_radius = 0.04
+height = 1.0
+radial_segments = 6
+rings = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_flagsurface"]
+material = SubResource("StandardMaterial3D_flagsurface")
+size = Vector3(0.45, 0.25, 0.05)
+
 [node name="Geometry" type="Node3D"]
 
 [node name="Foundation" type="MeshInstance3D" parent="."]
@@ -126,4 +141,12 @@ mesh = SubResource("BoxMesh_wscapmerlon")
 [node name="CapMerlon5" type="MeshInstance3D" parent="OuterCap"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 2.425, -1.0)
 mesh = SubResource("BoxMesh_wscapmerlon")
+
+[node name="FlagPole" type="MeshInstance3D" parent="OuterCap"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 3.025, 0)
+mesh = SubResource("CylinderMesh_flagpole")
+
+[node name="FlagSurface" type="MeshInstance3D" parent="OuterCap"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.725, 3.375, 0)
+mesh = SubResource("BoxMesh_flagsurface")
 
