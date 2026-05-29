@@ -84,7 +84,7 @@ func _process(_delta: float) -> void:
 
 
 func _update_visual_height() -> void:
-	if is_in_group("garrisoned"):
+	if is_in_group("garrisoned") or is_in_group("on_wall"):
 		return
 	if is_in_group("in_crew"):
 		return
