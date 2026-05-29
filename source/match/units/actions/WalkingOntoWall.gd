@@ -4,6 +4,7 @@ const Moving = preload("res://source/match/units/actions/Moving.gd")
 const Structure = preload("res://source/match/units/Structure.gd")
 
 const WALKWAY_Y = 1.95
+const APPROACH_DISTANCE = 2.5  # Trigger elevator when unit XZ is within this distance of tower
 
 var _target = null
 var _hit_position: Vector3
@@ -110,6 +111,22 @@ func _find_nearest_tower() -> Node:
 			best_dist = d
 			best = wt
 	return best
+
+
+func _process(_delta):
+	if _entered_wall:
+		return  # Past approach phase; elevator already fired
+	if _sub_action == null:
+		return  # No active approach sub-action
+	if not is_instance_valid(_entry_tower) or not _entry_tower.is_inside_tree():
+		return  # Tower gone; _check_valid will clean up
+	var unit_xz := Vector2(_unit.global_position.x, _unit.global_position.z)
+	var tower_xz := Vector2(_entry_tower.global_position.x, _entry_tower.global_position.z)
+	if unit_xz.distance_to(tower_xz) <= APPROACH_DISTANCE:
+		print("[WALKING-ONTO-WALL] proximity reached unit=", _unit.name, " dist=", unit_xz.distance_to(tower_xz))
+		var sub = _sub_action
+		_sub_action = null  # Prevent re-entry before tree_exited fires
+		sub.queue_free()    # _on_approach_finished fires via sub.tree_exited
 
 
 func _start_approaching_tower():
