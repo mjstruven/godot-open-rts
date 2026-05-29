@@ -361,11 +361,11 @@ func _navigate_unit_towards_unit(unit, target_unit, hit_position: Vector3 = Vect
 				return true
 	# Wall tower: dispatch by hit Y-coordinate (lower = walkway access, upper = tower garrison).
 	if target_unit.is_in_group("wall_towers") and target_unit.player == unit.player:
-		if hit_position.y < 2.5:
+		if hit_position.y < 3.0:
 			print("[WALL-TOWER-LOWER] hit_position=", hit_position, " unit=", unit.name)
 			MatchSignals.alert_message.emit(get_parent(), "Use a wall tower to access walls (NEW-1 stub — full behavior coming)")
 			return true
-		# Upper half (Y >= 2.5): fall through to tower garrison below.
+		# Upper half (Y >= 3.0): fall through to tower garrison below.
 	# Garrison: infantry/archer/siege right-clicking their own Tower
 	var garrison_manager = target_unit.find_child("GarrisonManager")
 	if garrison_manager != null and target_unit.player == unit.player:
