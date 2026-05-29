@@ -37,6 +37,7 @@ class Actions:
 	const ChargingPhaseA = preload("res://source/match/units/actions/ChargingPhaseA.gd")
 	const WaitingForTargets = preload("res://source/match/units/actions/WaitingForTargets.gd")
 	const LoadingIntoGarrison = preload("res://source/match/units/actions/LoadingIntoGarrison.gd")
+	const WalkingOntoWall = preload("res://source/match/units/actions/WalkingOntoWall.gd")
 	const ExitingWallSection = preload("res://source/match/units/actions/ExitingWallSection.gd")
 	const MovingOnWall = preload("res://source/match/units/actions/MovingOnWall.gd")
 	const InfantryThrowingRockWhileInRange = preload(
@@ -368,8 +369,13 @@ func _navigate_unit_towards_unit(unit, target_unit, hit_position: Vector3 = Vect
 		and not unit.is_in_group("builders")
 	):
 		if hit_position.y < 3.0:
-			print("[WALL-TOWER-LOWER] hit_position=", hit_position, " unit=", unit.name)
-			MatchSignals.alert_message.emit(get_parent(), "Use a wall tower to access walls (NEW-1 stub — full behavior coming)")
+			if unit.get("type") == "cavalry" or unit.is_in_group("siege_units"):
+				return true
+			var unit_type = unit.get("type")
+			if unit_type == "infantry" or unit_type == "archer":
+				var tgt = target_unit
+				var pos = hit_position
+				_set_or_queue_action(unit, func(): unit.action = Actions.WalkingOntoWall.new(tgt, pos), tgt.global_position)
 			return true
 		# Upper half (Y >= 3.0): fall through to tower garrison below.
 	# Garrison: infantry/archer/siege right-clicking their own Tower
@@ -397,7 +403,6 @@ func _navigate_unit_towards_unit(unit, target_unit, hit_position: Vector3 = Vect
 		unit.action_queue.clear()
 		unit.action = Actions.CollectingResourcesSequentially.new(target_unit)
 		return true
-	# Walls are not directly accessible via right-click. New architecture (tower-click dispatch) incoming.
 	if target_unit.is_in_group("walls") and target_unit is Structure and target_unit.is_constructed():
 		if unit.is_in_group("builders"):
 			MatchSignals.alert_message.emit(get_parent(), "Engineers cannot walk on walls")
@@ -406,7 +411,14 @@ func _navigate_unit_towards_unit(unit, target_unit, hit_position: Vector3 = Vect
 			return true
 		if unit.is_in_group("siege_units"):
 			return true
-		MatchSignals.alert_message.emit(get_parent(), "Use a wall tower to access walls")
+		var unit_type = unit.get("type")
+		if unit_type == "infantry" or unit_type == "archer":
+			if unit.player == target_unit.player:
+				var tgt = target_unit
+				var pos = hit_position
+				_set_or_queue_action(unit, func(): unit.action = Actions.WalkingOntoWall.new(tgt, pos), tgt.global_position)
+			else:
+				MatchSignals.alert_message.emit(get_parent(), "Cannot walk on enemy walls")
 		return true
 	if target_unit.is_in_group("walls"):
 		if not (unit.is_in_group("builders") and target_unit is Structure and not target_unit.is_constructed()):
