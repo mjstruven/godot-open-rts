@@ -91,8 +91,6 @@ func garrison_unit(unit: Node) -> void:
 				fc._group.on_member_died(unit)
 				break
 	_garrison_direct(unit)
-	var _geo = unit.find_child("Geometry")
-	print("[WGM-GARRISON] unit=", unit.name, " pos=", unit.global_position, " geo_y=", _geo.position.y if _geo else "no_geo", " in_group=", unit.is_in_group("garrisoned"))
 	garrison_changed.emit()
 
 

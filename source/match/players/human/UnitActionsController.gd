@@ -368,7 +368,6 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		return true
 	# Wall garrison: foot soldiers entering a constructed wall section.
 	if target_unit.is_in_group("walls") and target_unit is Structure and target_unit.is_constructed():
-		print("[WALL-RT] Wall branch entered unit=", unit.name, " target=", target_unit.name, " player_match=", unit.player == target_unit.player, " unit_type=", unit.get("type"))
 		if unit.is_in_group("builders"):
 			MatchSignals.alert_message.emit(get_parent(), "Engineers cannot garrison walls")
 			return true
@@ -379,7 +378,6 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		var unit_type = unit.get("type")
 		if unit_type == "infantry" or unit_type == "archer":
 			if unit.player == target_unit.player:
-				print("[WALL-RT]   Assigning LoadingIntoWallSection")
 				var tgt = target_unit
 				_set_or_queue_action(
 					unit,
@@ -387,7 +385,6 @@ func _navigate_unit_towards_unit(unit, target_unit):
 					tgt.global_position
 				)
 			else:
-				print("[WALL-RT]   Enemy wall reject")
 				MatchSignals.alert_message.emit(get_parent(), "Cannot garrison enemy walls")
 			return true
 		return false
