@@ -56,7 +56,7 @@ func _on_approach_finished():
 	_unit.add_to_group("on_wall")
 	var mv = _unit.find_child("Movement")
 	if mv != null:
-		mv.avoidance_enabled = false
+		mv.avoidance_enabled = true
 	queue_free()
 
 
