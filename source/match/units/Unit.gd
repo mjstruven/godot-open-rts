@@ -189,6 +189,7 @@ func _setup_color():
 
 
 func _set_action(action_node):
+	print("[UNIT-ACT] ", name, " action=", action_node.get_script().resource_path.get_file() if action_node else "null")
 	if not is_inside_tree() or _action_locked:
 		if action_node != null:
 			action_node.queue_free()
