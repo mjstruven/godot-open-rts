@@ -122,10 +122,13 @@ func _start_approaching_tower():
 
 
 func _on_approach_finished():
+	print("[WALKING-ONTO-WALL] approach_finished unit=", _unit.name, " inside_tree=", is_inside_tree(), " queued=", is_queued_for_deletion(), " unit_groups=", _unit.get_groups())
 	if not is_inside_tree() or is_queued_for_deletion():
+		print("[WALKING-ONTO-WALL] queue_free: approach_finished guard (not in tree or queued) unit=", _unit.name)
 		return
 	_sub_action = null
 	if not is_instance_valid(_entry_tower) or not _entry_tower.is_inside_tree():
+		print("[WALKING-ONTO-WALL] queue_free: entry_tower invalid unit=", _unit.name)
 		queue_free()
 		return
 	print("[WALKING-ONTO-WALL] elevator unit=", _unit.name, " tower=", _entry_tower.name)
@@ -142,6 +145,7 @@ func _on_approach_finished():
 
 func _start_wall_walk():
 	if not is_instance_valid(_target_wall_section) or not _target_wall_section.is_inside_tree():
+		print("[WALKING-ONTO-WALL] queue_free: target_wall_section invalid in _start_wall_walk unit=", _unit.name)
 		queue_free()
 		return
 	print("[WALKING-ONTO-WALL] wall_walk unit=", _unit.name, " target=", _target_wall_section.name)
@@ -159,8 +163,12 @@ func _on_wall_walk_finished():
 	queue_free()
 
 
+func _exit_tree():
+	print("[WALKING-ONTO-WALL] _exit_tree unit=", _unit.name if is_instance_valid(_unit) else "null", " entered_wall=", _entered_wall, " phase=", "wall" if _entered_wall else "ground")
+
+
 func _fail(reason: String):
-	print("[WALKING-ONTO-WALL] fail: ", reason, " unit=", _unit.name)
+	print("[WALKING-ONTO-WALL] queue_free: fail reason=", reason, " unit=", _unit.name)
 	MatchSignals.alert_message.emit(_unit.player, reason)
 	queue_free()
 
@@ -172,11 +180,11 @@ func _on_target_invalidated():
 func _check_valid():
 	if not is_inside_tree():
 		return
-	if (
-		not is_instance_valid(_target) or not _target.is_inside_tree()
-		or not is_instance_valid(_target_wall_section) or not _target_wall_section.is_inside_tree()
-		or not is_instance_valid(_entry_tower) or not _entry_tower.is_inside_tree()
-	):
+	var target_bad = not is_instance_valid(_target) or not _target.is_inside_tree()
+	var section_bad = not is_instance_valid(_target_wall_section) or not _target_wall_section.is_inside_tree()
+	var tower_bad = not is_instance_valid(_entry_tower) or not _entry_tower.is_inside_tree()
+	print("[WALKING-ONTO-WALL] check_valid unit=", _unit.name, " target_bad=", target_bad, " section_bad=", section_bad, " tower_bad=", tower_bad)
+	if target_bad or section_bad or tower_bad:
 		if _entered_wall:
 			_unit.remove_from_group("on_wall")
 		queue_free()
