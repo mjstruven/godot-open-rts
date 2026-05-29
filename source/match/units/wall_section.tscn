@@ -38,6 +38,10 @@ script = ExtResource("1_wsscr")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
 shape = SubResource("BoxShape3D_wsbox")
 
+[node name="WalkwayCollision" type="CollisionShape3D" parent="."]
+position = Vector3(0, 1.95, 0)
+shape = SubResource("BoxShape3D_walltopnav")
+
 [node name="Highlight" parent="." instance=ExtResource("3_wshi")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 radius = 1.5
