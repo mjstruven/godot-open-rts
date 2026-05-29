@@ -203,9 +203,9 @@ func _find_wall_at_xz(world_pos: Vector3) -> Node:
 	for wall in get_tree().get_nodes_in_group("walls"):
 		if not is_instance_valid(wall) or not wall.is_inside_tree():
 			continue
-		var local := wall.global_transform.affine_inverse() * world_pos
+		var local: Vector3 = wall.global_transform.affine_inverse() * world_pos
 		if absf(local.x) < 1.5 and absf(local.z) < 0.8:
-			var dist := Vector2(local.x, local.z).length()
+			var dist: float = Vector2(local.x, local.z).length()
 			if dist < best_dist:
 				best_dist = dist
 				best_wall = wall
