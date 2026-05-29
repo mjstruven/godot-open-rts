@@ -7,6 +7,7 @@ const APPROACH_LOCAL_Z = 2.3
 
 var _wall_section = null
 var _sub_action = null
+var _garrisoned_successfully := false
 
 @onready var _unit = Utils.NodeEx.find_parent_with_group(self, "units")
 
@@ -23,7 +24,7 @@ func _ready():
 		queue_free()
 		return
 	var wgm = _wall_section.find_child("WallGarrisonManager")
-	if wgm == null or not wgm.can_accept_unit(_unit):
+	if wgm == null or not wgm.reserve_slot(_unit):
 		print("[LoadingIntoWallSection] %s: wall full or unit type rejected" % _unit.name)
 		queue_free()
 		return
@@ -48,14 +49,23 @@ func _on_approach_finished():
 		queue_free()
 		return
 	var wgm = _wall_section.find_child("WallGarrisonManager")
-	if wgm == null or not wgm.can_accept_unit(_unit):
-		print("[LoadingIntoWallSection] %s: wall full at elevator — standing down" % _unit.name)
+	if wgm == null:
 		queue_free()
 		return
-	# garrison_unit handles: slot snap to wall-top position, "garrisoned" group,
-	# garrison_of meta, reset_terrain_visual_offset, and attack action assignment.
+	# garrison_unit consumes the reservation and handles slot assignment.
 	wgm.garrison_unit(_unit)
+	_garrisoned_successfully = true
 	queue_free()
+
+
+func _exit_tree():
+	if _garrisoned_successfully:
+		return
+	if not is_instance_valid(_wall_section) or not _wall_section.is_inside_tree():
+		return
+	var wgm = _wall_section.find_child("WallGarrisonManager")
+	if wgm != null:
+		wgm.release_reservation(_unit)
 
 
 func _on_wall_removed():

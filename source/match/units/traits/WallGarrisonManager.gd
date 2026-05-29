@@ -19,6 +19,7 @@ const InfantryWaitingForTargetsInTower = preload(
 
 var _garrisoned: Array = []
 var _slots: Dictionary = {}  # index(0-5) -> unit
+var _reservations: Array = []  # units approaching but not yet garrisoned
 
 @onready var _wall = get_parent()
 
@@ -70,14 +71,33 @@ func _release_slot(unit: Node) -> void:
 
 func can_accept_unit(unit) -> bool:
 	_cleanup_dead()
+	_reservations = _reservations.filter(func(u): return is_instance_valid(u))
 	if not _is_foot(unit):
 		return false
-	if unit in _garrisoned:
+	if unit in _garrisoned or unit in _reservations:
 		return false
-	return _garrisoned.size() < MAX_FOOT
+	return _garrisoned.size() + _reservations.size() < MAX_FOOT
+
+
+func reserve_slot(unit: Node) -> bool:
+	_cleanup_dead()
+	_reservations = _reservations.filter(func(u): return is_instance_valid(u))
+	if not _is_foot(unit):
+		return false
+	if unit in _garrisoned or unit in _reservations:
+		return false
+	if _garrisoned.size() + _reservations.size() >= MAX_FOOT:
+		return false
+	_reservations.append(unit)
+	return true
+
+
+func release_reservation(unit: Node) -> void:
+	_reservations.erase(unit)
 
 
 func garrison_unit(unit: Node) -> void:
+	_reservations.erase(unit)
 	if not can_accept_unit(unit):
 		print("[WallGarrison] Rejected %s — full or type conflict" % unit.name)
 		return
