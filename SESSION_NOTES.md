@@ -505,3 +505,55 @@ For later balancing: the four scatter tier radii (1.0 / 1.75 / 2.75 / 3.75), the
 ## GDD IS STALE ON THE TREBUCHET
 
 The GDD v0.3 Trebuchet (30 s pack, range 10–25, damage 32, buildings-only, "Flying Fire") is now fully superseded by the built Trebuchet. The GDD needs a reconciliation pass; until then, SESSION_NOTES is the source of truth for the Trebuchet.
+
+---
+
+## Session: B1 Wall Access — Architecture Pivot to Navmesh-Ramp (2026-05-29)
+
+### Journey: What Was Tried and Why It Failed
+
+**B1a–B1d (commits `ab39698`–`a21c126`):** Built wall-top navmesh, WallGarrisonManager, LoadingIntoWallSection, ExitingWallSection, MovingOnWall, ownership/flag visuals, right-click routing. Units teleported to wall top via a multi-phase `_elevator_phase()`.
+
+**B1 Pivot-1 (commits `7745b7c`–`5002424`):** Refactored to a `WalkingOntoWall` action, removed auto-garrison, added `on_wall` group to pin visual height on the wall navmesh.
+
+**Why teleport failed every time:** `NavigationAgent3D.set_target_position()` snaps the agent to the nearest polygon in the navmesh graph. The wall walkway was a disconnected navmesh island — no continuous path from ground to wall. After every teleport to Y=1.95, the agent's next path update snapped it back to Y≈1.0. `_update_visual_height()` also fought the position change. No amount of ordering fixes could override the NavigationServer3D snapping to a reachable polygon.
+
+**B1 Reset (commit `4556feb`):** Reverted all Pivot-1 routing additions. Kept walkway collision as static infrastructure. Walls explicitly inaccessible — new architecture incoming.
+
+**B1 NEW-1 (commits `69e220f`, `d85ecba`, `27b2861`):** Added upper/lower click dispatch on wall_tower. Y<3.0 = lower click (eventually: walk up ramp). Y≥3.0 = upper click (garrison). Threshold adjusted to 3.0 to match geometry (body ends at Y=3.10).
+
+**B1 NEW-2 (commits `30dace6`, `ef33b03`, `23d4988`, `6fc7a2b`, `8e89eba`):** Attempted multi-leg WalkingOntoWall (ground walk → approach tower → elevator → walk wall navmesh to target). Extensive diagnostics confirmed: unit exits elevator at Y=1.95, `_update_visual_height` corrects it, then NavigationAgent3D snaps to closest navmesh polygon (Y≈1.0). The wall walkway navmesh is a disconnected island. No routing fix can solve this without connecting the navmeshes.
+
+### Strategic Pivot: Path B+2 — Navmesh-Ramp Architecture
+
+**Root cause of all failures:** wall and ground navmeshes are not connected. The fix is structural, not a routing patch.
+
+**Solution:** Make the tower a physical navmesh ramp connecting ground (Y=0) to walkway (Y=2.0). NavigationServer3D bakes a continuous graph: ground polygons → tower ramp polygons → walkway polygon → wall section polygons. Units walk on walls via natural pathfinding — no teleport, no elevator, no special-case action.
+
+**Locked design:**
+- Tower interior ramp: a tilted `CollisionShape3D` on layer 128, baked by `TowerWallWalkwayRegion` via the `wall_top_nav_input` group.
+- `navigation_layers` per unit type (NEW-3b): infantry/archer = ground+wall layers; cavalry/siege = ground only. Prevents non-foot units from auto-routing onto walls.
+- Routing cleanup (NEW-3c): replace `WalkingOntoWall.gd` stub with direct `Moving` actions — natural pathfinding does the rest.
+
+### NEW-3a Shipped (commit `d59a3ee`)
+
+Added `TowerRampBody` (StaticBody3D, layer=128) + `TowerRampShape` (BoxShape3D 1.4×0.2×3.05, tilted 41°) to `wall_tower.tscn`.
+
+**Critical audit finding — ramp lower end placement:** The terrain navmesh rebakes with a ~1.5m radius obstacle hole when the tower is placed. Godot's default `edge_connection_margin` is 0.25m. A ramp ending at Z=+1.2 (foundation edge) leaves a 0.3m gap to the ground navmesh — stitching fails. The ramp lower end must reach Z=+1.5 (the exact `MovementObstacle` polygon boundary) so the gap is 0m.
+
+**Ramp geometry:** Z=-0.8 (top, at walkway edge) to Z=+1.5 (bottom, at obstacle boundary); 41° slope (under the 45° default `agent_max_slope`); 1.4m wide → 0.6m effective navigable width after agent_radius erosion. Reuses the existing `GDScript_twbody` script (adds to `wall_top_nav_input` group); placed before `TowerWallWalkwayRegion` in the scene tree so group membership is set before the bake fires.
+
+### Outstanding Work
+
+- **NEW-3b:** Set `navigation_layers` per unit type. Infantry/archer get ground + wall layers; cavalry, siege, engineers get ground only.
+- **NEW-3c:** Replace lower-tower click alert with actual `Moving` routing. Natural pathfinding handles the rest once navigation_layers are set.
+- **Polish:** Sticky pathing on lower-tower clicks; missing click animation.
+- **DEFERRED:** Garrison-into-unconstructed-tower crash.
+- **DEFERRED:** Stale flag visuals when tower is destroyed.
+
+### Current State
+
+- Navmesh ramp infrastructure is in place. Ground navmesh stitches to tower ramp, which stitches to walkway, which stitches to wall sections.
+- Units cannot walk on walls yet (routing not wired; navigation_layers not filtered).
+- Project compiles and runs clean.
+- **Next: NEW-3b (navigation_layers per unit type).**
