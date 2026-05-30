@@ -85,6 +85,8 @@ func _process(_delta: float) -> void:
 
 func _update_visual_height() -> void:
 	if is_in_group("garrisoned") or is_in_group("on_wall"):
+		if name == "Infantry":
+			print("[UVH-on_wall] Infantry _update_visual_height: on_wall/garrisoned group present, early-return")
 		return
 	if is_in_group("in_crew"):
 		return
@@ -96,6 +98,8 @@ func _update_visual_height() -> void:
 		return
 	var h: float = _tvs.get_visual_height_at(global_position)
 	var offset: float = h - global_position.y
+	if name == "Infantry":
+		print("[UVH-anchor] Infantry anchoring visual offset=", offset, " global_pos=", global_position, " terrain_h=", h)
 	(_geometry as Node3D).position.y = offset
 	if _collision_shape != null:
 		_collision_shape.position.y = _cs_base_y + offset
