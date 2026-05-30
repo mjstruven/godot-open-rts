@@ -12,6 +12,7 @@ var _target_wall_section = null
 var _entry_tower = null
 var _sub_action = null
 var _entered_wall := false
+var _walk_frame_count := 0
 
 @onready var _unit = Utils.NodeEx.find_parent_with_group(self, "units")
 
@@ -115,7 +116,14 @@ func _find_nearest_tower() -> Node:
 
 func _process(_delta):
 	if _entered_wall:
-		return  # Past approach phase; elevator already fired
+		_walk_frame_count += 1
+		if _walk_frame_count % 10 == 0 and _walk_frame_count <= 180:
+			var nav_target := Vector3.ZERO
+			var mv = _unit.find_child("Movement")
+			if mv != null and "target_position" in mv:
+				nav_target = mv.target_position
+			print("[WALKING-ONTO-WALL] poll frame=", _walk_frame_count, " unit_pos=", _unit.global_position, " in_on_wall=", _unit.is_in_group("on_wall"), " nav_target=", nav_target)
+		return
 	if _sub_action == null:
 		return  # No active approach sub-action
 	if not is_instance_valid(_entry_tower) or not _entry_tower.is_inside_tree():
