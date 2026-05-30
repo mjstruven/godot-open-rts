@@ -18,6 +18,9 @@ radius = 1.5
 [sub_resource type="BoxShape3D" id="BoxShape3D_towerwalkwaynav"]
 size = Vector3(1.6, 0.1, 1.6)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_towerrampnav"]
+size = Vector3(1.4, 0.2, 3.05)
+
 [sub_resource type="NavigationMesh" id="NavigationMesh_towerwalkway"]
 geometry_parsed_geometry_type = 1
 geometry_collision_mask = 128
@@ -91,6 +94,15 @@ script = SubResource("GDScript_twbody")
 
 [node name="TowerWalkwayShape" type="CollisionShape3D" parent="TowerWallWalkwayBody"]
 shape = SubResource("BoxShape3D_towerwalkwaynav")
+
+[node name="TowerRampBody" type="StaticBody3D" parent="."]
+collision_layer = 128
+collision_mask = 0
+script = SubResource("GDScript_twbody")
+
+[node name="TowerRampShape" type="CollisionShape3D" parent="TowerRampBody"]
+transform = Transform3D(1, 0, 0, 0, 0.755, -0.656, 0, 0.656, 0.755, 0, 1.0, 0.35)
+shape = SubResource("BoxShape3D_towerrampnav")
 
 [node name="TowerWallWalkwayRegion" type="NavigationRegion3D" parent="."]
 navigation_mesh = SubResource("NavigationMesh_towerwalkway")
